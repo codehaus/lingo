@@ -18,7 +18,10 @@
 package org.agilasoft.lingo.jms.impl;
 
 import org.agilasoft.lingo.jms.JmsProducer;
+import org.agilasoft.lingo.jms.Requestor;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -34,10 +37,17 @@ import javax.jms.TemporaryTopic;
  * @version $Revision$
  */
 public class SingleThreadedRequestor extends OneWayRequestor {
+    private Connection connection;
     private Session session;
     private Destination temporaryDestination;
     private MessageConsumer receiver;
     private long maximumTimeout = 20000L;
+
+
+    public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination) throws JMSException {
+        JmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
+        return new SingleThreadedRequestor(producer.getSession(), producer, serverDestination);
+    }
 
     public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination) throws JMSException {
         super(producer, serverDestination);
@@ -77,6 +87,13 @@ public class SingleThreadedRequestor extends OneWayRequestor {
             ((TemporaryTopic) temporaryDestination).delete();
         }
         super.close();
+
+        if (connection != null) {
+            connection.close();
+        }
+        connection = null;
+        session = null;
+        temporaryDestination = null;
     }
 
     public long getMaximumTimeout() {

@@ -18,6 +18,7 @@
 package org.agilasoft.lingo.jms;
 
 import org.activemq.ActiveMQConnectionFactory;
+import org.activemq.message.ActiveMQQueue;
 import org.agilasoft.lingo.LingoRemoteInvocationFactory;
 import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
@@ -88,6 +89,34 @@ public class JmsRemotingTest extends JmsTestSupport {
         catch (IllegalAccessException ex) {
             // expected
         }
+    }
+
+    public void testJmsProxyFactoryBeanAndServiceExporterUsingSimpleConfiguration() throws Throwable {
+        TestBean target = new TestBean("myname", 99);
+        exporter = new JmsServiceExporter();
+        exporter.setServiceInterface(ITestBean.class);
+        exporter.setService(target);
+        exporter.setConnectionFactory(connectionFactory);
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
+
+        pfb = new JmsProxyFactoryBean();
+        pfb.setServiceInterface(ITestBean.class);
+        pfb.setConnectionFactory(connectionFactory);
+        pfb.setDestination(new ActiveMQQueue(getDestinationName()));
+        configure(pfb);
+
+        ITestBean proxy = (ITestBean) pfb.getObject();
+        assertEquals("myname", proxy.getName());
+        assertEquals(99, proxy.getAge());
+        proxy.setAge(50);
+
+        System.out.println("getting name: " + proxy.getName());
+        int age = proxy.getAge();
+        System.out.println("got age: " + age);
+
+        assertEquals("myname", proxy.getName());
+        assertEquals(50, proxy.getAge());
     }
 
     public void testJmsProxyFactoryBeanAndServiceExporterWithOneWays() throws Throwable {

@@ -17,8 +17,6 @@
  **/
 package org.agilasoft.lingo.jms.impl;
 
-import org.agilasoft.lingo.jms.JmsProducer;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -35,11 +33,16 @@ public class DefaultJmsProducer extends JmsProducerImpl {
 
     private Connection connection;
 
-    public static JmsProducer newInstance(ConnectionFactory factory) throws JMSException {
-        return newInstance(factory.createConnection());
+    public static DefaultJmsProducer newInstance(ConnectionFactory factory) throws JMSException {
+        Connection connection = factory.createConnection();
+
+        // lets start the connection in case that we consume on the same connection
+        connection.start();
+
+        return newInstance(connection);
     }
 
-    public static JmsProducer newInstance(Connection connection) throws JMSException {
+    public static DefaultJmsProducer newInstance(Connection connection) throws JMSException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageProducer producer = session.createProducer(null);
         return new DefaultJmsProducer(connection, session, producer);

@@ -19,6 +19,8 @@ package org.agilasoft.lingo.jms.impl;
 
 import org.agilasoft.lingo.jms.JmsProducer;
 import org.agilasoft.lingo.jms.Requestor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -31,6 +33,8 @@ import javax.jms.Session;
  * @version $Revision$
  */
 public class OneWayRequestor implements Requestor {
+    private static final Log log = LogFactory.getLog(OneWayRequestor.class);
+
     private JmsProducer producer;
     private Destination serverDestination;
     private long counter;
@@ -72,7 +76,9 @@ public class OneWayRequestor implements Requestor {
         if (destination == null) {
             destination = serverDestination;
         }
-        System.out.println("Sending message to: " + destination + " message: " + message);
+        if (log.isDebugEnabled()) {
+            log.debug("Sending message to: " + destination + " message: " + message);
+        }
         producer.getMessageProducer().send(destination, message);
     }
 

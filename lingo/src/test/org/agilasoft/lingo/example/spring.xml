@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- START SNIPPET: spring -->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <!-- client side proxy-->
+  <bean id="client" class="org.agilasoft.lingo.jms.JmsProxyFactoryBean">
+    <property name="serviceInterface">
+      <value>org.agilasoft.lingo.example.ExampleService</value>
+    </property>
+    <property name="connectionFactory">
+      <ref bean="jmsFactory"/>
+    </property>
+    <property name="destination">
+      <ref bean="exampleDestination"/>
+    </property>
+  </bean>
+
+  <!-- the server side -->
+  <bean id="server" class="org.agilasoft.lingo.jms.JmsServiceExporter">
+    <property name="service">
+      <bean class="org.agilasoft.lingo.example.ExampleServiceImpl"/>
+    </property>
+    <property name="serviceInterface">
+      <value>org.agilasoft.lingo.example.ExampleService</value>
+    </property>
+    <property name="connectionFactory">
+      <ref bean="jmsFactory"/>
+    </property>
+    <property name="destination">
+      <ref bean="exampleDestination"/>
+    </property>
+  </bean>
+
+  <!-- JMS ConnectionFactory to use -->
+  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL">
+      <value>vm://localhost</value>
+    </property>
+  </bean>
+
+  <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
+    <constructor-arg index="0">
+      <value>test.org.agilasoft.lingo.example</value>
+    </constructor-arg>
+  </bean>
+</beans>
+
+<!-- END SNIPPET: spring -->
