@@ -47,8 +47,8 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
     protected Object proxy;
     private boolean ignoreFailures;
     private Marshaller marshaller;
-    private MetadataStrategy metadataStrategy = new SimpleMetadataStrategy(true);
-    private RemoteInvocationFactory responseInvocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
+    private MetadataStrategy metadataStrategy;
+    private RemoteInvocationFactory responseInvocationFactory;
     private Requestor responseRequestor;
 
     public void afterPropertiesSet() throws Exception {
@@ -62,7 +62,12 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         if (marshaller == null) {
             marshaller = new DefaultMarshaller();
         }
-
+        if (metadataStrategy == null) {
+            metadataStrategy = new SimpleMetadataStrategy(true);
+        }
+        if (responseInvocationFactory == null) {
+            responseInvocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
+        }
     }
 
     public void onMessage(Message message) {
@@ -86,12 +91,30 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         }
     }
 
+    // Properties
+    //-------------------------------------------------------------------------
     public Requestor getResponseRequestor() {
         return responseRequestor;
     }
 
     public void setResponseRequestor(Requestor responseRequestor) {
         this.responseRequestor = responseRequestor;
+    }
+
+    public Marshaller getMarshaller() {
+        return marshaller;
+    }
+
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
+    }
+
+    public RemoteInvocationFactory getResponseInvocationFactory() {
+        return responseInvocationFactory;
+    }
+
+    public void setResponseInvocationFactory(RemoteInvocationFactory responseInvocationFactory) {
+        this.responseInvocationFactory = responseInvocationFactory;
     }
 
     public boolean isIgnoreFailures() {
@@ -105,6 +128,10 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
     public void setIgnoreFailures(boolean ignoreFailures) {
         this.ignoreFailures = ignoreFailures;
     }
+
+
+    // Implementation methods
+    //-------------------------------------------------------------------------
 
     /**
      * Send the given RemoteInvocationResult as a JMS message to the originator

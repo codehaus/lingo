@@ -40,14 +40,14 @@ public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
         exporter.setServiceInterface(ExampleService.class);
         exporter.setService(target);
         exporter.setProducer(createJmsProducer());
-        exporter.afterPropertiesSet();
-        subscribeToQueue(exporter, getQueueName());
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
 
         pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ExampleService.class);
         pfb.setServiceUrl("http://myurl");
         pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(new SimpleMetadataStrategy(true)));
-        pfb.setRequestor(createRequestor(getQueueName()));
+        pfb.setRequestor(createRequestor(getDestinationName()));
         pfb.afterPropertiesSet();
 
         ExampleService proxy = (ExampleService) pfb.getObject();
@@ -64,7 +64,7 @@ public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
     }
 
     protected Requestor createRequestor(String name) throws Exception {
-        Session session = createQueueSession();
+        Session session = createSession();
         JmsProducer producer = createJmsProducer();
         return new MultiplexingRequestor(session, producer, session.createQueue(name));
     }

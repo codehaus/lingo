@@ -17,7 +17,7 @@
  **/
 package org.agilasoft.lingo.jms.marshall;
 
-import org.agilasoft.lingo.MethodMetadata;
+import org.agilasoft.lingo.LingoInvocation;
 import org.agilasoft.lingo.jms.Requestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +39,7 @@ public class DefaultMarshaller implements Marshaller {
 
     private boolean ignoreInvalidMessages;
 
-    public Message createRequestMessage(Requestor requestor, RemoteInvocation invocation, MethodMetadata metadata) throws JMSException {
+    public Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException {
         return requestor.getSession().createObjectMessage(invocation);
     }
 
