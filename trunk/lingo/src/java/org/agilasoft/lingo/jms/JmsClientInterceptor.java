@@ -37,6 +37,7 @@ import org.springframework.remoting.support.RemoteInvocationBasedAccessor;
 import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -61,6 +62,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     private Destination destination;
     private String correlationID;
     private Marshaller marshaller;
+    private ConnectionFactory connectionFactory;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -108,7 +110,12 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
 
         }
         if (requestor == null) {
-            throw new IllegalArgumentException("requestor is required");
+            if (connectionFactory == null) {
+                throw new IllegalArgumentException("requestor or connectionFactory is required");
+            }
+            else {
+                requestor = MultiplexingRequestor.newInstance(connectionFactory, destination);
+            }
         }
         if (marshaller == null) {
             // default to standard JMS marshalling
@@ -148,6 +155,18 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
 
     public void setMarshaller(Marshaller marshaller) {
         this.marshaller = marshaller;
+    }
+
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    /**
+     * Used to create a default {@link Requestor} if no requestor is explicitly
+     * configured.
+     */
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
 
     // Implementation methods

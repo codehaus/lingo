@@ -17,14 +17,18 @@
  **/
 package org.agilasoft.lingo.jms;
 
+import org.agilasoft.lingo.jms.impl.DefaultJmsProducer;
 import org.agilasoft.lingo.jms.impl.OneWayRequestor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
 
 /**
  * A JMS MessageListener that exports the specified service bean as a JMS service
@@ -36,20 +40,40 @@ import javax.jms.Message;
  * @author James Strachan
  * @see JmsProxyFactoryBean
  */
-public class JmsServiceExporter extends JmsServiceExporterSupport implements InitializingBean {
-    private static final Log log = LogFactory.getLog(JmsServiceExporter.class);
-
+public class JmsServiceExporter extends JmsServiceExporterSupport implements InitializingBean, DisposableBean {
     private JmsProducer producer;
+    private ConnectionFactory connectionFactory;
+    private Destination destination;
+    private MessageConsumer consumer;
 
     public void afterPropertiesSet() throws Exception {
         if (producer == null) {
-            throw new IllegalArgumentException("template is required");
+            if (connectionFactory == null) {
+                throw new IllegalArgumentException("requestor or connectionFactory is required");
+            }
+            else {
+                producer = DefaultJmsProducer.newInstance(connectionFactory);
+            }
         }
         Requestor responseRequestor = getResponseRequestor();
         if (responseRequestor == null) {
             setResponseRequestor(new OneWayRequestor(producer, null));
         }
+
+        // do we have a destination specified, if so consume
+        if (destination != null) {
+            Session session = producer.getSession();
+            consumer = session.createConsumer(destination);
+            consumer.setMessageListener(this);
+        }
+
         super.afterPropertiesSet();
+    }
+
+    public void destroy() throws Exception {
+        if (consumer != null) {
+            consumer.close();
+        }
     }
 
     public JmsProducer getProducer() {
@@ -58,6 +82,29 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
 
     public void setProducer(JmsProducer producer) {
         this.producer = producer;
+    }
+
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    /**
+     * Used to create a default {@link JmsProducer} if no producer is explicitly
+     * configured.
+     */
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    public Destination getDestination() {
+        return destination;
+    }
+
+    /**
+     * If specified then the service will be auto-subscribed to this destination
+     */
+    public void setDestination(Destination destination) {
+        this.destination = destination;
     }
 
     /**

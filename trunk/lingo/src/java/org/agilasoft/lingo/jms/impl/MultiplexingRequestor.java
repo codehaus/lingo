@@ -21,9 +21,11 @@ import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 import org.agilasoft.lingo.jms.FailedToProcessResponse;
 import org.agilasoft.lingo.jms.JmsProducer;
 import org.agilasoft.lingo.jms.ReplyHandler;
+import org.agilasoft.lingo.jms.Requestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -46,6 +48,12 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
     private static final Log log = LogFactory.getLog(MultiplexingRequestor.class);
 
     private Map requests = new HashMap();
+
+
+    public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination) throws JMSException {
+        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
+        return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination);
+    }
 
     public MultiplexingRequestor(Session session, JmsProducer producer, Destination destination) throws JMSException {
         super(session, producer, destination);
@@ -127,6 +135,5 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         answer.setLinkedException(e);
         return answer;
     }
-
 
 }
