@@ -40,8 +40,8 @@
   <distributionDirectory>/home/projects/lingo/dist</distributionDirectory>
 
   <repository>
-    <connection>scm:cvs:pserver:anonymous@cvs.lingo.codehaus.org:/home/projects/lingo/scm:lingo</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.lingo.codehaus.org:/home/projects/lingo/scm:lingo</developerConnection>
+    <connection>scm:cvs:pserver:anonymous@beaver.codehaus.org:/home/projects/lingo/scm:lingo</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@beaver.codehaus.org:/home/projects/lingo/scm:lingo</developerConnection>
     <url>http://cvs.lingo.codehaus.org/lingo/</url>
   </repository>
 
@@ -118,6 +118,11 @@
       <artifactId>cglib-full</artifactId>
       <version>2.0.2</version>
     </dependency>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <id>aopalliance</id>
+      <version>1.0</version>
+    </dependency>
 
 
     <!-- lets use freely distributable J2EE jars -->
@@ -147,16 +152,16 @@
       <version>1.5-rc1</version>
     </dependency>
 
-    <dependency>
-      <groupId>aopalliance</groupId>
-      <id>aopalliance</id>
-      <version>1.0</version>
-    </dependency>
-
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>2.2-SNAPSHOT</version>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
+    <!-- default XML marshaller -->
+    <dependency>
+      <id>xstream</id>
+      <version>1.1.1</version>
     </dependency>
 
     <!-- for unit test cases -->

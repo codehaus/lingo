@@ -22,6 +22,8 @@ import org.agilasoft.lingo.LingoRemoteInvocationFactory;
 import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.MethodMetadata;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
+import org.agilasoft.lingo.jms.marshall.DefaultMarshaller;
+import org.agilasoft.lingo.jms.marshall.Marshaller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -44,7 +46,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
 
     protected Object proxy;
     private boolean ignoreFailures;
-    private RemoteInvocationReader invocationReader = new RemoteInvocationReader();
+    private Marshaller marshaller;
     private MetadataStrategy metadataStrategy = new SimpleMetadataStrategy(true);
     private RemoteInvocationFactory responseInvocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
     private Requestor responseRequestor;
@@ -57,11 +59,15 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         if (responseRequestor == null) {
             throw new IllegalArgumentException("responseRequestor is required");
         }
+        if (marshaller == null) {
+            marshaller = new DefaultMarshaller();
+        }
+
     }
 
     public void onMessage(Message message) {
         try {
-            RemoteInvocation invocation = invocationReader.readRemoteInvocation(message);
+            RemoteInvocation invocation = marshaller.readRemoteInvocation(message);
             if (invocation != null) {
                 boolean oneway = false;
                 if (invocation instanceof LingoInvocation) {

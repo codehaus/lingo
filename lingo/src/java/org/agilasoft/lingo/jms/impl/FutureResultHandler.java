@@ -15,14 +15,15 @@
  * limitations under the License. 
  * 
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
 
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+import org.agilasoft.lingo.jms.ReplyHandler;
 
 import javax.jms.Message;
 
 /**
- * A {@link FutureResult} which implements {@link ReplyHandler} so that it can be used as a handler
+ * A {@link FutureResult} which implements {@link org.agilasoft.lingo.jms.ReplyHandler} so that it can be used as a handler
  * for a correlation ID
  *
  * @version $Revision$

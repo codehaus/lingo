@@ -15,7 +15,9 @@
  * limitations under the License.
  *
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
+
+import org.agilasoft.lingo.jms.JmsProducer;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -26,7 +28,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 /**
- * A simple {@link Requestor} which can only be used by one thread at once
+ * A simple {@link org.agilasoft.lingo.jms.Requestor} which can only be used by one thread at once
  * and only used for one message exchange at once.
  *
  * @version $Revision$

@@ -17,6 +17,7 @@
  **/
 package org.agilasoft.lingo.jms;
 
+import org.agilasoft.lingo.jms.impl.OneWayRequestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;

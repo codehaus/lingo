@@ -23,13 +23,16 @@ import org.agilasoft.lingo.LingoRemoteInvocationFactory;
 import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.MethodMetadata;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
+import org.agilasoft.lingo.jms.impl.AsyncReplyHandler;
+import org.agilasoft.lingo.jms.impl.MultiplexingRequestor;
+import org.agilasoft.lingo.jms.marshall.DefaultMarshaller;
+import org.agilasoft.lingo.jms.marshall.Marshaller;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationBasedAccessor;
 import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -37,7 +40,6 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.ObjectMessage;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -58,6 +60,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     private Requestor requestor;
     private Destination destination;
     private String correlationID;
+    private Marshaller marshaller;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -81,7 +84,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         MethodMetadata metadata = invocation.getMetadata();
         replaceRemoteReferences(invocation, metadata);
         try {
-            Message requestMessage = createRequestMessage(invocation, metadata);
+            Message requestMessage = marshaller.createRequestMessage(requestor, invocation, metadata);
             populateHeaders(requestMessage);
             if (metadata.isOneWay()) {
                 requestor.oneWay(destination, requestMessage);
@@ -89,7 +92,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
             }
             else {
                 Message response = requestor.request(destination, requestMessage);
-                RemoteInvocationResult result = extractInvocationResult(response);
+                RemoteInvocationResult result = marshaller.extractInvocationResult(response);
                 return recreateRemoteInvocationResult(result);
             }
         }
@@ -106,6 +109,10 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         }
         if (requestor == null) {
             throw new IllegalArgumentException("requestor is required");
+        }
+        if (marshaller == null) {
+            // default to standard JMS marshalling
+            marshaller = new DefaultMarshaller();
         }
     }
 
@@ -134,43 +141,22 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     public void setCorrelationID(String correlationID) {
         this.correlationID = correlationID;
     }
-    
+
+    public Marshaller getMarshaller() {
+        return marshaller;
+    }
+
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
+    }
+
     // Implementation methods
     //-------------------------------------------------------------------------
-
-    /**
-     * Creates the request message
-     *
-     * @param invocation the remote invocation to send
-     * @param metadata
-     * @throws javax.jms.JMSException if the message could not be created
-     */
-    protected Message createRequestMessage(RemoteInvocation invocation, MethodMetadata metadata) throws JMSException {
-        return requestor.getSession().createObjectMessage(invocation);
-    }
 
     protected void populateHeaders(Message requestMessage) throws JMSException {
         if (correlationID != null) {
             requestMessage.setJMSCorrelationID(correlationID);
         }
-    }
-
-    /**
-     * Extracts the invocation result from the response message
-     *
-     * @param message the response message
-     * @return the invocation result
-     * @throws javax.jms.JMSException is thrown if a JMS exception occurs
-     */
-    protected RemoteInvocationResult extractInvocationResult(Message message) throws JMSException {
-        if (message instanceof ObjectMessage) {
-            ObjectMessage objectMessage = (ObjectMessage) message;
-            Object body = objectMessage.getObject();
-            if (body instanceof RemoteInvocationResult) {
-                return (RemoteInvocationResult) body;
-            }
-        }
-        return onInvalidMessage(message);
     }
 
 
@@ -210,7 +196,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         }
         if (requestor instanceof MultiplexingRequestor) {
             MultiplexingRequestor multiplexingRequestor = (MultiplexingRequestor) requestor;
-            multiplexingRequestor.registerHandler(correlationID, new AsyncReplyHandler(value));
+            multiplexingRequestor.registerHandler(correlationID, new AsyncReplyHandler(value, marshaller));
         }
         else {
             throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");
@@ -232,10 +218,6 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
      */
     protected MetadataStrategy createMetadataStrategy() {
         return new SimpleMetadataStrategy();
-    }
-
-    protected RemoteInvocationResult onInvalidMessage(Message message) throws JMSException {
-        throw new JMSException("Invalid response message: " + message);
     }
 
 }

@@ -22,6 +22,7 @@ import org.agilasoft.lingo.SimpleMetadataStrategy;
 import org.agilasoft.lingo.example.ExampleService;
 import org.agilasoft.lingo.example.ExampleServiceImpl;
 import org.agilasoft.lingo.example.TestResultListener;
+import org.agilasoft.lingo.jms.impl.MultiplexingRequestor;
 
 import javax.jms.Session;
 import java.util.List;

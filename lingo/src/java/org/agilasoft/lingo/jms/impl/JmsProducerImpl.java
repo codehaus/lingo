@@ -15,16 +15,17 @@
  * limitations under the License. 
  * 
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
 
+import org.agilasoft.lingo.jms.JmsProducer;
 import org.springframework.beans.factory.DisposableBean;
 
+import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.JMSException;
 
 /**
- * An implementation of the {@link JmsProducer} which is designed to work in
+ * An implementation of the {@link org.agilasoft.lingo.jms.JmsProducer} which is designed to work in
  * message driven POJO type scenarios where the session and producer can be deduced
  * from the current consumption thread & the session can be reused from the consumer.
  *

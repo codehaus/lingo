@@ -15,8 +15,10 @@
  * limitations under the License. 
  * 
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
 
+import org.agilasoft.lingo.jms.ReplyHandler;
+import org.agilasoft.lingo.jms.marshall.Marshaller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -33,14 +35,15 @@ public class AsyncReplyHandler extends RemoteInvocationBasedExporter implements 
     private static final Log log = LogFactory.getLog(AsyncReplyHandler.class);
 
     private Object pojo;
-    private RemoteInvocationReader invocationReader = new RemoteInvocationReader();
+    private Marshaller marshaller;
 
-    public AsyncReplyHandler(Object pojo) {
+    public AsyncReplyHandler(Object pojo, Marshaller marshaller) {
         this.pojo = pojo;
+        this.marshaller = marshaller;
     }
 
     public boolean handle(Message message) throws JMSException {
-        RemoteInvocation invocation = invocationReader.readRemoteInvocation(message);
+        RemoteInvocation invocation = marshaller.readRemoteInvocation(message);
         try {
             invoke(invocation, pojo);
         }

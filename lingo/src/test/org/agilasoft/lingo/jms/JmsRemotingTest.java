@@ -24,6 +24,8 @@ import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
 import org.agilasoft.lingo.beans.ITestBean;
 import org.agilasoft.lingo.beans.TestBean;
+import org.agilasoft.lingo.jms.impl.DefaultJmsProducer;
+import org.agilasoft.lingo.jms.impl.SingleThreadedRequestor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.support.DefaultRemoteInvocationExecutor;
