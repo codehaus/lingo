@@ -21,6 +21,8 @@ import junit.framework.TestCase;
 
 import java.lang.reflect.Method;
 
+import org.agilasoft.lingo.example.ExampleService;
+
 /**
  * @version $Revision$
  */

@@ -15,20 +15,16 @@
  * limitations under the License.
  *
  **/
-package org.agilasoft.lingo;
-
-import java.util.EventListener;
+package org.agilasoft.lingo.example;
 
 /**
- * An example asynchronous notification listener which
- * can be passed as a parameter across lingo
- *
  * @version $Revision$
  */
-public interface ResultListener extends EventListener {
-    public void onResult(String data);
+public interface ExampleService {
+    public void someOneWayMethod(String name, int age);
 
-    // lifecycle end methods
-    public void stop();
-    public void onException(Exception e);
+    public int regularRPC(String name);
+    public void anotherRPC() throws Exception;
+
+    public void asyncRequestResponse(String stock, ResultListener listener);
 }

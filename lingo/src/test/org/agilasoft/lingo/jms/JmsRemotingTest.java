@@ -19,12 +19,12 @@ package org.agilasoft.lingo.jms;
 
 import junit.framework.TestCase;
 import org.activemq.ActiveMQConnectionFactory;
-import org.aopalliance.intercept.MethodInvocation;
 import org.agilasoft.lingo.LingoRemoteInvocationFactory;
 import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
 import org.agilasoft.lingo.beans.ITestBean;
 import org.agilasoft.lingo.beans.TestBean;
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.support.DefaultRemoteInvocationExecutor;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -67,13 +67,7 @@ public class JmsRemotingTest extends TestCase {
 
         ITestBean proxy = (ITestBean) pfb.getObject();
         assertEquals("myname", proxy.getName());
-        /*
         assertEquals(99, proxy.getAge());
-        assertEquals(99, proxy.getAge());
-        assertEquals(99, proxy.getAge());
-        assertEquals(99, proxy.getAge());
-        System.out.println("getting name: " + proxy.getName());
-        */
         proxy.setAge(50);
 
         System.out.println("getting name: " + proxy.getName());
@@ -86,13 +80,59 @@ public class JmsRemotingTest extends TestCase {
         try {
             proxy.exceptional(new IllegalStateException());
             fail("Should have thrown IllegalStateException");
-        } catch (IllegalStateException ex) {
+        }
+        catch (IllegalStateException ex) {
             // expected
         }
         try {
             proxy.exceptional(new IllegalAccessException());
             fail("Should have thrown IllegalAccessException");
-        } catch (IllegalAccessException ex) {
+        }
+        catch (IllegalAccessException ex) {
+            // expected
+        }
+    }
+
+    public void testJmsProxyFactoryBeanAndServiceExporterWithOneWays() throws Throwable {
+        TestBean target = new TestBean("myname", 99);
+        exporter = new JmsServiceExporter();
+        exporter.setServiceInterface(ITestBean.class);
+        exporter.setService(target);
+        exporter.setProducer(createJmsProducer());
+        exporter.afterPropertiesSet();
+        subscribeToQueue(exporter, getQueueName());
+
+        pfb = new JmsProxyFactoryBean();
+        pfb.setServiceInterface(ITestBean.class);
+        pfb.setServiceUrl("http://myurl");
+        pfb.setRequestor(createRequestor(getQueueName()));
+        pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(new SimpleMetadataStrategy(true)));
+        pfb.afterPropertiesSet();
+
+        ITestBean proxy = (ITestBean) pfb.getObject();
+        assertEquals("myname", proxy.getName());
+        assertEquals(99, proxy.getAge());
+        proxy.setAge(50);
+
+        System.out.println("getting name: " + proxy.getName());
+        int age = proxy.getAge();
+        System.out.println("got age: " + age);
+
+        assertEquals("myname", proxy.getName());
+        assertEquals(50, proxy.getAge());
+
+        try {
+            proxy.exceptional(new IllegalStateException());
+            fail("Should have thrown IllegalStateException");
+        }
+        catch (IllegalStateException ex) {
+            // expected
+        }
+        try {
+            proxy.exceptional(new IllegalAccessException());
+            fail("Should have thrown IllegalAccessException");
+        }
+        catch (IllegalAccessException ex) {
             // expected
         }
     }
@@ -119,7 +159,8 @@ public class JmsRemotingTest extends TestCase {
         try {
             proxy.setAge(50);
             fail("Should have thrown RemoteAccessException");
-        } catch (RemoteAccessException ex) {
+        }
+        catch (RemoteAccessException ex) {
             // expected
             assertTrue(ex.getCause() instanceof JMSException);
         }
@@ -156,7 +197,8 @@ public class JmsRemotingTest extends TestCase {
                 try {
                     invocation.addAttribute("myKey", "myValue");
                     fail("Should have thrown IllegalStateException");
-                } catch (IllegalStateException ex) {
+                }
+                catch (IllegalStateException ex) {
                     // expected: already defined
                 }
                 assertNotNull(invocation.getAttributes());
@@ -230,7 +272,8 @@ public class JmsRemotingTest extends TestCase {
         try {
             proxy.setAge(50);
             fail("Should have thrown RemoteAccessException");
-        } catch (RemoteAccessException ex) {
+        }
+        catch (RemoteAccessException ex) {
             // expected
             assertTrue(ex.getCause() instanceof JMSException);
         }
