@@ -40,11 +40,15 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
 
     private JmsProducer producer;
 
-    public void afterPropertiesSet() {
-        super.afterPropertiesSet();
+    public void afterPropertiesSet() throws Exception {
         if (producer == null) {
             throw new IllegalArgumentException("template is required");
         }
+        Requestor responseRequestor = getResponseRequestor();
+        if (responseRequestor == null) {
+            setResponseRequestor(new OneWayRequestor(producer, null));
+        }
+        super.afterPropertiesSet();
     }
 
     public JmsProducer getProducer() {

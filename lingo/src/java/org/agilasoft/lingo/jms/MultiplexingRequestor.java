@@ -20,13 +20,11 @@ package org.agilasoft.lingo.jms;
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.agilasoft.lingo.jms.FailedToProcessResponse;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +42,6 @@ import java.util.Map;
 public class MultiplexingRequestor extends SingleThreadedRequestor implements MessageListener {
     private static final Log log = LogFactory.getLog(MultiplexingRequestor.class);
 
-    private long counter;
     private Map requests = new HashMap();
 
     public MultiplexingRequestor(Session session, JmsProducer producer, Destination destination) throws JMSException {
@@ -52,12 +49,12 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         getReceiver().setMessageListener(this);
     }
 
-    public Message request(Message message) throws JMSException {
+    public Message request(Destination destination, Message message) throws JMSException {
         long timeout = getMaximumTimeout();
-        return request(message, timeout);
+        return request(destination, message, timeout);
     }
 
-    public Message request(Message message, long timeout) throws JMSException {
+    public Message request(Destination destination, Message message, long timeout) throws JMSException {
         // lets create a correlationID
         String correlationID = createCorrelationID();
         FutureResult future = new FutureResult();
@@ -65,7 +62,7 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
             requests.put(correlationID, future);
         }
         message.setJMSCorrelationID(correlationID);
-        oneWay(message);
+        oneWay(destination, message);
 
         try {
             if (timeout < 0) {
@@ -110,21 +107,6 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
 
     // Implementation methods
     //-------------------------------------------------------------------------
-
-    /**
-     * Creates a new correlation ID. Note that because the correlationID is used
-     * on a per-temporary destination basis, it does not need to be unique across
-     * more than one destination. So a simple counter will suffice.
-     *
-     * @return
-     */
-    protected String createCorrelationID() {
-        return Long.toString(nextCounter());
-    }
-
-    protected synchronized long nextCounter() {
-        return ++counter;
-    }
 
     protected JMSException createJMSException(Exception e) {
         JMSException answer = new JMSException(e.toString());

@@ -46,8 +46,10 @@ public class JmsRemotingTest extends TestCase {
     private ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
     private QueueConnection connection;
     private MetadataStrategy strategy;
-    private JmsServiceExporter exporter;
-    private JmsProxyFactoryBean pfb;
+
+    protected JmsServiceExporter exporter;
+    protected JmsProxyFactoryBean pfb;
+
 
     public void testJmsProxyFactoryBeanAndServiceExporter() throws Throwable {
         TestBean target = new TestBean("myname", 99);

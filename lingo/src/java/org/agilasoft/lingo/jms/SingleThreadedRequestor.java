@@ -17,9 +17,13 @@
  **/
 package org.agilasoft.lingo.jms;
 
-import org.agilasoft.lingo.jms.Requestor;
-
-import javax.jms.*;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TemporaryTopic;
 
 /**
  * A simple {@link Requestor} which can only be used by one thread at once
@@ -27,35 +31,27 @@ import javax.jms.*;
  *
  * @version $Revision$
  */
-public class SingleThreadedRequestor implements Requestor {
+public class SingleThreadedRequestor extends OneWayRequestor {
     private Session session;
-    private Destination destination;
     private Destination temporaryDestination;
-    private JmsProducer producer;
     private MessageConsumer receiver;
     private long maximumTimeout = 20000L;
 
-    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination destination) throws JMSException {
+    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination) throws JMSException {
+        super(producer, serverDestination);
         this.session = session;
-        this.producer = producer;
-        this.destination = destination;
         temporaryDestination = createTemporaryDestination(session);
         receiver = session.createConsumer(temporaryDestination);
     }
 
-    public void oneWay(Message message) throws JMSException {
-        populateHeaders(message);
-        doSend(destination, message);
-    }
-
-    public Message request(Message message) throws JMSException {
-        oneWay(message);
+    public Message request(Destination destination, Message message) throws JMSException {
+        oneWay(destination, message);
         long timeout = getMaximumTimeout();
         return receive(timeout);
     }
 
-    public Message request(Message message, long timeout) throws JMSException {
-        oneWay(message);
+    public Message request(Destination destination, Message message, long timeout) throws JMSException {
+        oneWay(destination, message);
         return receive(timeout);
     }
 
@@ -69,10 +65,6 @@ public class SingleThreadedRequestor implements Requestor {
         return receiver.receive(timeout);
     }
 
-    public Session getSession() {
-        return session;
-    }
-
     public void close() throws JMSException {
         // producer and consumer created by constructor are implicitly closed.
         session.close();
@@ -82,7 +74,7 @@ public class SingleThreadedRequestor implements Requestor {
         else if (temporaryDestination instanceof TemporaryTopic) {
             ((TemporaryTopic) temporaryDestination).delete();
         }
-        producer.close();
+        super.close();
     }
 
     public long getMaximumTimeout() {
@@ -99,21 +91,18 @@ public class SingleThreadedRequestor implements Requestor {
         this.maximumTimeout = maximumTimeout;
     }
 
+    // Implementation methods
+    //-------------------------------------------------------------------------
     protected TemporaryQueue createTemporaryDestination(Session session) throws JMSException {
         return session.createTemporaryQueue();
     }
 
-    // Implementation methods
-    //-------------------------------------------------------------------------
     protected void populateHeaders(Message message) throws JMSException {
         message.setJMSReplyTo(temporaryDestination);
-    }
-
-    protected void doSend(Destination destination, Message message) throws JMSException {
-        producer.getMessageProducer().send(destination, message);
     }
 
     protected MessageConsumer getReceiver() {
         return receiver;
     }
+
 }

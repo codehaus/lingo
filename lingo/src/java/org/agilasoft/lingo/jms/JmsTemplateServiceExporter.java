@@ -17,24 +17,16 @@
  **/
 package org.agilasoft.lingo.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
-import org.springframework.jms.JmsException;
-import org.springframework.remoting.support.RemoteInvocation;
-import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.remoting.support.RemoteInvocationResult;
-import org.springframework.core.NestedRuntimeException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
 import javax.jms.Session;
-import javax.jms.MessageNotReadableException;
 
 /**
  * A JMS MessageListener that exports the specified service bean as a JMS service
@@ -51,7 +43,7 @@ public class JmsTemplateServiceExporter extends JmsServiceExporterSupport implem
 
     private JmsTemplate template;
 
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws Exception {
         super.afterPropertiesSet();
         if (template == null) {
             throw new IllegalArgumentException("template is required");
@@ -64,6 +56,7 @@ public class JmsTemplateServiceExporter extends JmsServiceExporterSupport implem
 
     /**
      * Sets the JMS template used to send replies back for the request
+     *
      * @param template the JMS template to use
      */
     public void setTemplate(JmsTemplate template) {

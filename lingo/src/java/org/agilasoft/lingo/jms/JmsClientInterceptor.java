@@ -18,13 +18,13 @@
 
 package org.agilasoft.lingo.jms;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.agilasoft.lingo.LingoInvocation;
 import org.agilasoft.lingo.LingoRemoteInvocationFactory;
 import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.MethodMetadata;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,9 +34,12 @@ import org.springframework.remoting.support.RemoteInvocationBasedAccessor;
 import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Interceptor for accessing a JMS based service which must be configured with a
@@ -51,8 +54,9 @@ import javax.jms.ObjectMessage;
 public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         implements MethodInterceptor, InitializingBean, DisposableBean {
 
-
+    private Map remoteObjects = new WeakHashMap();
     private Requestor requestor;
+    private Destination destination;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -74,14 +78,15 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         }
         LingoInvocation invocation = (LingoInvocation) createRemoteInvocation(methodInvocation);
         MethodMetadata metadata = invocation.getMetadata();
+        replaceRemoteReferences(invocation, metadata);
         try {
             Message requestMessage = createRequestMessage(invocation, metadata);
             if (metadata.isOneWay()) {
-                requestor.oneWay(requestMessage);
+                requestor.oneWay(destination, requestMessage);
                 return null;
             }
             else {
-                Message response = requestor.request(requestMessage);
+                Message response = requestor.request(destination, requestMessage);
                 RemoteInvocationResult result = extractInvocationResult(response);
                 return recreateRemoteInvocationResult(result);
             }
@@ -116,6 +121,13 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         this.requestor = requestor;
     }
 
+    public Destination getDestination() {
+        return destination;
+    }
+
+    public void setDestination(Destination destination) {
+        this.destination = destination;
+    }
 
     // Implementation methods
     //-------------------------------------------------------------------------
@@ -163,6 +175,28 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
      */
     protected Object recreateRemoteInvocationResult(RemoteInvocationResult result) throws Throwable {
         return result.recreate();
+    }
+
+    protected void replaceRemoteReferences(LingoInvocation invocation, MethodMetadata metadata) {
+        Object[] arguments = invocation.getArguments();
+        Class[] parameterTypes = invocation.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (metadata.isRemoteParameter(i)) {
+                arguments[i] = remoteReference(parameterTypes[i], arguments[i]);
+            }
+        }
+    }
+
+    protected Object remoteReference(Class type, Object value) {
+        if (value == null) {
+            return null;
+        }
+        String correlationID = (String) remoteObjects.get(value);
+        if (correlationID == null) {
+            correlationID = requestor.createCorrelationID();
+            remoteObjects.put(value, correlationID);
+        }
+        return correlationID;
     }
 
     /**

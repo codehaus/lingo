@@ -17,8 +17,9 @@
  **/
 package org.agilasoft.lingo.jms;
 
-import javax.jms.Message;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
 
 /**
@@ -32,32 +33,37 @@ public interface Requestor {
 
     /**
      * Sends a one way message, not waiting for the response.
+     *
+     * @param destination the server side destination
+     * @param message     the message to send
      */
-    void oneWay(Message message) throws JMSException;
+    void oneWay(Destination destination, Message message) throws JMSException;
 
     /**
      * Sends a request and waits for a reply. The temporary queue is used for
      * the <CODE>JMSReplyTo</CODE> destination, and only one reply per request
      * is expected.
      *
-     * @param message the message to send
+     * @param destination the server side destination
+     * @param message     the message to send
      * @return the reply message
      * @throws javax.jms.JMSException if the JMS provider fails to complete the
-     *                      request due to some internal error.
+     *                                request due to some internal error.
      */
-    Message request(Message message) throws JMSException;
+    Message request(Destination destination, Message message) throws JMSException;
 
     /**
      * Sends a request and waits for a reply up to a maximum timeout. The temporary queue is used for
      * the <CODE>JMSReplyTo</CODE> destination, and only one reply per request
      * is expected.
      *
-     * @param message the message to send
+     * @param destination the server side destination
+     * @param message     the message to send
      * @return the reply message
      * @throws javax.jms.JMSException if the JMS provider fails to complete the
-     *                      request due to some internal error.
+     *                                request due to some internal error.
      */
-    Message request(Message message, long timeout) throws JMSException;
+    Message request(Destination destination, Message message, long timeout) throws JMSException;
 
     /**
      * Receives a message waiting for a maximum timeout if the timeout value
@@ -85,8 +91,17 @@ public interface Requestor {
      * passed to the <CODE>Requestor</CODE> constructor.
      *
      * @throws javax.jms.JMSException if the JMS provider fails to close the
-     *                      <CODE>Requestor</CODE> due to some internal
-     *                      error.
+     *                                <CODE>Requestor</CODE> due to some internal
+     *                                error.
      */
     void close() throws JMSException;
+
+    /**
+     * Creates a new correlation ID. Note that because the correlationID is used
+     * on a per-temporary destination basis, it does not need to be unique across
+     * more than one destination. So a simple counter will suffice.
+     *
+     * @return
+     */
+    String createCorrelationID();
 }
