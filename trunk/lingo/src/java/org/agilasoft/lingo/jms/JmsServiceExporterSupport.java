@@ -23,6 +23,7 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.beans.factory.InitializingBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.agilasoft.lingo.LingoInvocation;
 
 import javax.jms.MessageListener;
 import javax.jms.Message;
@@ -52,7 +53,9 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
             RemoteInvocation invocation = readRemoteInvocation(message);
             if (invocation != null) {
                 RemoteInvocationResult result = invokeAndCreateResult(invocation, this.proxy);
-                writeRemoteInvocationResult(message, result);
+                if (!isOneWay(invocation)) {
+                    writeRemoteInvocationResult(message, result);
+                }
             }
         }
         catch (JMSException e) {
@@ -121,11 +124,22 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
     protected Message createResponseMessage(Session session, Message message, RemoteInvocationResult result) throws JMSException {
         // an alternative strategy could be to use XStream and text messages
         // though some JMS providers, like ActiveMQ, might do this kind of thing for us under the covers
+        if (result == null) {
+            throw new IllegalArgumentException("result cannot be null");
+        }
         ObjectMessage answer = session.createObjectMessage(result);
 
         // lets preserve the correlation ID
         answer.setJMSCorrelationID(message.getJMSCorrelationID());
         return answer;
+    }
+
+    protected boolean isOneWay(RemoteInvocation invocation) {
+        if (invocation instanceof LingoInvocation) {
+            LingoInvocation lingoInvocation = (LingoInvocation) invocation;
+            return lingoInvocation.getMetadata().isOneWay();
+        }
+        return false;
     }
 
     /**
