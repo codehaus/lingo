@@ -47,6 +47,8 @@ public class ExampleTest extends TestCase {
         TestResultListener listener = new TestResultListener();
         service.asyncRequestResponse("IBM", listener);
 
+        // the server side will now invoke the listener
+        // objects's methods asynchronously
         // END SNIPPET: simple
 
         listener.waitForAsyncResponses(2);
