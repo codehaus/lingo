@@ -17,8 +17,12 @@
   <package>org.agilasoft.lingo</package>
   <packageGroups>
     <packageGroup>
-      <title>Core Lingo API</title>
+      <title>Core Lingo classes and API for Metadata Strategy</title>
       <packages>org.agilasoft.lingo</packages>
+    </packageGroup>
+    <packageGroup>
+      <title>JMS based binding for Lingo</title>
+      <packages>org.agilasoft.lingo.jms:org.agilasoft.lingo.jms.*</packages>
     </packageGroup>
   </packageGroups>
 
