@@ -17,7 +17,7 @@
  **/
 package org.agilasoft.lingo.jms.marshall;
 
-import org.agilasoft.lingo.MethodMetadata;
+import org.agilasoft.lingo.LingoInvocation;
 import org.agilasoft.lingo.jms.Requestor;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -34,10 +34,9 @@ public interface Marshaller {
      *
      * @param requestor
      * @param invocation the remote invocation to send
-     * @param metadata
      * @throws javax.jms.JMSException if the message could not be created
      */
-    Message createRequestMessage(Requestor requestor, RemoteInvocation invocation, MethodMetadata metadata) throws JMSException;
+    Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException;
 
     /**
      * Extracts the invocation result from the response message

@@ -84,7 +84,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         MethodMetadata metadata = invocation.getMetadata();
         replaceRemoteReferences(invocation, metadata);
         try {
-            Message requestMessage = marshaller.createRequestMessage(requestor, invocation, metadata);
+            Message requestMessage = marshaller.createRequestMessage(requestor, invocation);
             populateHeaders(requestMessage);
             if (metadata.isOneWay()) {
                 requestor.oneWay(destination, requestMessage);

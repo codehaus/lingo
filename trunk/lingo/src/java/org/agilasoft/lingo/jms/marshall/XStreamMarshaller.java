@@ -17,6 +17,16 @@
  **/
 package org.agilasoft.lingo.jms.marshall;
 
+import com.thoughtworks.xstream.XStream;
+import org.agilasoft.lingo.LingoInvocation;
+import org.agilasoft.lingo.jms.Requestor;
+import org.springframework.remoting.support.RemoteInvocation;
+import org.springframework.remoting.support.RemoteInvocationResult;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+
 
 /**
  * Uses XStream to marshall requests and responses into and out of messages.
@@ -24,5 +34,60 @@ package org.agilasoft.lingo.jms.marshall;
  * @version $Revision$
  */
 public class XStreamMarshaller extends DefaultMarshaller {
+    private XStream xStream;
+
+    public Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException {
+        String xml = toXML(invocation);
+        return requestor.getSession().createTextMessage(xml);
+    }
+
+    public RemoteInvocationResult extractInvocationResult(Message message) throws JMSException {
+        if (message instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) message;
+            String text = textMessage.getText();
+            return (RemoteInvocationResult) fromXML(text);
+        }
+        return super.extractInvocationResult(message);
+    }
+
+    public RemoteInvocation readRemoteInvocation(Message message) throws JMSException {
+        if (message instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) message;
+            String text = textMessage.getText();
+            return (RemoteInvocation) fromXML(text);
+        }
+        return super.readRemoteInvocation(message);
+    }
+
+
+    // Properties
+    //-------------------------------------------------------------------------
+    public XStream getXStream() {
+        if (xStream == null) {
+            xStream = createXStream();
+        }
+        return xStream;
+    }
+
+    public void setXStream(XStream xStream) {
+        this.xStream = xStream;
+    }
+
+    // Implementation methods
+    //-------------------------------------------------------------------------
+    protected XStream createXStream() {
+        XStream answer = new XStream();
+        answer.alias("invoke", LingoInvocation.class);
+        return answer;
+    }
+
+    protected Object fromXML(String xml) {
+        return getXStream().fromXML(xml);
+    }
+
+    protected String toXML(Object object) {
+        return getXStream().toXML(object);
+    }
+
 
 }

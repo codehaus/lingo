@@ -17,15 +17,12 @@
  **/
 package org.agilasoft.lingo.jms;
 
-import junit.framework.TestCase;
 import org.activemq.ActiveMQConnectionFactory;
 import org.agilasoft.lingo.LingoRemoteInvocationFactory;
 import org.agilasoft.lingo.MetadataStrategy;
 import org.agilasoft.lingo.SimpleMetadataStrategy;
 import org.agilasoft.lingo.beans.ITestBean;
 import org.agilasoft.lingo.beans.TestBean;
-import org.agilasoft.lingo.jms.impl.DefaultJmsProducer;
-import org.agilasoft.lingo.jms.impl.SingleThreadedRequestor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.support.DefaultRemoteInvocationExecutor;
@@ -34,8 +31,6 @@ import org.springframework.remoting.support.RemoteInvocation;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueSession;
 import javax.jms.Session;
 import java.lang.reflect.InvocationTargetException;
 
@@ -44,9 +39,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @version $Revision$
  */
-public class JmsRemotingTest extends TestCase {
-    private ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
-    private QueueConnection connection;
+public class JmsRemotingTest extends JmsTestSupport {
     private MetadataStrategy strategy;
 
     protected JmsServiceExporter exporter;
@@ -59,15 +52,15 @@ public class JmsRemotingTest extends TestCase {
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
         exporter.setProducer(createJmsProducer());
-        exporter.afterPropertiesSet();
-        subscribeToQueue(exporter, getQueueName());
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
 
         pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ITestBean.class);
         pfb.setServiceUrl("http://myurl");
+        pfb.setRequestor(createRequestor(getDestinationName()));
+        configure(pfb);
 
-        pfb.setRequestor(createRequestor(getQueueName()));
-        pfb.afterPropertiesSet();
 
         ITestBean proxy = (ITestBean) pfb.getObject();
         assertEquals("myname", proxy.getName());
@@ -103,15 +96,15 @@ public class JmsRemotingTest extends TestCase {
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
         exporter.setProducer(createJmsProducer());
-        exporter.afterPropertiesSet();
-        subscribeToQueue(exporter, getQueueName());
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
 
         pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ITestBean.class);
         pfb.setServiceUrl("http://myurl");
-        pfb.setRequestor(createRequestor(getQueueName()));
+        pfb.setRequestor(createRequestor(getDestinationName()));
         pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(new SimpleMetadataStrategy(true)));
-        pfb.afterPropertiesSet();
+        configure(pfb);
 
         ITestBean proxy = (ITestBean) pfb.getObject();
         assertEquals("myname", proxy.getName());
@@ -147,15 +140,15 @@ public class JmsRemotingTest extends TestCase {
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
         exporter.setProducer(createJmsProducer());
-        exporter.afterPropertiesSet();
-        subscribeToQueue(exporter, getQueueName());
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
 
         JmsProxyFactoryBean pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ITestBean.class);
         pfb.setServiceUrl("http://myurl");
 
-        pfb.setRequestor(createRequestor(getQueueName()));
-        pfb.afterPropertiesSet();
+        pfb.setRequestor(createRequestor(getDestinationName()));
+        configure(pfb);
         ITestBean proxy = (ITestBean) pfb.getObject();
 
         // lets force an exception by closing the session
@@ -186,14 +179,13 @@ public class JmsRemotingTest extends TestCase {
                 return super.invoke(invocation, targetObject);
             }
         });
-        exporter.afterPropertiesSet();
-        subscribeToQueue(exporter, getQueueName());
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
 
         JmsProxyFactoryBean pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ITestBean.class);
         pfb.setServiceUrl("http://myurl");
-
-        pfb.setRequestor(createRequestor(getQueueName()));
+        pfb.setRequestor(createRequestor(getDestinationName()));
         pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(strategy) {
             public RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
                 RemoteInvocation invocation = super.createRemoteInvocation(methodInvocation);
@@ -212,8 +204,8 @@ public class JmsRemotingTest extends TestCase {
                 return invocation;
             }
         });
+        configure(pfb);
 
-        pfb.afterPropertiesSet();
         ITestBean proxy = (ITestBean) pfb.getObject();
         assertEquals("myname", proxy.getName());
         assertEquals(99, proxy.getAge());
@@ -233,14 +225,13 @@ public class JmsRemotingTest extends TestCase {
                 return super.invoke(invocation, targetObject);
             }
         });
-        exporter.afterPropertiesSet();
-        subscribeToQueue(exporter, getQueueName());
+        configure(exporter);
+        subscribeToQueue(exporter, getDestinationName());
 
         JmsProxyFactoryBean pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ITestBean.class);
         pfb.setServiceUrl("http://myurl");
-
-        pfb.setRequestor(createRequestor(getQueueName()));
+        pfb.setRequestor(createRequestor(getDestinationName()));
         pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(strategy) {
             public RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
                 RemoteInvocation invocation = super.createRemoteInvocation(methodInvocation);
@@ -249,7 +240,8 @@ public class JmsRemotingTest extends TestCase {
                 return invocation;
             }
         });
-        pfb.afterPropertiesSet();
+        configure(pfb);
+
         ITestBean proxy = (ITestBean) pfb.getObject();
         assertEquals("myname", proxy.getName());
         assertEquals(99, proxy.getAge());
@@ -260,9 +252,9 @@ public class JmsRemotingTest extends TestCase {
         JmsProxyFactoryBean pfb = new JmsProxyFactoryBean();
         pfb.setServiceInterface(ITestBean.class);
         pfb.setServiceUrl(serviceUrl);
+        pfb.setRequestor(createRequestor(getDestinationName()));
+        configure(pfb);
 
-        pfb.setRequestor(createRequestor(getQueueName()));
-        pfb.afterPropertiesSet();
         ITestBean proxy = (ITestBean) pfb.getObject();
 
         // shouldn't go through to remote service
@@ -292,8 +284,20 @@ public class JmsRemotingTest extends TestCase {
         if (connection != null) {
             connection.close();
         }
-        connectionFactory.stop();
+        if (connectionFactory instanceof ActiveMQConnectionFactory) {
+            ActiveMQConnectionFactory amqConnectionFactory = (ActiveMQConnectionFactory) connectionFactory;
+            amqConnectionFactory.stop();
+        }
         super.tearDown();
+    }
+
+
+    protected void configure(JmsServiceExporter exporter) throws Exception {
+        exporter.afterPropertiesSet();
+    }
+
+    protected void configure(JmsProxyFactoryBean pfb) throws JMSException {
+        pfb.afterPropertiesSet();
     }
 
     protected MetadataStrategy createMetadataStrategy() {
@@ -302,40 +306,10 @@ public class JmsRemotingTest extends TestCase {
 
 
     protected void subscribeToQueue(JmsServiceExporter exporter, String queueName) throws JMSException {
-        QueueSession serverSession = createQueueSession();
+        Session serverSession = createSession();
         Queue queue = serverSession.createQueue(queueName);
         MessageConsumer consumer = serverSession.createConsumer(queue);
         consumer.setMessageListener(exporter);
     }
 
-    protected JmsProducer createJmsProducer() throws JMSException {
-        return DefaultJmsProducer.newInstance(connectionFactory);
-    }
-
-    protected QueueSession createQueueSession() throws JMSException {
-        return getConnection().createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-    }
-
-    protected QueueConnection getConnection() throws JMSException {
-        if (connection == null) {
-            connection = connectionFactory.createQueueConnection();
-            connection.start();
-        }
-        return connection;
-    }
-
-    protected Requestor createRequestor(String name) throws Exception {
-        Session session = createQueueSession();
-        JmsProducer producer = createJmsProducer();
-        return new SingleThreadedRequestor(session, producer, session.createQueue(name));
-    }
-
-    protected void closeSession(JmsProxyFactoryBean factoryBean) throws JMSException {
-        Requestor requestor = factoryBean.getRequestor();
-        requestor.getSession().close();
-    }
-
-    protected String getQueueName() {
-        return "test." + getClass().getName() + "." + getName();
-    }
 }
