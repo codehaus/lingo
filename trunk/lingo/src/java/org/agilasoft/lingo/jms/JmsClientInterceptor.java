@@ -57,6 +57,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     private Map remoteObjects = new WeakHashMap();
     private Requestor requestor;
     private Destination destination;
+    private String correlationID;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -81,6 +82,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         replaceRemoteReferences(invocation, metadata);
         try {
             Message requestMessage = createRequestMessage(invocation, metadata);
+            populateHeaders(requestMessage);
             if (metadata.isOneWay()) {
                 requestor.oneWay(destination, requestMessage);
                 return null;
@@ -129,6 +131,10 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         this.destination = destination;
     }
 
+    public void setCorrelationID(String correlationID) {
+        this.correlationID = correlationID;
+    }
+    
     // Implementation methods
     //-------------------------------------------------------------------------
 
@@ -141,6 +147,12 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
      */
     protected Message createRequestMessage(RemoteInvocation invocation, MethodMetadata metadata) throws JMSException {
         return requestor.getSession().createObjectMessage(invocation);
+    }
+
+    protected void populateHeaders(Message requestMessage) throws JMSException {
+        if (correlationID != null) {
+            requestMessage.setJMSCorrelationID(correlationID);
+        }
     }
 
     /**
@@ -195,6 +207,13 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         if (correlationID == null) {
             correlationID = requestor.createCorrelationID();
             remoteObjects.put(value, correlationID);
+        }
+        if (requestor instanceof MultiplexingRequestor) {
+            MultiplexingRequestor multiplexingRequestor = (MultiplexingRequestor) requestor;
+            multiplexingRequestor.registerHandler(correlationID, new AsyncReplyHandler(value));
+        }
+        else {
+            throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");
         }
         return correlationID;
     }
