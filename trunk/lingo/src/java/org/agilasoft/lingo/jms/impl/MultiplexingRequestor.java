@@ -15,9 +15,12 @@
  * limitations under the License.
  *
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
 
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+import org.agilasoft.lingo.jms.FailedToProcessResponse;
+import org.agilasoft.lingo.jms.JmsProducer;
+import org.agilasoft.lingo.jms.ReplyHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link Requestor} which will use a single producer, consumer
+ * A {@link org.agilasoft.lingo.jms.Requestor} which will use a single producer, consumer
  * and temporary topic for resource efficiency, but will use correlation
  * IDs on each message and response to ensure that each threads requests
  * can occur synchronously.

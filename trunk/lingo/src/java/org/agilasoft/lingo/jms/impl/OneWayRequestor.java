@@ -15,7 +15,10 @@
  * limitations under the License. 
  * 
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
+
+import org.agilasoft.lingo.jms.JmsProducer;
+import org.agilasoft.lingo.jms.Requestor;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;

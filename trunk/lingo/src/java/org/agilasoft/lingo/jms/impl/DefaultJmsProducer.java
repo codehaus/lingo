@@ -15,7 +15,9 @@
  * limitations under the License. 
  * 
  **/
-package org.agilasoft.lingo.jms;
+package org.agilasoft.lingo.jms.impl;
+
+import org.agilasoft.lingo.jms.JmsProducer;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -24,9 +26,9 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
- * A default implementation of the {@link JmsProducer} which contains a reference to the
+ * A default implementation of the {@link org.agilasoft.lingo.jms.JmsProducer} which contains a reference to the
  * connection, session and producer so that it can easily close down all its resources properly.
- * 
+ *
  * @version $Revision$
  */
 public class DefaultJmsProducer extends JmsProducerImpl {
