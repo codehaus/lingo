@@ -49,6 +49,12 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         getReceiver().setMessageListener(this);
     }
 
+    public void registerHandler(String correlationID, ReplyHandler handler) {
+        synchronized (this) {
+            requests.put(correlationID, handler);
+        }
+    }
+
     public Message request(Destination destination, Message message) throws JMSException {
         long timeout = getMaximumTimeout();
         return request(destination, message, timeout);
@@ -57,7 +63,7 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
     public Message request(Destination destination, Message message, long timeout) throws JMSException {
         // lets create a correlationID
         String correlationID = createCorrelationID();
-        FutureResult future = new FutureResult();
+        FutureResult future = new FutureResultHandler();
         synchronized (this) {
             requests.put(correlationID, future);
         }
@@ -88,15 +94,20 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
             String correlationID = message.getJMSCorrelationID();
 
             // lets notify the monitor for this response
-            FutureResult future = null;
+            ReplyHandler handler = null;
             synchronized (this) {
-                future = (FutureResult) requests.remove(correlationID);
+                handler = (ReplyHandler) requests.get(correlationID);
             }
-            if (future == null) {
+            if (handler == null) {
                 log.warn("Response received for unknown request: " + message);
             }
             else {
-                future.set(message);
+                boolean complete = handler.handle(message);
+                if (complete) {
+                    synchronized (this) {
+                        requests.remove(correlationID);
+                    }
+                }
             }
         }
         catch (JMSException e) {

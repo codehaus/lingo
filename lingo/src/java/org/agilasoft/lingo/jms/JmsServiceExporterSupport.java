@@ -30,7 +30,6 @@ import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -45,7 +44,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
 
     protected Object proxy;
     private boolean ignoreFailures;
-    private boolean ignoreInvalidMessages;
+    private RemoteInvocationReader invocationReader = new RemoteInvocationReader();
     private MetadataStrategy metadataStrategy = new SimpleMetadataStrategy(true);
     private RemoteInvocationFactory responseInvocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
     private Requestor responseRequestor;
@@ -62,13 +61,13 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
 
     public void onMessage(Message message) {
         try {
-            RemoteInvocation invocation = readRemoteInvocation(message);
+            RemoteInvocation invocation = invocationReader.readRemoteInvocation(message);
             if (invocation != null) {
                 boolean oneway = false;
                 if (invocation instanceof LingoInvocation) {
                     LingoInvocation lingoInvocation = (LingoInvocation) invocation;
                     oneway = lingoInvocation.getMetadata().isOneWay();
-                    introduceRemoteReferences(lingoInvocation, message.getJMSReplyTo());
+                    introduceRemoteReferences(lingoInvocation, message);
                 }
                 RemoteInvocationResult result = invokeAndCreateResult(invocation, this.proxy);
                 if (!oneway) {
@@ -99,34 +98,6 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
      */
     public void setIgnoreFailures(boolean ignoreFailures) {
         this.ignoreFailures = ignoreFailures;
-    }
-
-    public boolean isIgnoreInvalidMessages() {
-        return ignoreInvalidMessages;
-    }
-
-    /**
-     * Sets whether invalidly formatted messages should be silently ignored or not
-     */
-    public void setIgnoreInvalidMessages(boolean ignoreInvalidMessages) {
-        this.ignoreInvalidMessages = ignoreInvalidMessages;
-    }
-
-    /**
-     * Read a RemoteInvocation from the given JMS message
-     *
-     * @param message current JMS message
-     * @return the RemoteInvocation object
-     */
-    protected RemoteInvocation readRemoteInvocation(Message message) throws JMSException {
-        if (message instanceof ObjectMessage) {
-            ObjectMessage objectMessage = (ObjectMessage) message;
-            Object body = objectMessage.getObject();
-            if (body instanceof RemoteInvocation) {
-                return (RemoteInvocation) body;
-            }
-        }
-        return onInvalidMessage(message);
     }
 
     /**
@@ -164,22 +135,23 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
      * Lets replace any remote object correlation IDs with dynamic proxies
      *
      * @param invocation
-     * @param replyTo
+     * @param requestMessage
      */
-    protected void introduceRemoteReferences(LingoInvocation invocation, Destination replyTo) throws JMSException {
+    protected void introduceRemoteReferences(LingoInvocation invocation, Message requestMessage) throws JMSException {
         MethodMetadata metadata = invocation.getMetadata();
         Object[] arguments = invocation.getArguments();
         Class[] parameterTypes = invocation.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
             if (metadata.isRemoteParameter(i)) {
-                arguments[i] = createRemoteProxy(replyTo, parameterTypes[i], arguments[i]);
+                arguments[i] = createRemoteProxy(requestMessage, parameterTypes[i], arguments[i]);
             }
         }
     }
 
-    protected Object createRemoteProxy(Destination replyTo, Class parameterType, Object argument) throws JMSException {
+    protected Object createRemoteProxy(Message message, Class parameterType, Object argument) throws JMSException {
         JmsProxyFactoryBean factory = new JmsProxyFactoryBean();
-        factory.setDestination(replyTo);
+        factory.setDestination(message.getJMSReplyTo());
+        factory.setCorrelationID((String) argument);
         factory.setRemoteInvocationFactory(responseInvocationFactory);
         factory.setServiceInterface(parameterType);
         factory.setRequestor(responseRequestor);
@@ -187,18 +159,6 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         return factory.getObject();
     }
 
-    /**
-     * Handle invalid messages by just logging, though a different implementation
-     * may wish to throw exceptions
-     */
-    protected RemoteInvocation onInvalidMessage(Message message) {
-        String text = "Invalid message will be discarded: " + message;
-        log.info(text);
-        if (!ignoreInvalidMessages) {
-            throw new RuntimeException(text);
-        }
-        return null;
-    }
 
     /**
      * Handle the processing of an exception when processing an inbound messsage
