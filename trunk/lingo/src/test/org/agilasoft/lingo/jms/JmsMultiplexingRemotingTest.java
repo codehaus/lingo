@@ -17,10 +17,14 @@
  **/
 package org.agilasoft.lingo.jms;
 
-import org.agilasoft.lingo.jms.MultiplexingRequestor;
-import org.agilasoft.lingo.jms.Requestor;
+import org.agilasoft.lingo.LingoRemoteInvocationFactory;
+import org.agilasoft.lingo.SimpleMetadataStrategy;
+import org.agilasoft.lingo.example.ExampleService;
+import org.agilasoft.lingo.example.ExampleServiceImpl;
+import org.agilasoft.lingo.example.TestResultListener;
 
 import javax.jms.Session;
+import java.util.List;
 
 /**
  * Uses the multiplexing, multi-threaded requestor
@@ -28,6 +32,36 @@ import javax.jms.Session;
  * @version $Revision$
  */
 public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
+
+    public void testJmsProxyFactoryBeanAndAsyncServiceExporter() throws Throwable {
+        ExampleService target = new ExampleServiceImpl();
+        exporter = new JmsServiceExporter();
+        exporter.setServiceInterface(ExampleService.class);
+        exporter.setService(target);
+        exporter.setProducer(createJmsProducer());
+        exporter.afterPropertiesSet();
+        subscribeToQueue(exporter, getQueueName());
+
+        pfb = new JmsProxyFactoryBean();
+        pfb.setServiceInterface(ExampleService.class);
+        pfb.setServiceUrl("http://myurl");
+        pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(new SimpleMetadataStrategy(true)));
+        pfb.setRequestor(createRequestor(getQueueName()));
+        pfb.afterPropertiesSet();
+
+        ExampleService proxy = (ExampleService) pfb.getObject();
+
+        TestResultListener listener = new TestResultListener();
+        proxy.asyncRequestResponse("IBM", listener);
+
+        listener.waitForAsyncResponses(2);
+
+        List results = listener.getResults();
+        System.out.println("Found results: " + results);
+
+        assertEquals("size of results: " + results, 2, results.size());
+    }
+
     protected Requestor createRequestor(String name) throws Exception {
         Session session = createQueueSession();
         JmsProducer producer = createJmsProducer();

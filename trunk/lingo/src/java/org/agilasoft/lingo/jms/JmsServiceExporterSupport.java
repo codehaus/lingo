@@ -1,4 +1,4 @@
-/** 
+/**
  * 
  * Copyright 2005 AgilaSoft Ltd
  * 
@@ -17,17 +17,23 @@
  **/
 package org.agilasoft.lingo.jms;
 
-import org.springframework.remoting.support.RemoteInvocationBasedExporter;
-import org.springframework.remoting.support.RemoteInvocation;
-import org.springframework.remoting.support.RemoteInvocationResult;
-import org.springframework.beans.factory.InitializingBean;
+import org.agilasoft.lingo.LingoInvocation;
+import org.agilasoft.lingo.LingoRemoteInvocationFactory;
+import org.agilasoft.lingo.MetadataStrategy;
+import org.agilasoft.lingo.MethodMetadata;
+import org.agilasoft.lingo.SimpleMetadataStrategy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.agilasoft.lingo.LingoInvocation;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.remoting.support.RemoteInvocation;
+import org.springframework.remoting.support.RemoteInvocationBasedExporter;
+import org.springframework.remoting.support.RemoteInvocationFactory;
+import org.springframework.remoting.support.RemoteInvocationResult;
 
-import javax.jms.MessageListener;
-import javax.jms.Message;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
@@ -40,11 +46,17 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
     protected Object proxy;
     private boolean ignoreFailures;
     private boolean ignoreInvalidMessages;
+    private MetadataStrategy metadataStrategy = new SimpleMetadataStrategy(true);
+    private RemoteInvocationFactory responseInvocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
+    private Requestor responseRequestor;
 
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws Exception {
         this.proxy = getProxyForService();
         if (proxy == null) {
             throw new IllegalArgumentException("proxy is required");
+        }
+        if (responseRequestor == null) {
+            throw new IllegalArgumentException("responseRequestor is required");
         }
     }
 
@@ -52,8 +64,14 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         try {
             RemoteInvocation invocation = readRemoteInvocation(message);
             if (invocation != null) {
+                boolean oneway = false;
+                if (invocation instanceof LingoInvocation) {
+                    LingoInvocation lingoInvocation = (LingoInvocation) invocation;
+                    oneway = lingoInvocation.getMetadata().isOneWay();
+                    introduceRemoteReferences(lingoInvocation, message.getJMSReplyTo());
+                }
                 RemoteInvocationResult result = invokeAndCreateResult(invocation, this.proxy);
-                if (!isOneWay(invocation)) {
+                if (!oneway) {
                     writeRemoteInvocationResult(message, result);
                 }
             }
@@ -61,6 +79,14 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         catch (JMSException e) {
             onException(message, e);
         }
+    }
+
+    public Requestor getResponseRequestor() {
+        return responseRequestor;
+    }
+
+    public void setResponseRequestor(Requestor responseRequestor) {
+        this.responseRequestor = responseRequestor;
     }
 
     public boolean isIgnoreFailures() {
@@ -134,12 +160,31 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         return answer;
     }
 
-    protected boolean isOneWay(RemoteInvocation invocation) {
-        if (invocation instanceof LingoInvocation) {
-            LingoInvocation lingoInvocation = (LingoInvocation) invocation;
-            return lingoInvocation.getMetadata().isOneWay();
+    /**
+     * Lets replace any remote object correlation IDs with dynamic proxies
+     *
+     * @param invocation
+     * @param replyTo
+     */
+    protected void introduceRemoteReferences(LingoInvocation invocation, Destination replyTo) throws JMSException {
+        MethodMetadata metadata = invocation.getMetadata();
+        Object[] arguments = invocation.getArguments();
+        Class[] parameterTypes = invocation.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (metadata.isRemoteParameter(i)) {
+                arguments[i] = createRemoteProxy(replyTo, parameterTypes[i], arguments[i]);
+            }
         }
-        return false;
+    }
+
+    protected Object createRemoteProxy(Destination replyTo, Class parameterType, Object argument) throws JMSException {
+        JmsProxyFactoryBean factory = new JmsProxyFactoryBean();
+        factory.setDestination(replyTo);
+        factory.setRemoteInvocationFactory(responseInvocationFactory);
+        factory.setServiceInterface(parameterType);
+        factory.setRequestor(responseRequestor);
+        factory.afterPropertiesSet();
+        return factory.getObject();
     }
 
     /**
