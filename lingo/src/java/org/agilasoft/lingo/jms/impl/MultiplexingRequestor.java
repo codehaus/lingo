@@ -127,6 +127,15 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
 
     }
 
+    // Lets ensure only one thread performs a send/receive at once
+    public synchronized Message receive(long timeout) throws JMSException {
+        return super.receive(timeout);
+    }
+
+    protected synchronized void doSend(Destination destination, Message message) throws JMSException {
+        super.doSend(destination, message);
+    }
+
     // Implementation methods
     //-------------------------------------------------------------------------
 
