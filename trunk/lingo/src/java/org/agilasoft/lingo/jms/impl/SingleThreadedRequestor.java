@@ -77,7 +77,7 @@ public class SingleThreadedRequestor extends OneWayRequestor {
         return receiver.receive(timeout);
     }
 
-    public void close() throws JMSException {
+    public synchronized void close() throws JMSException {
         // producer and consumer created by constructor are implicitly closed.
         session.close();
         if (temporaryDestination instanceof TemporaryQueue) {
