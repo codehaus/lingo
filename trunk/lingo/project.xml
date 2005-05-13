@@ -165,7 +165,7 @@
     <!-- default XML marshaller -->
     <dependency>
       <id>xstream</id>
-      <version>1.1.1</version>
+      <version>1.1.2</version>
     </dependency>
     <dependency>
       <groupId>xmlpull</groupId>
