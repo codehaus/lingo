@@ -6,23 +6,23 @@
   <currentVersion>1.0-SNAPSHOT</currentVersion>
 
   <organization>
-    <name>AgilaSoft, Ltd.</name>
-    <url>http://agilasoft.com</url>
-    <logo>http://agilasoft.com/images/logo.jpg</logo>
+    <name>LogicBlaze, Inc.</name>
+    <url>http://logicblaze.com</url>
+    <logo>http://logicblaze.com/images/logo.jpg</logo>
   </organization>
   <logo></logo>
 
   <inceptionYear>2005</inceptionYear>
 
-  <package>org.agilasoft.lingo</package>
+  <package>org.logicblaze.lingo</package>
   <packageGroups>
     <packageGroup>
       <title>Core Lingo classes and API for Metadata Strategy</title>
-      <packages>org.agilasoft.lingo</packages>
+      <packages>org.logicblaze.lingo</packages>
     </packageGroup>
     <packageGroup>
       <title>JMS based binding for Lingo</title>
-      <packages>org.agilasoft.lingo.jms:org.agilasoft.lingo.jms.*</packages>
+      <packages>org.logicblaze.lingo.jms:org.logicblaze.lingo.jms.*</packages>
     </packageGroup>
   </packageGroups>
 
@@ -159,7 +159,7 @@
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>3.0-SNAPSHOT</version>
+      <version>3.0</version>
     </dependency>
 
     <!-- default XML marshaller -->
