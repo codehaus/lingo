@@ -41,7 +41,6 @@ public class SingleThreadedRequestor extends OneWayRequestor {
     private Session session;
     private Destination temporaryDestination;
     private MessageConsumer receiver;
-    private long maximumTimeout = 20000L;
 
 
     public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination) throws JMSException {
@@ -58,12 +57,12 @@ public class SingleThreadedRequestor extends OneWayRequestor {
 
     public Message request(Destination destination, Message message) throws JMSException {
         oneWay(destination, message);
-        long timeout = getMaximumTimeout();
+        long timeout = getTimeToLive();
         return receive(timeout);
     }
 
     public Message request(Destination destination, Message message, long timeout) throws JMSException {
-        oneWay(destination, message);
+        oneWay(destination, message, timeout);
         return receive(timeout);
     }
 
@@ -96,19 +95,7 @@ public class SingleThreadedRequestor extends OneWayRequestor {
         temporaryDestination = null;
     }
 
-    public long getMaximumTimeout() {
-        return maximumTimeout;
-    }
 
-    /**
-     * Sets the maximum default timeout used for remote requests. If set to <= 0 then
-     * the timeout is ignored.
-     *
-     * @param maximumTimeout
-     */
-    public void setMaximumTimeout(long maximumTimeout) {
-        this.maximumTimeout = maximumTimeout;
-    }
 
     // Implementation methods
     //-------------------------------------------------------------------------

@@ -67,7 +67,7 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
     }
 
     public Message request(Destination destination, Message message) throws JMSException {
-        long timeout = getMaximumTimeout();
+        long timeout = getTimeToLive();
         return request(destination, message, timeout);
     }
 
@@ -132,8 +132,8 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         return super.receive(timeout);
     }
 
-    protected synchronized void doSend(Destination destination, Message message) throws JMSException {
-        super.doSend(destination, message);
+    protected synchronized void doSend(Destination destination, Message message, long timeout) throws JMSException {
+        super.doSend(destination, message, timeout);
     }
 
     // Implementation methods
