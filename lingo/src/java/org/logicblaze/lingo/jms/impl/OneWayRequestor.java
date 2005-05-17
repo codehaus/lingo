@@ -26,6 +26,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.DeliveryMode;
 
 /**
  * A simple requestor which only supports one-way and so does not need a consumer.
@@ -38,15 +39,58 @@ public class OneWayRequestor implements Requestor {
     private JmsProducer producer;
     private Destination serverDestination;
     private long counter;
+    private int deliveryMode = DeliveryMode.NON_PERSISTENT;
+    private int priority = 5;
+    private long timeToLive = 30000;
 
     public OneWayRequestor(JmsProducer producer, Destination serverDestination) {
         this.producer = producer;
         this.serverDestination = serverDestination;
     }
 
+    /**
+     * The default delivery mode of request messages
+     */
+    public int getDeliveryMode() {
+        return deliveryMode;
+    }
+
+    public void setDeliveryMode(int deliveryMode) {
+        this.deliveryMode = deliveryMode;
+    }
+
+    /**
+     * The default priority of request messages
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    /**
+     * The default time to live on request messages
+     */
+    public long getTimeToLive() {
+        return timeToLive;
+    }
+
+    /**
+     * Sets the maximum time to live for requests
+     */ 
+    public void setTimeToLive(long timeToLive) {
+        this.timeToLive = timeToLive;
+    }
+
     public void oneWay(Destination destination, Message message) throws JMSException {
+        oneWay(destination, message, timeToLive);
+    }
+
+    public void oneWay(Destination destination, Message message, long timeToLive) throws JMSException {
         populateHeaders(message);
-        doSend(destination, message);
+        doSend(destination, message, timeToLive);
     }
 
     public Session getSession() {
@@ -58,7 +102,7 @@ public class OneWayRequestor implements Requestor {
     }
 
     public Message receive(long timeout) throws JMSException {
-        throw new JMSException("receive(timeout) not implemented for OneWayRequestor");
+        throw new JMSException("receive(timeToLive) not implemented for OneWayRequestor");
     }
 
     public Message request(Destination destination, Message message) throws JMSException {
@@ -72,14 +116,14 @@ public class OneWayRequestor implements Requestor {
     protected void populateHeaders(Message message) throws JMSException {
     }
 
-    protected void doSend(Destination destination, Message message) throws JMSException {
+    protected void doSend(Destination destination, Message message, long timeToLive) throws JMSException {
         if (destination == null) {
             destination = serverDestination;
         }
         if (log.isDebugEnabled()) {
             log.debug("Sending message to: " + destination + " message: " + message);
         }
-        producer.getMessageProducer().send(destination, message);
+        producer.getMessageProducer().send(destination, message, deliveryMode, priority, timeToLive);
     }
 
     /**
