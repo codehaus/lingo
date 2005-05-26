@@ -40,10 +40,13 @@ public class DefaultMarshaller implements Marshaller {
     private boolean ignoreInvalidMessages;
 
     public Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException {
-        return requestor.getSession().createObjectMessage(invocation);
+        ObjectMessage message = requestor.getSession().createObjectMessage(invocation);
+        appendMessageHeaders(message, requestor, invocation);
+        return message;
     }
 
     public RemoteInvocationResult extractInvocationResult(Message message) throws JMSException {
+        handleInvocationResultHeaders(message);
         if (message instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) message;
             Object body = objectMessage.getObject();
@@ -55,6 +58,7 @@ public class DefaultMarshaller implements Marshaller {
     }
 
     public RemoteInvocation readRemoteInvocation(Message message) throws JMSException {
+        handleInvocationHeaders(message);
         if (message instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) message;
             Object body = objectMessage.getObject();
@@ -64,7 +68,6 @@ public class DefaultMarshaller implements Marshaller {
         }
         return onInvalidMessage(message);
     }
-
 
     // Properties
     //-------------------------------------------------------------------------
@@ -97,4 +100,24 @@ public class DefaultMarshaller implements Marshaller {
         }
         return null;
     }
+
+    /**
+     * A strategy method for derived classes to allow them a plugin point to perform custom header processing
+     */
+    protected void appendMessageHeaders(Message message, Requestor requestor, LingoInvocation invocation) {
+    }
+
+
+    /**
+     * A strategy method to allow derived classes to process the headers in a special way
+     */
+    protected void handleInvocationHeaders(Message message) {
+    }
+
+    /**
+     * A strategy method to allow derived classes to process the headers in a special way
+     */
+    protected void handleInvocationResultHeaders(Message message) {
+    }
+
 }

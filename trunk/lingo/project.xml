@@ -159,7 +159,7 @@
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>3.0</version>
+      <version>3.1-M1</version>
     </dependency>
 
     <!-- default XML marshaller -->
