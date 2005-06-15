@@ -234,7 +234,10 @@
     <report>maven-faq-plugin</report>
     -->
     <report>maven-changes-plugin</report>
+
+    <!-- no license yet
     <report>maven-clover-plugin</report>
+    -->
     <report>maven-changelog-plugin</report>
     <report>maven-file-activity-plugin</report>
     <report>maven-developer-activity-plugin</report>
