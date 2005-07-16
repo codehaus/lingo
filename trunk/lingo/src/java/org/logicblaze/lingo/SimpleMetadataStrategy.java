@@ -25,8 +25,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A simple metadata strategy which uses POJO naming conventions. One way methods are enabled by
- * default for all void methods which do not throw checked exceptions.
+ * A simple metadata strategy which uses POJO naming conventions.
+ *
+ * By default all method invocations are synchronous to avoid surprising users of Spring Remoting. However
+ * if you set the {@link #setOneWayForVoidMethods(boolean)} value to true then all void methods which do
+ * not throw checked exceptions become asynchronous one way methods.
+ *
  * <p/>
  * Also any object which implements the {@link Remote} interface or the {@link EventListener}
  * are assumed to be remote and so a remote proxy is used to allow remote notifications and asynchronous
