@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- START SNIPPET: spring -->
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
 
-  <!-- client side proxy-->
+  <!-- START SNIPPET: client -->
   <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
-    <property name="serviceInterface">
-      <value>org.logicblaze.lingo.example.ExampleService</value>
-    </property>
-    <property name="connectionFactory">
-      <ref bean="jmsFactory"/>
-    </property>
-    <property name="destination">
-      <ref bean="exampleDestination"/>
-    </property>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+
+    <!-- lets enable async one ways on the client -->
+    <property name="remoteInvocationFactory" ref="invocationFactory"/>
   </bean>
+
+  <bean id="invocationFactory" class="org.logicblaze.lingo.LingoRemoteInvocationFactory">
+    <constructor-arg>
+      <bean class="org.logicblaze.lingo.SimpleMetadataStrategy">
+        <!-- enable async one ways -->
+        <constructor-arg value="true"/>
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- END SNIPPET: client -->
+
 
   <!-- the server side -->
   <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporter">
@@ -24,6 +31,7 @@
     <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
     <property name="connectionFactory" ref="jmsFactory"/>
     <property name="destination" ref="exampleDestination"/>
+    <property name="invocationFactory" ref="invocationFactory"/>
   </bean>
 
   <!-- the actual implementation of the service - which is only made public for testing purposes -->
@@ -44,4 +52,3 @@
   </bean>
 </beans>
 
-<!-- END SNIPPET: spring -->
