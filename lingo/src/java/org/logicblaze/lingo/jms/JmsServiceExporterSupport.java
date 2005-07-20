@@ -48,7 +48,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
     private boolean ignoreFailures;
     private Marshaller marshaller;
     private MetadataStrategy metadataStrategy;
-    private RemoteInvocationFactory responseInvocationFactory;
+    private RemoteInvocationFactory invocationFactory;
     private Requestor responseRequestor;
 
     public void afterPropertiesSet() throws Exception {
@@ -65,8 +65,8 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         if (metadataStrategy == null) {
             metadataStrategy = new SimpleMetadataStrategy(true);
         }
-        if (responseInvocationFactory == null) {
-            responseInvocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
+        if (invocationFactory == null) {
+            invocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
         }
     }
 
@@ -109,12 +109,12 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         this.marshaller = marshaller;
     }
 
-    public RemoteInvocationFactory getResponseInvocationFactory() {
-        return responseInvocationFactory;
+    public RemoteInvocationFactory getInvocationFactory() {
+        return invocationFactory;
     }
 
-    public void setResponseInvocationFactory(RemoteInvocationFactory responseInvocationFactory) {
-        this.responseInvocationFactory = responseInvocationFactory;
+    public void setInvocationFactory(RemoteInvocationFactory invocationFactory) {
+        this.invocationFactory = invocationFactory;
     }
 
     public boolean isIgnoreFailures() {
@@ -185,7 +185,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         JmsProxyFactoryBean factory = new JmsProxyFactoryBean();
         factory.setDestination(message.getJMSReplyTo());
         factory.setCorrelationID((String) argument);
-        factory.setRemoteInvocationFactory(responseInvocationFactory);
+        factory.setRemoteInvocationFactory(invocationFactory);
         factory.setServiceInterface(parameterType);
         factory.setRequestor(responseRequestor);
         factory.afterPropertiesSet();

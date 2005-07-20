@@ -40,9 +40,6 @@ public class ExampleTest extends TestCase {
         int i = service.regularRPC("Foo");
         System.out.println("Found result: " + i);
 
-        // async one-way method
-        service.someOneWayMethod("James", 35);
-
         // async request-response
         TestResultListener listener = new TestResultListener();
         service.asyncRequestResponse("IBM", listener);
@@ -56,6 +53,27 @@ public class ExampleTest extends TestCase {
         System.out.println("Found results: " + listener.getResults());
     }
 
+    public void testOneWayMethodCall() throws Exception {
+        ExampleServiceImpl serverImpl = (ExampleServiceImpl) factory.getBean("serverImpl");
+
+        callOneWayMethod();
+
+        serverImpl.assertOneWayCalled();
+    }
+
+    protected void callOneWayMethod() {
+        ExampleService service = (ExampleService) factory.getBean("client");
+
+        long start = System.currentTimeMillis();
+        service.someOneWayMethod("James", 35);
+        logTime("Method invocation took", System.currentTimeMillis() - start);
+        System.out.println("### client side method invoked");
+    }
+
+    protected void logTime(String text, long millis) {
+        System.out.println(text + " took: " + (millis) + " milli(s) to complete");
+    }
+
     protected void setUp() throws Exception {
         factory = new XmlBeanFactory(createSpringConfig());
 
@@ -64,7 +82,7 @@ public class ExampleTest extends TestCase {
         assertTrue("Should have created the server side", bean != null);
     }
 
-    private ClassPathResource createSpringConfig() {
+    protected ClassPathResource createSpringConfig() {
         return new ClassPathResource("org/logicblaze/lingo/example/spring.xml");
     }
 }

@@ -17,16 +17,37 @@
  **/
 package org.logicblaze.lingo.example;
 
+import junit.framework.Assert;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @version $Revision$
  */
-public class ExampleServiceImpl implements ExampleService {
-    private String lastMethod;
-    private Object[] lastArguments;
+public class ExampleServiceImpl extends Assert implements ExampleService {
+    private static final transient Log log = LogFactory.getLog(ExampleServiceImpl.class);
 
-    public void someOneWayMethod(String name, int age) {
+    private static String lastMethod;
+    private Object[] lastArguments;
+    private int delay = 10000;
+
+    public synchronized void someOneWayMethod(String name, int age) {
+        System.out.println("#### starting server side method for: " + name + " with age: " + age + " on instance: " + this);
+
+        // TODO bad test case but lets simulate slow server with a sleep
+
+        System.out.println("####Êsleeping for: " + delay + " millis to simulate slow server");
+
+        try {
+            Thread.sleep(delay);
+        }
+        catch (InterruptedException e) {
+            log.error("Caught: " + e, e);
+        }
         lastMethod = "someOneWayMethod";
         lastArguments = new Object[]{name, new Integer(age)};
+
+        System.out.println("#### completed server side method for: " + name + " with age: " + age);
     }
 
     public int regularRPC(String name) {
@@ -73,5 +94,21 @@ public class ExampleServiceImpl implements ExampleService {
 
     public Object[] getLastArguments() {
         return lastArguments;
+    }
+
+    public synchronized void assertOneWayCalled() {
+        assertNotNull("lastMethod should not be null if we have been invoked on instance: " + this, lastMethod);
+    }
+
+    public synchronized void assertOneWayNotCompletedYet() {
+        assertEquals("lastMethod not have a value yet on instance: " + this, null, lastMethod);
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 }
