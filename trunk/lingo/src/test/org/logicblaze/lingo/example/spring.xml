@@ -7,15 +7,9 @@
 
   <!-- client side proxy-->
   <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
-    <property name="serviceInterface">
-      <value>org.logicblaze.lingo.example.ExampleService</value>
-    </property>
-    <property name="connectionFactory">
-      <ref bean="jmsFactory"/>
-    </property>
-    <property name="destination">
-      <ref bean="exampleDestination"/>
-    </property>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
   </bean>
 
   <!-- the server side -->
@@ -32,15 +26,11 @@
 
   <!-- JMS ConnectionFactory to use -->
   <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
-    <property name="brokerURL">
-      <value>vm://localhost</value>
-    </property>
+    <property name="brokerURL" value="vm://localhost"/>
   </bean>
 
   <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
-    <constructor-arg index="0">
-      <value>test.org.logicblaze.lingo.example</value>
-    </constructor-arg>
+    <constructor-arg index="0" value="test.org.logicblaze.lingo.example"/>
   </bean>
 </beans>
 
