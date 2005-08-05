@@ -18,6 +18,8 @@
     <property name="destination" ref="exampleDestination"/>
   </bean>
 
+
+  <!-- START SNIPPET: server -->
   <!-- the server side -->
   <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporterMessageListener" depends-on="broker">
     <property name="service" ref="serverImpl"/>
@@ -27,11 +29,11 @@
 
   <!-- the actual implementation of the service - which is only made public for testing purposes -->
   <bean id="serverImpl" class="org.logicblaze.lingo.example.ExampleServiceImpl" singleton="true"/>
+  <!-- END SNIPPET: server -->
 
 
-  <!--
-    || A JCA container for ActiveMQ
-    -->
+  <!-- START SNIPPET: jca -->
+  <!-- JCA container -->
   <bean id="activeMQContainer" class="org.activemq.jca.JCAContainer" singleton="true">
 
     <property name="lazyLoad" value="true"/>
@@ -54,9 +56,7 @@
 
   </bean>
 
-  <!--
-    || an inbound message connector using a stateless, thread safe MessageListener
-    -->
+  <!-- an inbound message connector using a stateless, thread safe MessageListener -->
   <bean id="inboundMessageA" factory-method="addConnector" factory-bean="activeMQContainer" singleton="true">
 
     <!-- subscription details -->
@@ -69,6 +69,7 @@
 
     <property name="ref" value="server"/>
   </bean>
+  <!-- END SNIPPET: jca -->
 
 
   <!-- JMS ConnectionFactory to use -->
