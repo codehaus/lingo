@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- START SNIPPET: spring -->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <!-- embedded JMS broker -->
+  <bean id="broker" class="org.activemq.spring.BrokerFactoryBean" singleton="true">
+    <property name="config" value="classpath:org/logicblaze/lingo/broker.xml"/>
+  </bean>
+
+
+  <!-- client side proxy-->
+  <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean"  depends-on="inboundMessageA">
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+  </bean>
+
+  <!-- the server side -->
+  <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporterMessageListener" depends-on="broker">
+    <property name="service" ref="serverImpl"/>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+  </bean>
+
+  <!-- the actual implementation of the service - which is only made public for testing purposes -->
+  <bean id="serverImpl" class="org.logicblaze.lingo.example.ExampleServiceImpl" singleton="true"/>
+
+
+  <!--
+    || A JCA container for ActiveMQ
+    -->
+  <bean id="activeMQContainer" class="org.activemq.jca.JCAContainer" singleton="true">
+
+    <property name="lazyLoad" value="true"/>
+    
+    <!-- the work manager (thread pool) for this container -->
+    <property name="workManager">
+      <bean id="workManager" class="org.activemq.work.SpringWorkManager">
+        <property name="startMaximumPoolSize" value="30"/>
+        <property name="syncMaximumPoolSize" value="30"/>
+        <property name="scheduledMaximumPoolSize" value="30"/>
+     </bean>
+    </property>
+
+    <!-- the JCA Resource Adapter -->
+    <property name="resourceAdapter">
+      <bean id="activeMQResourceAdapter" class="org.activemq.ra.ActiveMQResourceAdapter">
+        <property name="serverUrl" value="tcp://localhost:61626"/>
+      </bean>
+    </property>
+
+  </bean>
+
+  <!--
+    || an inbound message connector using a stateless, thread safe MessageListener
+    -->
+  <bean id="inboundMessageA" factory-method="addConnector" factory-bean="activeMQContainer" singleton="true">
+
+    <!-- subscription details -->
+    <property name="activationSpec">
+      <bean class="org.activemq.ra.ActiveMQActivationSpec">
+        <property name="destination" value="test.org.logicblaze.lingo.jca.example"/>
+        <property name="destinationType" value="javax.jms.Queue"/>
+      </bean>
+    </property>
+
+    <property name="ref" value="server"/>
+  </bean>
+
+
+  <!-- JMS ConnectionFactory to use -->
+  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61626"/>
+  </bean>
+
+  <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
+    <constructor-arg index="0" value="test.org.logicblaze.lingo.jca.example"/>
+  </bean>
+</beans>
+
+<!-- END SNIPPET: spring -->

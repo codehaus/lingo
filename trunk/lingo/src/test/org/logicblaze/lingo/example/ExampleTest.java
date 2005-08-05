@@ -82,6 +82,13 @@ public class ExampleTest extends TestCase {
         assertTrue("Should have created the server side", bean != null);
     }
 
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        if (factory != null) {
+            factory.destroySingletons();
+        }
+    }
+
     protected ClassPathResource createSpringConfig() {
         return new ClassPathResource("org/logicblaze/lingo/example/spring.xml");
     }

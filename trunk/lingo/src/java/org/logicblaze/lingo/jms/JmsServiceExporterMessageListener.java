@@ -18,9 +18,12 @@
 package org.logicblaze.lingo.jms;
 
 import org.springframework.remoting.support.RemoteInvocationResult;
+import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
+import org.logicblaze.lingo.jms.impl.OneWayRequestor;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.ConnectionFactory;
 
 /**
  * A regular JMS message listener which can be used from inside a message driven object
@@ -30,12 +33,22 @@ import javax.jms.Message;
  */
 public class JmsServiceExporterMessageListener extends JmsServiceExporterSupport {
     private JmsProducer producer;
+    private ConnectionFactory connectionFactory;
 
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
         if (producer == null) {
-            throw new IllegalArgumentException("producer is required");
+            if (connectionFactory == null) {
+                throw new IllegalArgumentException("requestor or connectionFactory is required");
+            }
+            else {
+                producer = DefaultJmsProducer.newInstance(connectionFactory);
+            }
         }
+        Requestor responseRequestor = getResponseRequestor();
+        if (responseRequestor == null) {
+            setResponseRequestor(new OneWayRequestor(producer, null));
+        }
+        super.afterPropertiesSet();
     }
 
     public JmsProducer getProducer() {
@@ -44,6 +57,14 @@ public class JmsServiceExporterMessageListener extends JmsServiceExporterSupport
 
     public void setProducer(JmsProducer producer) {
         this.producer = producer;
+    }
+
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
     }
 
     protected void writeRemoteInvocationResult(Message message, RemoteInvocationResult result) throws JMSException {

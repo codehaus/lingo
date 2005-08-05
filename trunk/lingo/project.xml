@@ -159,7 +159,23 @@
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>3.1-M1</version>
+      <version>3.1-M6</version>
+    </dependency>
+
+    <!-- JCA -->
+    <dependency>
+      <id>activemq+container</id>
+      <version>3.1-M6</version>
+      <properties>
+        <lib>true</lib>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>activemq+ra</id>
+      <version>3.1-M6</version>
+      <properties>
+        <lib>true</lib>
+      </properties>
     </dependency>
 
     <!-- default XML marshaller -->
@@ -173,6 +189,15 @@
       <version>1.1.3.4d_b4_min</version>
     </dependency>
 
+    <!-- example database for testing -->
+    <dependency>
+      <id>hsqldb</id>
+      <version>1.7.3.3</version>
+      <properties>
+        <optional>true</optional>
+      </properties>
+    </dependency>
+    
     <!-- for unit test cases -->
     <dependency>
       <id>junit</id>
