@@ -45,7 +45,8 @@
 
   <repository>
     <connection>scm:cvs:pserver:anonymous@beaver.codehaus.org:/home/projects/lingo/scm:lingo</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@beaver.codehaus.org:/home/projects/lingo/scm:lingo</developerConnection>
+    <developerConnection>
+      scm:cvs:ext:${maven.username}@beaver.codehaus.org:/home/projects/lingo/scm:lingo</developerConnection>
     <url>http://cvs.lingo.codehaus.org/lingo/</url>
   </repository>
 
@@ -72,9 +73,9 @@
 
   <versions>
     <version>
-      <id>1.0-beta-1</id>
-      <name>1.0-beta-1</name>
-      <tag>1.0-beta-1</tag>
+      <id>1.0-M1</id>
+      <name>1.0-M1</name>
+      <tag>LINGO_1_0_M1</tag>
     </version>
   </versions>
   <branches></branches>
@@ -83,14 +84,14 @@
     <developer>
       <name>James Strachan</name>
       <id>jstrachan</id>
-      <email>jstrachan@protique.com</email>
-      <organization>Protique</organization>
+      <email>jstrachan@logicblaze.com</email>
+      <organization>LogicBlaze, Inc.</organization>
     </developer>
     <developer>
       <name>Hiram Chirino</name>
       <id>chirino</id>
-      <email>hiram@protique.com</email>
-      <organization>Protique</organization>
+      <email>hiram@logicblaze.com</email>
+      <organization>LogicBlaze, Inc.</organization>
     </developer>
   </developers>
 
@@ -156,23 +157,30 @@
       <version>1.5-rc1</version>
     </dependency>
 
+    <!-- JMX APIs if on Java 1.4 -->
+    <dependency>
+      <groupId>mx4j</groupId>
+      <artifactId>mx4j</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+    
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
       <version>3.1-M6</version>
     </dependency>
-
-    <!-- JCA -->
     <dependency>
-      <id>activemq+container</id>
+      <id>activemq+ra</id>
       <version>3.1-M6</version>
       <properties>
         <lib>true</lib>
       </properties>
     </dependency>
+
+    <!-- JCA and TransactionManager -->
     <dependency>
-      <id>activemq+ra</id>
-      <version>3.1-M6</version>
+      <id>jencks+all</id>
+      <version>1.0-M1</version>
       <properties>
         <lib>true</lib>
       </properties>
@@ -197,7 +205,7 @@
         <optional>true</optional>
       </properties>
     </dependency>
-    
+
     <!-- for unit test cases -->
     <dependency>
       <id>junit</id>

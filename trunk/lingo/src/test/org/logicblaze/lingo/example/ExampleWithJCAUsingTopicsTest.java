@@ -28,7 +28,7 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class ExampleWithJCAUsingTopicsTest extends ExampleTest {
 
-    protected ClassPathResource createSpringConfig() {
-        return new ClassPathResource("org/logicblaze/lingo/example/spring-with-jca-topics.xml");
+    protected String getApplicationContextXml() {
+        return "org/logicblaze/lingo/example/spring-with-jca-topics.xml";
     }
 }
