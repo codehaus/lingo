@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <name>Lingo</name>
+  <id>lingo</id>
+  <currentVersion>1.0-M1</currentVersion>
+
+  <organization>
+    <name>LogicBlaze, Inc.</name>
+    <url>http://logicblaze.com</url>
+    <logo>http://logicblaze.com/images/logo.jpg</logo>
+  </organization>
+  <logo></logo>
+
+  <inceptionYear>2005</inceptionYear>
+
+  <package>org.logicblaze.lingo</package>
+  <packageGroups>
+    <packageGroup>
+      <title>Core Lingo classes and API for Metadata Strategy</title>
+      <packages>org.logicblaze.lingo</packages>
+    </packageGroup>
+    <packageGroup>
+      <title>JMS based binding for Lingo</title>
+      <packages>org.logicblaze.lingo.jms:org.logicblaze.lingo.jms.*</packages>
+    </packageGroup>
+  </packageGroups>
+
+  <shortDescription>
+    Lingo is a POJO based remoting and messaging framework
+  </shortDescription>
+
+  <gumpRepositoryId>lingo</gumpRepositoryId>
+
+  <description>
+    Lingo is a POJO based remoting and messaging framework
+  </description>
+
+  <url>http://lingo.codehaus.org/</url>
+  <issueTrackingUrl>http://jira.codehaus.org</issueTrackingUrl>
+
+  <siteAddress>lingo.codehaus.org</siteAddress>
+  <siteDirectory>/home/projects/lingo/public_html/maven</siteDirectory>
+  <distributionDirectory>/home/projects/lingo/dist</distributionDirectory>
+
+  <repository>
+    <connection>scm:cvs:pserver:anonymous@beaver.codehaus.org:/home/projects/lingo/scm:lingo</connection>
+    <developerConnection>
+      scm:cvs:ext:${maven.username}@beaver.codehaus.org:/home/projects/lingo/scm:lingo</developerConnection>
+    <url>http://cvs.lingo.codehaus.org/lingo/</url>
+  </repository>
+
+  <mailingLists>
+    <mailingList>
+      <name>Lingo Developer List</name>
+      <subscribe>dev-subscribe@lingo.codehaus.org</subscribe>
+      <unsubscribe>dev-unsubscribe@lingo.codehaus.org</unsubscribe>
+      <archive>http://archive.lingo.codehaus.org/dev/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Lingo User List</name>
+      <subscribe>user-subscribe@lingo.codehaus.org</subscribe>
+      <unsubscribe>user-unsubscribe@lingo.codehaus.org</unsubscribe>
+      <archive>http://archive.lingo.codehaus.org/user/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Lingo SCM List</name>
+      <subscribe>scm-subscribe@lingo.codehaus.org</subscribe>
+      <unsubscribe>scm-unsubscribe@lingo.codehaus.org</unsubscribe>
+      <archive>http://archive.lingo.codehaus.org/scm/</archive>
+    </mailingList>
+  </mailingLists>
+
+  <versions>
+    <version>
+      <id>1.0-M1</id>
+      <name>1.0-M1</name>
+      <tag>LINGO_1_0_M1</tag>
+    </version>
+  </versions>
+  <branches></branches>
+
+  <developers>
+    <developer>
+      <name>James Strachan</name>
+      <id>jstrachan</id>
+      <email>jstrachan@logicblaze.com</email>
+      <organization>LogicBlaze, Inc.</organization>
+    </developer>
+    <developer>
+      <name>Hiram Chirino</name>
+      <id>chirino</id>
+      <email>hiram@logicblaze.com</email>
+      <organization>LogicBlaze, Inc.</organization>
+    </developer>
+  </developers>
+
+
+  <contributors>
+  </contributors>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.3</version>
+      <url>http://jakarta.apache.org/commons/logging/</url>
+    </dependency>
+    <dependency>
+      <id>concurrent</id>
+      <version>1.3.4</version>
+    </dependency>
+
+    <!-- Spring for the IoC container -->
+    <dependency>
+      <id>springframework</id>
+      <artifactId>spring</artifactId>
+      <version>1.2.2</version>
+      <url>http://www.springframework.org</url>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-full</artifactId>
+      <version>2.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <id>aopalliance</id>
+      <version>1.0</version>
+    </dependency>
+
+
+    <!-- lets use freely distributable J2EE jars -->
+    <dependency>
+      <id>geronimo-spec+jms</id>
+      <version>1.1-rc1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>geronimo-spec+jta</id>
+      <version>1.0.1B-rc1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>geronimo-spec+j2ee-management</id>
+      <version>1.0-rc1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>geronimo-spec+j2ee-connector</id>
+      <version>1.5-rc1</version>
+    </dependency>
+
+    <!-- JMX APIs if on Java 1.4 -->
+    <dependency>
+      <groupId>mx4j</groupId>
+      <artifactId>mx4j</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+    
+    <!-- default JMS provider -->
+    <dependency>
+      <id>activemq</id>
+      <version>3.1-M6</version>
+    </dependency>
+    <dependency>
+      <id>activemq+ra</id>
+      <version>3.1-M6</version>
+      <properties>
+        <lib>true</lib>
+      </properties>
+    </dependency>
+
+    <!-- JCA and TransactionManager -->
+    <dependency>
+      <id>jencks+all</id>
+      <version>1.0-M1</version>
+      <properties>
+        <lib>true</lib>
+      </properties>
+    </dependency>
+
+    <!-- default XML marshaller -->
+    <dependency>
+      <id>xstream</id>
+      <version>1.1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>xmlpull</groupId>
+      <artifactId>xmlpull</artifactId>
+      <version>1.1.3.4d_b4_min</version>
+    </dependency>
+
+    <!-- example database for testing -->
+    <dependency>
+      <id>hsqldb</id>
+      <version>1.7.3.3</version>
+      <properties>
+        <optional>true</optional>
+      </properties>
+    </dependency>
+
+    <!-- for unit test cases -->
+    <dependency>
+      <id>junit</id>
+      <version>3.8.1</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <nagEmailAddress>dev@lingo.codehaus.org</nagEmailAddress>
+    <sourceDirectory>src/java</sourceDirectory>
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+
+    <integrationUnitTestSourceDirectory/>
+    <aspectSourceDirectory/>
+
+    <unitTest>
+      <resources>
+        <resource>
+          <directory>src/test</directory>
+          <includes>
+            <include>**/*.properties</include>
+            <include>**/*.xml</include>
+          </includes>
+        </resource>
+      </resources>
+      <includes>
+        <include>**/*Test.*</include>
+        <include>**/*TestCase.*</include>
+      </includes>
+    </unitTest>
+
+    <resources>
+      <resource>
+        <directory>src/conf</directory>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+
+  <reports>
+    <!--
+     |
+     | These should all be completely self contained. You should be able
+     | to generate each of them individually without needing the final
+     | xdoc transformation.
+     |
+     | Each report plugin with it's POM and plugin.jelly logic should
+     | contain everything needed to produced the report.
+     |
+    -->
+
+    <report>maven-jdepend-plugin</report>
+    <!-- re-enable when we can get the warnings down to less than a few Mb!
+    <report>maven-checkstyle-plugin</report>
+    <report>maven-simian-plugin</report>
+    <report>maven-faq-plugin</report>
+    -->
+    <report>maven-changes-plugin</report>
+
+    <!-- no license yet
+    <report>maven-clover-plugin</report>
+    -->
+    <report>maven-changelog-plugin</report>
+    <report>maven-file-activity-plugin</report>
+    <report>maven-developer-activity-plugin</report>
+    <report>maven-javadoc-plugin</report>
+    <report>maven-jxr-plugin</report>
+    <report>maven-junit-report-plugin</report>
+    <report>maven-tasklist-plugin</report>
+    <report>maven-pmd-plugin</report>
+
+  </reports>
+</project>
