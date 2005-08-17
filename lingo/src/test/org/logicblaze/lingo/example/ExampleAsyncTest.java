@@ -28,15 +28,14 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class ExampleAsyncTest extends ExampleTest {
     public void testOneWayMethodCall() throws Exception {
-        ExampleServiceImpl serverImpl = (ExampleServiceImpl) factory.getBean("serverImpl");
+        ExampleServiceImpl serverImpl = (ExampleServiceImpl) getBean("serverImpl");
 
         callOneWayMethod();
 
         serverImpl.assertOneWayNotCompletedYet();
     }
 
-
-    protected ClassPathResource createSpringConfig() {
-        return new ClassPathResource("org/logicblaze/lingo/example/spring-with-async.xml");
+    protected String getApplicationContextXml() {
+        return "org/logicblaze/lingo/example/spring-with-async.xml";
     }
 }
