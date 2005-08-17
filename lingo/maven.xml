@@ -23,7 +23,7 @@
 
     <j:forEach var="lib" items="${pom.artifacts}">
       <echo>Processing ${lib.name}</echo>
-      <j:if test="${lib.name.startsWith('concurrent') || lib.name.startsWith('active') || lib.name.startsWith('common')}">
+      <j:if test="${lib.name.startsWith('concurrent') || lib.name.startsWith('active') || lib.name.startsWith('common') || lib.name.startsWith('jencks')}">
         <copy file="${lib.path}" todir="${maven.dist.bin.assembly.dir}/lib"/>
       </j:if>
     </j:forEach>
