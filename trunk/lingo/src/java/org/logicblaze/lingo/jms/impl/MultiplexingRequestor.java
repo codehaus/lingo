@@ -55,9 +55,18 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination);
     }
 
-    public MultiplexingRequestor(Session session, JmsProducer producer, Destination destination) throws JMSException {
-        super(session, producer, destination);
+    public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination, Destination clientDestination) throws JMSException {
+        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
+        return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination, clientDestination);
+    }
+
+    public MultiplexingRequestor(Session session, JmsProducer producer, Destination serverDestination, Destination clientDestination) throws JMSException {
+        super(session, producer, serverDestination, clientDestination);
         getReceiver().setMessageListener(this);
+    }
+
+    public MultiplexingRequestor(Session session, JmsProducer producer, Destination serverDestination) throws JMSException {
+        this(session, producer, serverDestination, null);
     }
 
     public void registerHandler(String correlationID, ReplyHandler handler) {

@@ -39,7 +39,7 @@ import javax.jms.TemporaryTopic;
 public class SingleThreadedRequestor extends OneWayRequestor {
     private Connection connection;
     private Session session;
-    private Destination temporaryDestination;
+    private Destination inboundDestination;
     private MessageConsumer receiver;
 
 
@@ -48,11 +48,18 @@ public class SingleThreadedRequestor extends OneWayRequestor {
         return new SingleThreadedRequestor(producer.getSession(), producer, serverDestination);
     }
 
-    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination) throws JMSException {
+    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination, Destination clientDestination) throws JMSException {
         super(producer, serverDestination);
         this.session = session;
-        temporaryDestination = createTemporaryDestination(session);
-        receiver = session.createConsumer(temporaryDestination);
+        this.inboundDestination = clientDestination;
+        if (inboundDestination == null) {
+            inboundDestination = createTemporaryDestination(session);
+        }
+        receiver = session.createConsumer(inboundDestination);
+    }
+
+    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination) throws JMSException {
+        this(session, producer, serverDestination, null);
     }
 
     public Message request(Destination destination, Message message) throws JMSException {
@@ -79,11 +86,11 @@ public class SingleThreadedRequestor extends OneWayRequestor {
     public synchronized void close() throws JMSException {
         // producer and consumer created by constructor are implicitly closed.
         session.close();
-        if (temporaryDestination instanceof TemporaryQueue) {
-            ((TemporaryQueue) temporaryDestination).delete();
+        if (inboundDestination instanceof TemporaryQueue) {
+            ((TemporaryQueue) inboundDestination).delete();
         }
-        else if (temporaryDestination instanceof TemporaryTopic) {
-            ((TemporaryTopic) temporaryDestination).delete();
+        else if (inboundDestination instanceof TemporaryTopic) {
+            ((TemporaryTopic) inboundDestination).delete();
         }
         super.close();
 
@@ -92,9 +99,8 @@ public class SingleThreadedRequestor extends OneWayRequestor {
         }
         connection = null;
         session = null;
-        temporaryDestination = null;
+        inboundDestination = null;
     }
-
 
 
     // Implementation methods
@@ -104,7 +110,7 @@ public class SingleThreadedRequestor extends OneWayRequestor {
     }
 
     protected void populateHeaders(Message message) throws JMSException {
-        message.setJMSReplyTo(temporaryDestination);
+        message.setJMSReplyTo(inboundDestination);
     }
 
     protected MessageConsumer getReceiver() {

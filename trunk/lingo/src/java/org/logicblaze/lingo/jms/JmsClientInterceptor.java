@@ -60,6 +60,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     private Map remoteObjects = new WeakHashMap();
     private Requestor requestor;
     private Destination destination;
+    private Destination responseDestination;
     private String correlationID;
     private Marshaller marshaller;
     private ConnectionFactory connectionFactory;
@@ -114,7 +115,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
                 throw new IllegalArgumentException("requestor or connectionFactory is required");
             }
             else {
-                requestor = MultiplexingRequestor.newInstance(connectionFactory, destination);
+                requestor = MultiplexingRequestor.newInstance(connectionFactory, destination, responseDestination);
             }
         }
         if (marshaller == null) {
@@ -141,8 +142,27 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         return destination;
     }
 
+    /**
+     * Sets the destination used to make requests
+     *
+     * @param destination
+     */
     public void setDestination(Destination destination) {
         this.destination = destination;
+    }
+
+    public Destination getResponseDestination() {
+        return responseDestination;
+    }
+
+    /**
+     * Sets the destination used to consume responses on - or null
+     * and a temporary queue will be created.
+     *
+     * @param responseDestination
+     */
+    public void setResponseDestination(Destination responseDestination) {
+        this.responseDestination = responseDestination;
     }
 
     public void setCorrelationID(String correlationID) {
