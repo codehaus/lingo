@@ -31,9 +31,9 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 /**
- * A simple {@link org.logicblaze.lingo.jms.Requestor} which can only be used by one thread at once
- * and only used for one message exchange at once.
- *
+ * A simple {@link org.logicblaze.lingo.jms.Requestor} which can only be used by
+ * one thread at once and only used for one message exchange at once.
+ * 
  * @version $Revision$
  */
 public class SingleThreadedRequestor extends OneWayRequestor {
@@ -41,7 +41,7 @@ public class SingleThreadedRequestor extends OneWayRequestor {
     private Session session;
     private Destination inboundDestination;
     private MessageConsumer receiver;
-
+    private boolean deleteTemporaryDestinationsOnClose;
 
     public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination) throws JMSException {
         JmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
@@ -86,13 +86,16 @@ public class SingleThreadedRequestor extends OneWayRequestor {
     public synchronized void close() throws JMSException {
         // producer and consumer created by constructor are implicitly closed.
         session.close();
-        if (inboundDestination instanceof TemporaryQueue) {
-            ((TemporaryQueue) inboundDestination).delete();
-        }
-        else if (inboundDestination instanceof TemporaryTopic) {
-            ((TemporaryTopic) inboundDestination).delete();
-        }
         super.close();
+
+        if (deleteTemporaryDestinationsOnClose) {
+            if (inboundDestination instanceof TemporaryQueue) {
+                ((TemporaryQueue) inboundDestination).delete();
+            }
+            else if (inboundDestination instanceof TemporaryTopic) {
+                ((TemporaryTopic) inboundDestination).delete();
+            }
+        }
 
         if (connection != null) {
             connection.close();
@@ -102,9 +105,18 @@ public class SingleThreadedRequestor extends OneWayRequestor {
         inboundDestination = null;
     }
 
+    // Properties
+    // -------------------------------------------------------------------------
+    public boolean isDeleteTemporaryDestinationsOnClose() {
+        return deleteTemporaryDestinationsOnClose;
+    }
+
+    public void setDeleteTemporaryDestinationsOnClose(boolean deleteTemporaryDestinationsOnClose) {
+        this.deleteTemporaryDestinationsOnClose = deleteTemporaryDestinationsOnClose;
+    }
 
     // Implementation methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     protected TemporaryQueue createTemporaryDestination(Session session) throws JMSException {
         return session.createTemporaryQueue();
     }
