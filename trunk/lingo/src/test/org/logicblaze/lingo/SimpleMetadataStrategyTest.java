@@ -17,11 +17,11 @@
  **/
 package org.logicblaze.lingo;
 
-import junit.framework.TestCase;
+import org.logicblaze.lingo.example.ExampleService;
 
 import java.lang.reflect.Method;
 
-import org.logicblaze.lingo.example.ExampleService;
+import junit.framework.TestCase;
 
 /**
  * @version $Revision$

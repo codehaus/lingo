@@ -17,16 +17,17 @@
  **/
 package org.logicblaze.lingo.jms.marshall;
 
-import org.logicblaze.lingo.LingoInvocation;
-import org.logicblaze.lingo.jms.Requestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.LingoInvocation;
+import org.logicblaze.lingo.jms.Requestor;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
+import javax.jms.Session;
 
 /**
  * Represents the strategy of marshalling of requests and responses in and out of JMS messages
@@ -44,6 +45,16 @@ public class DefaultMarshaller implements Marshaller {
         appendMessageHeaders(message, requestor, invocation);
         return message;
     }
+
+    
+    public Message createResponseMessage(Session session, RemoteInvocationResult result, Message requestMessage) throws JMSException {
+        ObjectMessage answer = session.createObjectMessage(result);
+        addResponseMessageHeaders(answer, result, requestMessage);
+        return answer;
+    }
+
+
+
 
     public RemoteInvocationResult extractInvocationResult(Message message) throws JMSException {
         handleInvocationResultHeaders(message);
@@ -104,9 +115,14 @@ public class DefaultMarshaller implements Marshaller {
     /**
      * A strategy method for derived classes to allow them a plugin point to perform custom header processing
      */
-    protected void appendMessageHeaders(Message message, Requestor requestor, LingoInvocation invocation) {
+    protected void appendMessageHeaders(Message message, Requestor requestor, LingoInvocation invocation) throws JMSException {
     }
 
+    /**
+     * A strategy for derived classes to allow them to plug in custom header processing for responses
+     */
+    protected void addResponseMessageHeaders(ObjectMessage answer, RemoteInvocationResult result, Message requestMessage) throws JMSException {
+    }
 
     /**
      * A strategy method to allow derived classes to process the headers in a special way

@@ -17,9 +17,6 @@
  **/
 package org.logicblaze.lingo.example;
 
-import junit.framework.TestCase;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.ClassPathResource;
 import org.logicblaze.lingo.SpringTestSupport;
 
 /**

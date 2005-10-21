@@ -17,8 +17,8 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import javax.jms.Message;
 import javax.jms.JMSException;
+import javax.jms.Message;
 
 /**
  * An exception caused by failing to process an inbound message response
@@ -26,6 +26,8 @@ import javax.jms.JMSException;
  * @version $Revision$
  */
 public class FailedToProcessResponse extends RuntimeException {
+
+    private static final long serialVersionUID = -6517904559060142134L;
 
     public FailedToProcessResponse(Message message, JMSException cause) {
         super("Failed to process response: " + message + ". Reason: " + cause, cause);

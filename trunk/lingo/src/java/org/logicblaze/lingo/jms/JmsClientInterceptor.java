@@ -18,6 +18,8 @@
 
 package org.logicblaze.lingo.jms;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.logicblaze.lingo.LingoInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
@@ -27,8 +29,6 @@ import org.logicblaze.lingo.jms.impl.AsyncReplyHandler;
 import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 import org.logicblaze.lingo.jms.marshall.DefaultMarshaller;
 import org.logicblaze.lingo.jms.marshall.Marshaller;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -41,6 +41,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+
 import java.util.Map;
 import java.util.WeakHashMap;
 

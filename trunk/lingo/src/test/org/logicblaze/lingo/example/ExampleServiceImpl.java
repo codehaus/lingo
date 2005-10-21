@@ -17,9 +17,10 @@
  **/
 package org.logicblaze.lingo.example;
 
-import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import junit.framework.Assert;
 
 /**
  * @version $Revision$
@@ -27,9 +28,9 @@ import org.apache.commons.logging.LogFactory;
 public class ExampleServiceImpl extends Assert implements ExampleService {
     private static final transient Log log = LogFactory.getLog(ExampleServiceImpl.class);
 
-    private static String lastMethod;
+    private static volatile String lastMethod;
     private Object[] lastArguments;
-    private int delay = 10000;
+    private int delay = 1000;
 
     public synchronized void someOneWayMethod(String name, int age) {
         System.out.println("#### starting server side method for: " + name + " with age: " + age + " on instance: " + this);
@@ -72,7 +73,7 @@ public class ExampleServiceImpl extends Assert implements ExampleService {
 
             listener.onResult("Price for " + stock + " is 10");
             try {
-                Thread.sleep(500);
+                Thread.sleep(delay);
             }
             catch (InterruptedException e) {
                 // ignore
@@ -96,12 +97,12 @@ public class ExampleServiceImpl extends Assert implements ExampleService {
         return lastArguments;
     }
 
-    public synchronized void assertOneWayCalled() {
+    public void assertOneWayCalled() {
         assertNotNull("lastMethod should not be null if we have been invoked on instance: " + this, lastMethod);
     }
 
-    public synchronized void assertOneWayNotCompletedYet() {
-        assertEquals("lastMethod not have a value yet on instance: " + this, null, lastMethod);
+    public void assertOneWayNotCompletedYet() {
+        assertEquals("lastMethod should be null as we should not have waited for the method to complete for instance: " + this, null, lastMethod);
     }
 
     public int getDelay() {
@@ -110,5 +111,9 @@ public class ExampleServiceImpl extends Assert implements ExampleService {
 
     public void setDelay(int delay) {
         this.delay = delay;
+    }
+
+    public void clear() {
+        lastMethod = null;
     }
 }

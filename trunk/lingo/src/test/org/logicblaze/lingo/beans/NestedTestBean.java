@@ -16,7 +16,6 @@
 
 package org.logicblaze.lingo.beans;
 
-import org.logicblaze.lingo.beans.INestedTestBean;
 
 /**
  * Simple nested test bean used for testing bean factories, AOP framework etc.

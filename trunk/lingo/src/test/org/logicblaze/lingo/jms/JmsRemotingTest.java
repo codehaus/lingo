@@ -19,12 +19,12 @@ package org.logicblaze.lingo.jms;
 
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.message.ActiveMQQueue;
+import org.aopalliance.intercept.MethodInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
 import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.logicblaze.lingo.beans.ITestBean;
 import org.logicblaze.lingo.beans.TestBean;
-import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.support.DefaultRemoteInvocationExecutor;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -33,6 +33,7 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.Session;
+
 import java.lang.reflect.InvocationTargetException;
 
 /**

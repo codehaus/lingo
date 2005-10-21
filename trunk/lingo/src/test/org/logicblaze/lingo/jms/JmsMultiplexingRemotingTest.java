@@ -25,6 +25,7 @@ import org.logicblaze.lingo.example.TestResultListener;
 import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 
 import javax.jms.Session;
+
 import java.util.List;
 
 /**
@@ -48,8 +49,8 @@ public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
         pfb.setServiceUrl("http://myurl");
         pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(new SimpleMetadataStrategy(true)));
         pfb.setRequestor(createRequestor(getDestinationName()));
-        pfb.afterPropertiesSet();
-
+        configure(pfb);
+        
         ExampleService proxy = (ExampleService) pfb.getObject();
 
         TestResultListener listener = new TestResultListener();

@@ -24,11 +24,13 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.Session;
 
 /**
  * @version $Revision$
  */
 public interface Marshaller {
+
     /**
      * Creates the request message
      *
@@ -37,6 +39,17 @@ public interface Marshaller {
      * @throws javax.jms.JMSException if the message could not be created
      */
     Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException;
+
+    /**
+     * Creates the response message
+     * 
+     * @param session the JMS session to use
+     * @param result the result invocation
+     * @param requestMessage the original request message
+     * @return the response message to send
+     * @throws JMSException if the message could not be created
+     */
+    Message createResponseMessage(Session session, RemoteInvocationResult result, Message requestMessage) throws JMSException;
 
     /**
      * Extracts the invocation result from the response message

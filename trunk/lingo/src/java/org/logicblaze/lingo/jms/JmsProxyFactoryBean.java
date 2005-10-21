@@ -18,7 +18,6 @@
 
 package org.logicblaze.lingo.jms;
 
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 

@@ -17,8 +17,6 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -29,18 +27,16 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 /**
- * A JMS MessageListener that exports the specified service bean as a JMS service
- * endpoint, accessible via a JMS proxy.
- * <p/>
- * <p>Note: JMS services exported with this class can be accessed by
- * any JMS client, as there isn't any special handling involved.
- *
+ * A JMS MessageListener that exports the specified service bean as a JMS
+ * service endpoint, accessible via a JMS proxy. <p/>
+ * <p>
+ * Note: JMS services exported with this class can be accessed by any JMS
+ * client, as there isn't any special handling involved.
+ * 
  * @author James Strachan
  * @see JmsProxyFactoryBean
  */
 public class JmsTemplateServiceExporter extends JmsServiceExporterSupport implements InitializingBean {
-    private static final Log log = LogFactory.getLog(JmsTemplateServiceExporter.class);
-
     private JmsTemplate template;
 
     public void afterPropertiesSet() throws Exception {
@@ -56,22 +52,26 @@ public class JmsTemplateServiceExporter extends JmsServiceExporterSupport implem
 
     /**
      * Sets the JMS template used to send replies back for the request
-     *
-     * @param template the JMS template to use
+     * 
+     * @param template
+     *            the JMS template to use
      */
     public void setTemplate(JmsTemplate template) {
         this.template = template;
     }
 
-
     /**
      * Send the given RemoteInvocationResult as a JMS message to the originator
-     *
-     * @param message current HTTP message
-     * @param result  the RemoteInvocationResult object
-     * @throws javax.jms.JMSException if thrown by trying to send the message
+     * 
+     * @param message
+     *            current HTTP message
+     * @param result
+     *            the RemoteInvocationResult object
+     * @throws javax.jms.JMSException
+     *             if thrown by trying to send the message
      */
-    protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result) throws JMSException {
+    protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result)
+            throws JMSException {
         template.send(message.getJMSReplyTo(), new MessageCreator() {
             public Message createMessage(Session session) throws JMSException {
                 return createResponseMessage(session, message, result);

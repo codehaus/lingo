@@ -18,12 +18,13 @@
 package org.logicblaze.lingo.jms.impl;
 
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.FailedToProcessResponse;
 import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.Requestor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -31,6 +32,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,6 +108,7 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         }
     }
 
+    
     /**
      * Processes inbound responses from requests
      */

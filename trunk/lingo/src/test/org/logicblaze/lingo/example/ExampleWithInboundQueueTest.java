@@ -17,10 +17,6 @@
  **/
 package org.logicblaze.lingo.example;
 
-import junit.framework.TestCase;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * A simple test case which tests the use of Lingo from Spring using the Spring XML deployment descriptor

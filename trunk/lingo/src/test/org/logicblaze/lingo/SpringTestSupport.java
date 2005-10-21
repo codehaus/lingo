@@ -1,10 +1,9 @@
 package org.logicblaze.lingo;
 
-import junit.framework.TestCase;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.jms.Session;
+import junit.framework.TestCase;
 
 /**
  * @version $Revision$
