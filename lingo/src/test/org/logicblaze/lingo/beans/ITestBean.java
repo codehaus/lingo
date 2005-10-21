@@ -16,8 +16,6 @@
 
 package org.logicblaze.lingo.beans;
 
-import org.logicblaze.lingo.beans.IndexedTestBean;
-import org.logicblaze.lingo.beans.INestedTestBean;
 
 /**
  * Interface used for test beans.

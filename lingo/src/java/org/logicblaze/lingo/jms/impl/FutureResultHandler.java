@@ -18,6 +18,7 @@
 package org.logicblaze.lingo.jms.impl;
 
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+
 import org.logicblaze.lingo.jms.ReplyHandler;
 
 import javax.jms.Message;

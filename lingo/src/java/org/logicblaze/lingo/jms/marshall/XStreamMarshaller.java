@@ -18,6 +18,7 @@
 package org.logicblaze.lingo.jms.marshall;
 
 import com.thoughtworks.xstream.XStream;
+
 import org.logicblaze.lingo.LingoInvocation;
 import org.logicblaze.lingo.jms.Requestor;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -25,12 +26,12 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.Session;
 import javax.jms.TextMessage;
-
 
 /**
  * Uses XStream to marshall requests and responses into and out of messages.
- *
+ * 
  * @version $Revision$
  */
 public class XStreamMarshaller extends DefaultMarshaller {
@@ -39,6 +40,12 @@ public class XStreamMarshaller extends DefaultMarshaller {
     public Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException {
         String xml = toXML(invocation);
         return requestor.getSession().createTextMessage(xml);
+    }
+
+    public Message createResponseMessage(Session session, RemoteInvocationResult result, Message requestMessage)
+            throws JMSException {
+        String xml = toXML(result);
+        return session.createTextMessage(xml);
     }
 
     public RemoteInvocationResult extractInvocationResult(Message message) throws JMSException {
@@ -59,9 +66,8 @@ public class XStreamMarshaller extends DefaultMarshaller {
         return super.readRemoteInvocation(message);
     }
 
-
     // Properties
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     public XStream getXStream() {
         if (xStream == null) {
             xStream = createXStream();
@@ -74,10 +80,11 @@ public class XStreamMarshaller extends DefaultMarshaller {
     }
 
     // Implementation methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     protected XStream createXStream() {
         XStream answer = new XStream();
         answer.alias("invoke", LingoInvocation.class);
+        answer.alias("result", RemoteInvocationResult.class);
         return answer;
     }
 
@@ -88,6 +95,5 @@ public class XStreamMarshaller extends DefaultMarshaller {
     protected String toXML(Object object) {
         return getXStream().toXML(object);
     }
-
 
 }

@@ -17,16 +17,16 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
-import org.logicblaze.lingo.jms.JmsProducer;
-import org.logicblaze.lingo.jms.Requestor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.jms.JmsProducer;
+import org.logicblaze.lingo.jms.Requestor;
 
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.DeliveryMode;
 
 /**
  * A simple requestor which only supports one-way and so does not need a consumer.
@@ -102,15 +102,15 @@ public class OneWayRequestor implements Requestor {
     }
 
     public Message receive(long timeout) throws JMSException {
-        throw new JMSException("receive(timeToLive) not implemented for OneWayRequestor");
+        throw new JMSException("receive(long) not implemented for OneWayRequestor");
     }
 
     public Message request(Destination destination, Message message) throws JMSException {
-        throw new JMSException("request() not implemented for OneWayRequestor");
+        throw new JMSException("request(Destination, Message) not implemented for OneWayRequestor");
     }
 
     public Message request(Destination destination, Message message, long timeout) throws JMSException {
-        throw new JMSException("request() not implemented for OneWayRequestor");
+        throw new JMSException("request(Destination, Message, long) not implemented for OneWayRequestor");
     }
 
     protected void populateHeaders(Message message) throws JMSException {

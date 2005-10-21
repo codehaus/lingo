@@ -39,6 +39,8 @@ import java.util.Set;
  * @version $Revision$
  */
 public class SimpleMetadataStrategy implements MetadataStrategy {
+    private static final long serialVersionUID = 3314789109318386510L;
+    
     private boolean oneWayForVoidMethods;
     private Set remoteTypes;
 
@@ -87,7 +89,7 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
         this.remoteTypes = remoteTypes;
     }
 
-    protected boolean isRemoteParameter(Method method, Class parameterType, int index) {
+    public boolean isRemoteParameter(Method method, Class parameterType, int index) {
         for (Iterator iter = getRemoteTypes().iterator(); iter.hasNext();) {
             Class type = (Class) iter.next();
             if (type.isAssignableFrom(parameterType)) {

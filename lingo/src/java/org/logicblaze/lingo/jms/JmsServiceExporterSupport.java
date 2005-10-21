@@ -17,6 +17,8 @@
  **/
 package org.logicblaze.lingo.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.LingoInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
@@ -24,8 +26,6 @@ import org.logicblaze.lingo.MethodMetadata;
 import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.logicblaze.lingo.jms.marshall.DefaultMarshaller;
 import org.logicblaze.lingo.jms.marshall.Marshaller;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
@@ -157,8 +157,9 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         if (result == null) {
             throw new IllegalArgumentException("result cannot be null");
         }
-        ObjectMessage answer = session.createObjectMessage(result);
-
+        
+        Message answer = getMarshaller().createResponseMessage(session, result, message);
+        
         // lets preserve the correlation ID
         answer.setJMSCorrelationID(message.getJMSCorrelationID());
         return answer;
@@ -185,6 +186,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         JmsProxyFactoryBean factory = new JmsProxyFactoryBean();
         factory.setDestination(message.getJMSReplyTo());
         factory.setCorrelationID((String) argument);
+        factory.setMarshaller(getMarshaller());
         factory.setRemoteInvocationFactory(invocationFactory);
         factory.setServiceInterface(parameterType);
         factory.setRequestor(responseRequestor);

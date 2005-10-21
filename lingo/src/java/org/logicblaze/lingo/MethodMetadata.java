@@ -26,6 +26,8 @@ import java.io.Serializable;
  * @version $Revision$
  */
 public class MethodMetadata implements Serializable {
+    private static final long serialVersionUID = 7969481427004071349L;
+    
     private boolean oneWay;
     private boolean[] remoteParameters;
 

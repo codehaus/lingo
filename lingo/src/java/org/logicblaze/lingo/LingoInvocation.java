@@ -17,8 +17,8 @@
  **/
 package org.logicblaze.lingo;
 
-import org.springframework.remoting.support.RemoteInvocation;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.remoting.support.RemoteInvocation;
 
 /**
  * Extends the Spring remote invocation bean to add the extra Lingo metadata
@@ -26,6 +26,8 @@ import org.aopalliance.intercept.MethodInvocation;
  * @version $Revision$
  */
 public class LingoInvocation extends RemoteInvocation {
+    private static final long serialVersionUID = -7584977401796151266L;
+    
     private MethodMetadata metadata;
 
     public LingoInvocation(MethodInvocation methodInvocation, MethodMetadata metadata) {

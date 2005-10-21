@@ -26,5 +26,11 @@ public interface ExampleService {
     public int regularRPC(String name);
     public void anotherRPC() throws Exception;
 
+    /**
+     * @org.logicblaze.lingo.annotations.Async
+     * 
+     * @param stock
+     * @param listener
+     */
     public void asyncRequestResponse(String stock, ResultListener listener);
 }

@@ -20,6 +20,9 @@
 
 package org.logicblaze.lingo.beans;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,14 +30,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.logicblaze.lingo.beans.ITestBean;
-import org.logicblaze.lingo.beans.IndexedTestBean;
-import org.logicblaze.lingo.beans.INestedTestBean;
-import org.logicblaze.lingo.beans.IOther;
-import org.logicblaze.lingo.beans.ITestBean;
 
 /**
  * Simple test bean used for testing bean factories,

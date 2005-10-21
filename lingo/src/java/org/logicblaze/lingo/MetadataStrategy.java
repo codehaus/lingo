@@ -17,10 +17,8 @@
  **/
 package org.logicblaze.lingo;
 
-import org.aopalliance.intercept.MethodInvocation;
-
-import java.lang.reflect.Method;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * Represents the metadata strategy used to decide which methods

@@ -17,13 +17,13 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import org.springframework.remoting.support.RemoteInvocationResult;
 import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
 import org.logicblaze.lingo.jms.impl.OneWayRequestor;
+import org.springframework.remoting.support.RemoteInvocationResult;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.ConnectionFactory;
 
 /**
  * A regular JMS message listener which can be used from inside a message driven object

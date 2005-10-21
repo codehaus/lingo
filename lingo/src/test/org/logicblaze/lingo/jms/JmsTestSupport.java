@@ -17,7 +17,6 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import junit.framework.TestCase;
 import org.activemq.ActiveMQConnectionFactory;
 import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
 import org.logicblaze.lingo.jms.impl.SingleThreadedRequestor;
@@ -26,6 +25,8 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
+
+import junit.framework.TestCase;
 
 /**
  * A useful base class for any JMS related test cases

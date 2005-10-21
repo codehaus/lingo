@@ -1,6 +1,6 @@
-/** 
+/**
  * 
- * Copyright 2005 LogicBlaze, Inc.
+ * Copyright 2005 LogicBlaze, Inc. http://www.logicblaze.com
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -15,17 +15,13 @@
  * limitations under the License. 
  * 
  **/
-package org.logicblaze.lingo.example;
-
+package org.logicblaze.lingo.annotations;
 
 /**
- * A simple test case which tests the use of Lingo from Spring using the Spring XML deployment descriptor
- *
+ * An annotation to mark a parameter as being pass by reference rather than pass by value.
+ * 
  * @version $Revision$
  */
-public class ExampleWithJCAUsingTopicsTest extends ExampleTest {
+public interface Reference {
 
-    protected String getApplicationContextXml() {
-        return "org/logicblaze/lingo/example/spring-with-jca-topics.xml";
-    }
 }

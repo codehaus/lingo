@@ -23,17 +23,9 @@ package org.logicblaze.lingo.example;
  *
  * @version $Revision$
  */
-public class ExampleAsyncTest extends ExampleTest {
-    public void testOneWayMethodCall() throws Exception {
-        ExampleServiceImpl serverImpl = (ExampleServiceImpl) getBean("serverImpl");
-        serverImpl.clear();
-        
-        callOneWayMethod();
-
-        serverImpl.assertOneWayNotCompletedYet();
-    }
+public class ExampleWithJCAWithXStreamTest extends ExampleTest {
 
     protected String getApplicationContextXml() {
-        return "org/logicblaze/lingo/example/spring-with-async.xml";
+        return "org/logicblaze/lingo/example/spring-with-jca-xstream.xml";
     }
 }
