@@ -18,7 +18,6 @@
 package org.logicblaze.lingo.jms;
 
 import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
-import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 import org.logicblaze.lingo.jms.impl.OneWayRequestor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;

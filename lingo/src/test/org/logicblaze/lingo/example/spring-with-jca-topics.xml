@@ -47,7 +47,9 @@
   </bean>
 
   <!-- an inbound message connector using a stateless, thread safe MessageListener -->
-  <bean id="inboundMessageA" factory-method="addConnector" factory-bean="jencks" singleton="true">
+  <bean id="inboundMessageA"  class="org.jencks.JCAConnector">
+
+	<property name="jcaContainer" ref="jencks" />
 
     <!-- subscription details -->
     <property name="activationSpec">

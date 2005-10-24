@@ -115,7 +115,7 @@
     <dependency>
       <id>springframework</id>
       <artifactId>spring</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.5</version>
       <url>http://www.springframework.org</url>
     </dependency>
     <dependency>
@@ -167,11 +167,11 @@
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>3.1-M6</version>
+      <version>3.1</version>
     </dependency>
     <dependency>
       <id>activemq+ra</id>
-      <version>3.1-M6</version>
+      <version>3.1</version>
       <properties>
         <lib>true</lib>
       </properties>
@@ -180,7 +180,7 @@
     <!-- JCA and TransactionManager -->
     <dependency>
       <id>jencks+all</id>
-      <version>1.0-M1</version>
+      <version>1.1</version>
       <properties>
         <lib>true</lib>
       </properties>
