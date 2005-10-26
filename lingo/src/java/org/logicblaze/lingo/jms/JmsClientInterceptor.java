@@ -42,6 +42,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -65,6 +66,8 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     private String correlationID;
     private Marshaller marshaller;
     private ConnectionFactory connectionFactory;
+    private String jmsType;
+    private Map messageProperties;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -170,6 +173,30 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         this.correlationID = correlationID;
     }
 
+    
+    public String getJmsType() {
+        return jmsType;
+    }
+
+    /**
+     * Sets the JMS message type string which is appended to messages if set
+     */
+    public void setJmsType(String jmsType) {
+        this.jmsType = jmsType;
+    }
+
+    public Map getMessageProperties() {
+        return messageProperties;
+    }
+
+    /**
+     * Sets the message properties to be added to each message. Note that the keys should be Strings
+     * and the values should be primitive types.
+     */
+    public void setMessageProperties(Map messageProperties) {
+        this.messageProperties = messageProperties;
+    }
+
     public Marshaller getMarshaller() {
         return marshaller;
     }
@@ -196,6 +223,17 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     protected void populateHeaders(Message requestMessage) throws JMSException {
         if (correlationID != null) {
             requestMessage.setJMSCorrelationID(correlationID);
+        }
+        if (jmsType != null) {
+            requestMessage.setJMSType(jmsType);
+        }
+        if (messageProperties != null) {
+            for (Iterator iter = messageProperties.entrySet().iterator(); iter.hasNext();) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                String name = entry.getKey().toString();
+                Object value = entry.getValue();
+                requestMessage.setObjectProperty(name, value);
+            }
         }
     }
 
