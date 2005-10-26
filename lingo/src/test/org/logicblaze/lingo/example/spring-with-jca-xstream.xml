@@ -58,10 +58,7 @@
     <property name="activationSpec">
       <bean class="org.activemq.ra.ActiveMQActivationSpec">
         <property name="destination" value="test.org.logicblaze.lingo.jca.xstreamExample"/>
-        <property name="destinationType" value="javax.jms.Topic"/>
-        <property name="messageSelector" value="symbolID &lt;&gt; 'testSymbolID2' "/>
-        <property name="noLocal" value="true"></property>
-        <property name="subscriptionName" value="Client1"></property>
+        <property name="destinationType" value="javax.jms.Queue"/>
       </bean>
     </property>
 
@@ -86,7 +83,7 @@
     <property name="brokerURL" value="tcp://localhost:61626"/>
   </bean>
 
-  <bean id="exampleDestination" class="org.activemq.message.ActiveMQTopic">
+  <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
     <constructor-arg index="0" value="test.org.logicblaze.lingo.jca.xstreamExample"/>
   </bean>
 </beans>
