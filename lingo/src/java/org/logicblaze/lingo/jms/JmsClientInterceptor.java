@@ -49,15 +49,14 @@ import java.util.WeakHashMap;
 /**
  * Interceptor for accessing a JMS based service which must be configured with a
  * {@link org.logicblaze.lingo.LingoRemoteInvocationFactory} instance.
- *
+ * 
  * @author James Strachan
  * @see #setServiceInterface
  * @see #setServiceUrl
  * @see JmsServiceExporter
  * @see JmsProxyFactoryBean
  */
-public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
-        implements MethodInterceptor, InitializingBean, DisposableBean {
+public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implements MethodInterceptor, InitializingBean, DisposableBean {
 
     private Map remoteObjects = new WeakHashMap();
     private Requestor requestor;
@@ -68,6 +67,8 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     private ConnectionFactory connectionFactory;
     private String jmsType;
     private Map messageProperties;
+    private int jmsExpiration = -1;
+    private int jmsPriority = -1;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -133,7 +134,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     }
 
     // Properties
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     public Requestor getRequestor() {
         return requestor;
     }
@@ -148,7 +149,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
 
     /**
      * Sets the destination used to make requests
-     *
+     * 
      * @param destination
      */
     public void setDestination(Destination destination) {
@@ -160,9 +161,9 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     }
 
     /**
-     * Sets the destination used to consume responses on - or null
-     * and a temporary queue will be created.
-     *
+     * Sets the destination used to consume responses on - or null and a
+     * temporary queue will be created.
+     * 
      * @param responseDestination
      */
     public void setResponseDestination(Destination responseDestination) {
@@ -173,7 +174,6 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         this.correlationID = correlationID;
     }
 
-    
     public String getJmsType() {
         return jmsType;
     }
@@ -189,9 +189,31 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         return messageProperties;
     }
 
+    public int getJmsExpiration() {
+        return jmsExpiration;
+    }
+
     /**
-     * Sets the message properties to be added to each message. Note that the keys should be Strings
-     * and the values should be primitive types.
+     * Sets the JMS expiration timeout (in milliseconds) of the request message
+     */
+    public void setJmsExpiration(int jmsExpiration) {
+        this.jmsExpiration = jmsExpiration;
+    }
+
+    public int getJmsPriority() {
+        return jmsPriority;
+    }
+
+    /**
+     * Sets the JMS priority of the request message
+     */
+    public void setJmsPriority(int jmsPriority) {
+        this.jmsPriority = jmsPriority;
+    }
+
+    /**
+     * Sets the message properties to be added to each message. Note that the
+     * keys should be Strings and the values should be primitive types.
      */
     public void setMessageProperties(Map messageProperties) {
         this.messageProperties = messageProperties;
@@ -218,7 +240,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     }
 
     // Implementation methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     protected void populateHeaders(Message requestMessage) throws JMSException {
         if (correlationID != null) {
@@ -226,6 +248,12 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         }
         if (jmsType != null) {
             requestMessage.setJMSType(jmsType);
+        }
+        if (jmsExpiration >= 0) {
+            requestMessage.setJMSExpiration(jmsExpiration);
+        }
+        if (jmsPriority >= 0) {
+            requestMessage.setJMSPriority(jmsPriority);
         }
         if (messageProperties != null) {
             for (Iterator iter = messageProperties.entrySet().iterator(); iter.hasNext();) {
@@ -237,16 +265,19 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
         }
     }
 
-
     /**
-     * Recreate the invocation result contained in the given RemoteInvocationResult
-     * object. The default implementation calls the default recreate method.
-     * <p>Can be overridden in subclass to provide custom recreation, potentially
+     * Recreate the invocation result contained in the given
+     * RemoteInvocationResult object. The default implementation calls the
+     * default recreate method.
+     * <p>
+     * Can be overridden in subclass to provide custom recreation, potentially
      * processing the returned result object.
-     *
-     * @param result the RemoteInvocationResult to recreate
+     * 
+     * @param result
+     *            the RemoteInvocationResult to recreate
      * @return a return value if the invocation result is a successful return
-     * @throws Throwable if the invocation result is an exception
+     * @throws Throwable
+     *             if the invocation result is an exception
      * @see org.springframework.remoting.support.RemoteInvocationResult#recreate
      */
     protected Object recreateRemoteInvocationResult(RemoteInvocationResult result) throws Throwable {
@@ -283,15 +314,17 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor
     }
 
     /**
-     * Factory method to create a default lingo based invocation factory if none is configured
+     * Factory method to create a default lingo based invocation factory if none
+     * is configured
      */
     protected LingoRemoteInvocationFactory createRemoteInvocationFactory() {
         return new LingoRemoteInvocationFactory(createMetadataStrategy());
     }
 
     /**
-     * Factory method to create a default metadata strategy if none is configured
-     *
+     * Factory method to create a default metadata strategy if none is
+     * configured
+     * 
      * @return
      */
     protected MetadataStrategy createMetadataStrategy() {
