@@ -64,6 +64,8 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
             setResponseRequestor(new OneWayRequestor(producer, null));
         }
 
+        super.afterPropertiesSet();
+
         // do we have a destination specified, if so consume
         if (destination != null) {
             Session session = producer.getSession();
@@ -75,8 +77,6 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
             }
             consumer.setMessageListener(this);
         }
-
-        super.afterPropertiesSet();
     }
 
     public void destroy() throws Exception {
