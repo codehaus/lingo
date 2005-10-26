@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>Lingo</name>
   <id>lingo</id>
-  <currentVersion>1.0-SNAPSHOT</currentVersion>
+  <currentVersion>1.0</currentVersion>
 
   <organization>
     <name>LogicBlaze, Inc.</name>
@@ -76,6 +76,11 @@
       <id>1.0-M1</id>
       <name>1.0-M1</name>
       <tag>LINGO_1_0_M1</tag>
+    </version>
+    <version>
+      <id>1.0</id>
+      <name>1.0</name>
+      <tag>LINGO_1_0</tag>
     </version>
   </versions>
   <branches></branches>
@@ -167,11 +172,11 @@
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>3.1</version>
+      <version>3.2</version>
     </dependency>
     <dependency>
       <id>activemq+ra</id>
-      <version>3.1</version>
+      <version>3.2</version>
       <properties>
         <lib>true</lib>
       </properties>
