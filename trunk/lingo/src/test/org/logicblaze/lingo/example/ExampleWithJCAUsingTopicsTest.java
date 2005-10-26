@@ -28,4 +28,13 @@ public class ExampleWithJCAUsingTopicsTest extends ExampleTest {
     protected String getApplicationContextXml() {
         return "org/logicblaze/lingo/example/spring-with-jca-topics.xml";
     }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        // With ActiveMQ activation of topic subscriptions is not synchronous, so if we send a message immediately
+        // the subscription may not yet be active - so lets sleep a little to ensure the subscription is active
+        
+        Thread.sleep(1000);
+    }
 }
