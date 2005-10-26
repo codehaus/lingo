@@ -37,7 +37,6 @@ import javax.jms.TemporaryTopic;
  * @version $Revision$
  */
 public class SingleThreadedRequestor extends OneWayRequestor {
-    private Connection connection;
     private Session session;
     private Destination inboundDestination;
     private MessageConsumer receiver;
@@ -97,10 +96,6 @@ public class SingleThreadedRequestor extends OneWayRequestor {
             }
         }
 
-        if (connection != null) {
-            connection.close();
-        }
-        connection = null;
         session = null;
         inboundDestination = null;
     }
