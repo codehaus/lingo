@@ -6,21 +6,28 @@
 <beans>
 
   <!-- embedded JMS broker -->
-  <bean id="broker" class="org.activemq.spring.BrokerFactoryBean" singleton="true">
-    <property name="config" value="classpath:org/logicblaze/lingo/broker.xml"/>
+  <bean id="broker" class="org.activemq.spring.BrokerFactoryBean"
+    singleton="true">
+    <property name="config"
+      value="classpath:org/logicblaze/lingo/broker.xml" />
   </bean>
 
 
   <!-- START SNIPPET: server -->
   <!-- the server side -->
-  <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporterMessageListener" depends-on="broker">
-    <property name="service" ref="serverImpl"/>
-    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
-    <property name="connectionFactory" ref="jmsFactory"/>
+  <bean id="server"
+    class="org.logicblaze.lingo.jms.JmsServiceExporterMessageListener"
+    depends-on="broker">
+    <property name="service" ref="serverImpl" />
+    <property name="serviceInterface"
+      value="org.logicblaze.lingo.example.ExampleService" />
+    <property name="connectionFactory" ref="jmsFactory" />
   </bean>
 
   <!-- the actual implementation of the service - which is only made public for testing purposes -->
-  <bean id="serverImpl" class="org.logicblaze.lingo.example.ExampleServiceImpl" singleton="true"/>
+  <bean id="serverImpl"
+    class="org.logicblaze.lingo.example.ExampleServiceImpl"
+    singleton="true" />
   <!-- END SNIPPET: server -->
 
 
@@ -31,54 +38,70 @@
     <!-- lets use the default configuration of work manager and transaction manager-->
     <property name="bootstrapContext">
       <bean class="org.jencks.factory.BootstrapContextFactoryBean">
-        <property name="threadPoolSize" value="25"/>
+        <property name="threadPoolSize" value="25" />
       </bean>
     </property>
 
 
     <!-- the JCA Resource Adapter -->
     <property name="resourceAdapter">
-      <bean id="activeMQResourceAdapter" class="org.activemq.ra.ActiveMQResourceAdapter">
-        <property name="serverUrl" value="tcp://localhost:61626"/>
+      <bean id="activeMQResourceAdapter"
+        class="org.activemq.ra.ActiveMQResourceAdapter">
+        <property name="serverUrl" value="tcp://localhost:61626" />
       </bean>
     </property>
   </bean>
 
   <!-- an inbound message connector using a stateless, thread safe MessageListener -->
-  <bean id="inboundMessageA"  class="org.jencks.JCAConnector">
+  <bean id="inboundMessageA" class="org.jencks.JCAConnector">
 
-	<property name="jcaContainer" ref="jencks" />
+    <property name="jcaContainer" ref="jencks" />
 
     <!-- subscription details -->
     <property name="activationSpec">
       <bean class="org.activemq.ra.ActiveMQActivationSpec">
-        <property name="destination" value="test.org.logicblaze.lingo.jca.example"/>
-        <property name="destinationType" value="javax.jms.Queue"/>
+        <property name="destination"
+          value="test.org.logicblaze.lingo.jca.example" />
+        <property name="destinationType" value="javax.jms.Queue" />
       </bean>
     </property>
 
-    <property name="ref" value="server"/>
+    <property name="ref" value="server" />
   </bean>
   <!-- END SNIPPET: jca -->
 
 
   <!-- START SNIPPET: client -->
-  <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean" >
-    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
-    <property name="connectionFactory" ref="jmsFactory"/>
-    <property name="destination" ref="exampleDestination"/>
+  <bean id="client"
+    class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
+    <property name="serviceInterface"
+      value="org.logicblaze.lingo.example.ExampleService" />
+    <property name="connectionFactory" ref="jmsFactory" />
+    <property name="destination" ref="exampleDestination" />
+
+    <!--  lets add some custom headers to the messages -->
+    <property name="messageProperties">
+      <map>
+        <entry key="MyHeader">
+          <value>Cheese</value>
+        </entry>
+      </map>
+    </property>
   </bean>
   <!-- END SNIPPET: client -->
 
 
 
   <!-- JMS ConnectionFactory to use -->
-  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="tcp://localhost:61626"/>
+  <bean id="jmsFactory"
+    class="org.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61626" />
   </bean>
 
-  <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
-    <constructor-arg index="0" value="test.org.logicblaze.lingo.jca.example"/>
+  <bean id="exampleDestination"
+    class="org.activemq.message.ActiveMQQueue">
+    <constructor-arg index="0"
+      value="test.org.logicblaze.lingo.jca.example" />
   </bean>
 </beans>
 

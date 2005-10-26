@@ -31,12 +31,12 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
 /**
- * A JMS MessageListener that exports the specified service bean as a JMS service
- * endpoint, accessible via a JMS proxy.
- * <p/>
- * <p>Note: JMS services exported with this class can be accessed by
- * any JMS client, as there isn't any special handling involved.
- *
+ * A JMS MessageListener that exports the specified service bean as a JMS
+ * service endpoint, accessible via a JMS proxy. <p/>
+ * <p>
+ * Note: JMS services exported with this class can be accessed by any JMS
+ * client, as there isn't any special handling involved.
+ * 
  * @author James Strachan
  * @see JmsProxyFactoryBean
  */
@@ -45,6 +45,7 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
     private ConnectionFactory connectionFactory;
     private Destination destination;
     private MessageConsumer consumer;
+    private String messageSelector;
 
     public void afterPropertiesSet() throws Exception {
         if (producer == null) {
@@ -57,15 +58,21 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
         }
         Requestor responseRequestor = getResponseRequestor();
         if (responseRequestor == null) {
-            //responseRequestor = new MultiplexingRequestor(producer.getSession(), producer, null);
-            //setResponseRequestor(responseRequestor);
+            // responseRequestor = new
+            // MultiplexingRequestor(producer.getSession(), producer, null);
+            // setResponseRequestor(responseRequestor);
             setResponseRequestor(new OneWayRequestor(producer, null));
         }
 
         // do we have a destination specified, if so consume
         if (destination != null) {
             Session session = producer.getSession();
-            consumer = session.createConsumer(destination);
+            if (messageSelector != null) {
+                consumer = session.createConsumer(destination, messageSelector);
+            }
+            else {
+                consumer = session.createConsumer(destination);
+            }
             consumer.setMessageListener(this);
         }
 
@@ -109,12 +116,26 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
         this.destination = destination;
     }
 
+    public String getMessageSelector() {
+        return messageSelector;
+    }
+
+    /**
+     * Sets the message selector applied to the subscription
+     */
+    public void setMessageSelector(String messageSelector) {
+        this.messageSelector = messageSelector;
+    }
+
     /**
      * Send the given RemoteInvocationResult as a JMS message to the originator
-     *
-     * @param message current HTTP message
-     * @param result  the RemoteInvocationResult object
-     * @throws javax.jms.JMSException if thrown by trying to send the message
+     * 
+     * @param message
+     *            current HTTP message
+     * @param result
+     *            the RemoteInvocationResult object
+     * @throws javax.jms.JMSException
+     *             if thrown by trying to send the message
      */
     protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result) throws JMSException {
         Message responseMessage = createResponseMessage(producer.getSession(), message, result);
