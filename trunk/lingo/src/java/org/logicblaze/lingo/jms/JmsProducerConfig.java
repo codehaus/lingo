@@ -27,6 +27,7 @@ import javax.jms.MessageProducer;
  */
 public class JmsProducerConfig {
 
+    private String clientID;
     private int deliveryMode;
     private boolean disableMessageID;
     private boolean disableMessageTimestamp;
@@ -88,5 +89,16 @@ public class JmsProducerConfig {
     public void setTimeToLive(int timeToLive) {
         this.timeToLive = timeToLive;
     }
+    
+    public String getClientID() {
+        return clientID;
+    }
 
+    /**
+     * Sets the JMS connections unique clientID. This is optional unless you wish to use durable topic subscriptions. 
+     * Only one connection can have a given clientID at any time.
+     */
+    public void setClientID(String clientID) {
+        this.clientID = clientID;
+    }
 }

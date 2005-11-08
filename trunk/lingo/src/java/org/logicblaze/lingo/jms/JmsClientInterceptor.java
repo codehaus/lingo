@@ -255,14 +255,27 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     public boolean isPersistentDelivery() {
         return producerConfig.getDeliveryMode() == DeliveryMode.PERSISTENT;
     }
-    
+
     /**
      * Sets the delivery mode to be persistent or non-persistent.
      */
     public void setPersistentDelivery(boolean persistent) {
         producerConfig.setDeliveryMode(persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT);
     }
-    
+
+    public String getClientID() {
+        return producerConfig.getClientID();
+    }
+
+    /**
+     * Sets the JMS connections unique clientID. This is optional unless you
+     * wish to use durable topic subscriptions. Only one connection can have a
+     * given clientID at any time.
+     */
+    public void setClientID(String clientID) {
+        producerConfig.setClientID(clientID);
+    }
+
     // Implementation methods
     // -------------------------------------------------------------------------
 
