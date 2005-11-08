@@ -29,6 +29,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 /**
  * A JMS MessageListener that exports the specified service bean as a JMS
@@ -46,6 +47,8 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
     private Destination destination;
     private MessageConsumer consumer;
     private String messageSelector;
+    private String subscriberName;
+    private boolean noLocal;
 
     public void afterPropertiesSet() throws Exception {
         if (producer == null) {
@@ -68,13 +71,7 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
 
         // do we have a destination specified, if so consume
         if (destination != null) {
-            Session session = producer.getSession();
-            if (messageSelector != null) {
-                consumer = session.createConsumer(destination, messageSelector);
-            }
-            else {
-                consumer = session.createConsumer(destination);
-            }
+            consumer = createConsumer();
             consumer.setMessageListener(this);
         }
     }
@@ -127,6 +124,31 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
         this.messageSelector = messageSelector;
     }
 
+    public boolean isNoLocal() {
+        return noLocal;
+    }
+
+    /**
+     * Sets whether or not topic subscriptions should receive locally produced messages
+     */
+    public void setNoLocal(boolean noLocal) {
+        this.noLocal = noLocal;
+    }
+
+    public String getSubscriberName() {
+        return subscriberName;
+    }
+
+    /**
+     * Sets the durable subscriber name and enables a durable subscription.
+     */
+    public void setSubscriberName(String subscriberName) {
+        this.subscriberName = subscriberName;
+    }
+
+    // Implementation methods
+    // -------------------------------------------------------------------------
+
     /**
      * Send the given RemoteInvocationResult as a JMS message to the originator
      * 
@@ -140,6 +162,26 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
     protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result) throws JMSException {
         Message responseMessage = createResponseMessage(producer.getSession(), message, result);
         producer.getMessageProducer().send(message.getJMSReplyTo(), responseMessage);
+    }
+
+    /**
+     * Factory method to create the consumer
+     */
+    protected MessageConsumer createConsumer() throws JMSException {
+        Session session = producer.getSession();
+        if (subscriberName != null) {
+            if (destination instanceof Topic) {
+                Topic topic = (Topic) destination;
+                return session.createDurableSubscriber(topic, subscriberName, messageSelector, noLocal);
+            }
+            else {
+                throw new IllegalArgumentException("Cannot specify the subscriberName property when using a Queue destination");
+            }
+
+        }
+        else {
+            return session.createConsumer(destination, messageSelector, noLocal);
+        }
     }
 
 }

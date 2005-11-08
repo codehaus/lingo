@@ -22,7 +22,6 @@ import org.logicblaze.lingo.jms.JmsProducerConfig;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
@@ -38,6 +37,11 @@ public class DefaultJmsProducer extends JmsProducerImpl {
     public static DefaultJmsProducer newInstance(ConnectionFactory factory, JmsProducerConfig config) throws JMSException {
         Connection connection = factory.createConnection();
 
+        String clientID = config.getClientID();
+        if (clientID != null) {
+            connection.setClientID(clientID);
+        }
+        
         // lets start the connection in case that we consume on the same connection
         connection.start();
 
