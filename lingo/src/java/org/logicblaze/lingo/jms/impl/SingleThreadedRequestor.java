@@ -18,6 +18,7 @@
 package org.logicblaze.lingo.jms.impl;
 
 import org.logicblaze.lingo.jms.JmsProducer;
+import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.logicblaze.lingo.jms.Requestor;
 
 import javax.jms.Connection;
@@ -42,8 +43,8 @@ public class SingleThreadedRequestor extends OneWayRequestor {
     private MessageConsumer receiver;
     private boolean deleteTemporaryDestinationsOnClose;
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination) throws JMSException {
-        JmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
+    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination) throws JMSException {
+        JmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
         return new SingleThreadedRequestor(producer.getSession(), producer, serverDestination);
     }
 

@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.FailedToProcessResponse;
 import org.logicblaze.lingo.jms.JmsProducer;
+import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.Requestor;
 
@@ -52,13 +53,13 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
     private Map requests = new HashMap();
 
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination) throws JMSException {
-        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
+    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination) throws JMSException {
+        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
         return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination);
     }
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, Destination serverDestination, Destination clientDestination) throws JMSException {
-        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory);
+    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination, Destination clientDestination) throws JMSException {
+        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
         return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination, clientDestination);
     }
 

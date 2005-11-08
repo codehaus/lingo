@@ -36,9 +36,10 @@ import junit.framework.TestCase;
 public abstract class JmsTestSupport extends TestCase {
     protected ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
     protected Connection connection;
+    protected JmsProducerConfig config = new JmsProducerConfig();
 
     protected JmsProducer createJmsProducer() throws JMSException {
-        return DefaultJmsProducer.newInstance(connectionFactory);
+        return DefaultJmsProducer.newInstance(connectionFactory, config );
     }
 
     protected Session createSession() throws JMSException {

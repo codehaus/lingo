@@ -17,6 +17,8 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
+import org.logicblaze.lingo.jms.JmsProducerConfig;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -33,23 +35,22 @@ public class DefaultJmsProducer extends JmsProducerImpl {
 
     private Connection connection;
 
-    public static DefaultJmsProducer newInstance(ConnectionFactory factory) throws JMSException {
+    public static DefaultJmsProducer newInstance(ConnectionFactory factory, JmsProducerConfig config) throws JMSException {
         Connection connection = factory.createConnection();
 
         // lets start the connection in case that we consume on the same connection
         connection.start();
 
-        return newInstance(connection);
+        return newInstance(connection, config);
     }
 
-    public static DefaultJmsProducer newInstance(Connection connection) throws JMSException {
+    public static DefaultJmsProducer newInstance(Connection connection, JmsProducerConfig config) throws JMSException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageProducer producer = session.createProducer(null);
-        return new DefaultJmsProducer(connection, session, producer);
+        return new DefaultJmsProducer(connection, session, config);
     }
 
-    public DefaultJmsProducer(Connection connection, Session session, MessageProducer producer) {
-        super(session, producer);
+    public DefaultJmsProducer(Connection connection, Session session, JmsProducerConfig config) throws JMSException {
+        super(session, config);
         this.connection = connection;
     }
 
