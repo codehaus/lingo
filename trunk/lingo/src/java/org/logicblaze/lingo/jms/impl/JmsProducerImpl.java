@@ -18,6 +18,7 @@
 package org.logicblaze.lingo.jms.impl;
 
 import org.logicblaze.lingo.jms.JmsProducer;
+import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.jms.JMSException;
@@ -35,9 +36,10 @@ public class JmsProducerImpl implements JmsProducer, DisposableBean {
     private Session session;
     private MessageProducer producer;
 
-    public JmsProducerImpl(Session session) throws JMSException {
+    public JmsProducerImpl(Session session, JmsProducerConfig config) throws JMSException {
         this.session = session;
         this.producer = session.createProducer(null);
+        config.configure(producer);
     }
 
     public JmsProducerImpl(Session session, MessageProducer producer) {

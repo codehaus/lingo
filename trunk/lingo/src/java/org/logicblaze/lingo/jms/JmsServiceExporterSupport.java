@@ -32,6 +32,7 @@ import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
+import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -49,6 +50,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
     private MetadataStrategy metadataStrategy;
     private RemoteInvocationFactory invocationFactory;
     private Requestor responseRequestor;
+    private JmsProducerConfig producerConfig = new JmsProducerConfig();
 
     public void afterPropertiesSet() throws Exception {
         this.proxy = getProxyForService();
@@ -128,7 +130,29 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
         this.ignoreFailures = ignoreFailures;
     }
 
+    public JmsProducerConfig getProducerConfig() {
+        return producerConfig;
+    }
 
+    /**
+     * Sets the configuration of the producer used to send back responses
+     */
+    public void setProducerConfig(JmsProducerConfig producerConfig) {
+        this.producerConfig = producerConfig;
+    }
+
+
+    public boolean isPersistentDelivery() {
+        return producerConfig.getDeliveryMode() == DeliveryMode.PERSISTENT;
+    }
+    
+    /**
+     * Sets the delivery mode to be persistent or non-persistent.
+     */
+    public void setPersistentDelivery(boolean persistent) {
+        producerConfig.setDeliveryMode(persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT);
+    }
+    
     // Implementation methods
     //-------------------------------------------------------------------------
 

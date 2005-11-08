@@ -41,7 +41,7 @@ public class JmsServiceExporterMessageListener extends JmsServiceExporterSupport
                 throw new IllegalArgumentException("requestor or connectionFactory is required");
             }
             else {
-                producer = DefaultJmsProducer.newInstance(connectionFactory);
+                producer = DefaultJmsProducer.newInstance(connectionFactory, getProducerConfig());
             }
         }
         Requestor responseRequestor = getResponseRequestor();

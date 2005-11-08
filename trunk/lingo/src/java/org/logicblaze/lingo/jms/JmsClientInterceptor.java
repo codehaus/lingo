@@ -38,6 +38,7 @@ import org.springframework.remoting.support.RemoteInvocationFactory;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -69,6 +70,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     private Map messageProperties;
     private int jmsExpiration = -1;
     private int jmsPriority = -1;
+    private JmsProducerConfig producerConfig = new JmsProducerConfig();
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -120,11 +122,11 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
                 throw new IllegalArgumentException("requestor or connectionFactory is required");
             }
             else {
-                requestor = MultiplexingRequestor.newInstance(connectionFactory, destination, responseDestination);
+                requestor = createRequestor();
             }
         }
         if (marshaller == null) {
-            // default to standard JMS marshalling
+            // default to standard JMS marshaling
             marshaller = new DefaultMarshaller();
         }
     }
@@ -239,6 +241,28 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         this.connectionFactory = connectionFactory;
     }
 
+    public JmsProducerConfig getProducerConfig() {
+        return producerConfig;
+    }
+
+    /**
+     * Sets the configuration of the producer used to send back responses
+     */
+    public void setProducerConfig(JmsProducerConfig producerConfig) {
+        this.producerConfig = producerConfig;
+    }
+
+    public boolean isPersistentDelivery() {
+        return producerConfig.getDeliveryMode() == DeliveryMode.PERSISTENT;
+    }
+    
+    /**
+     * Sets the delivery mode to be persistent or non-persistent.
+     */
+    public void setPersistentDelivery(boolean persistent) {
+        producerConfig.setDeliveryMode(persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT);
+    }
+    
     // Implementation methods
     // -------------------------------------------------------------------------
 
@@ -311,6 +335,10 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
             throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");
         }
         return correlationID;
+    }
+
+    protected Requestor createRequestor() throws JMSException {
+        return MultiplexingRequestor.newInstance(connectionFactory, getProducerConfig(), destination, responseDestination);
     }
 
     /**
