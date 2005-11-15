@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <!-- START SNIPPET: client -->
+  <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+
+    <!-- lets enable async one ways on the client -->
+    <property name="remoteInvocationFactory" ref="invocationFactory"/>
+  </bean>
+
+  <bean id="invocationFactory" class="org.logicblaze.lingo.LingoRemoteInvocationFactory">
+    <constructor-arg>
+      <bean class="org.logicblaze.lingo.Backport175MetadataStrategy"/>
+    </constructor-arg>
+  </bean>
+  <!-- END SNIPPET: client -->
+
+
+  <!-- the server side -->
+  <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporter">
+    <property name="service" ref="serverImpl"/>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+    <property name="invocationFactory" ref="invocationFactory"/>
+  </bean>
+
+  <!-- the actual implementation of the service - which is only made public for testing purposes -->
+  <bean id="serverImpl" class="org.logicblaze.lingo.example.ExampleServiceImpl" singleton="true"/>
+
+
+  <!-- JMS ConnectionFactory to use -->
+  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL">
+      <value>vm://localhost</value>
+    </property>
+  </bean>
+
+  <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
+    <constructor-arg index="0">
+      <value>test.org.logicblaze.lingo.example</value>
+    </constructor-arg>
+  </bean>
+</beans>
+

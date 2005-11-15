@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- START SNIPPET: spring -->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <!-- client side proxy-->
+  <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+    <property name="persistentDelivery" value="true"/>
+  </bean>
+
+  <!-- the server side -->
+  <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporter">
+    <property name="service" ref="serverImpl"/>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+
+    <!-- unique values for durable subscription  -->
+    <property name="clientID" value="James"/>
+    <property name="subscriberName" value="foo"/>
+  </bean>
+
+  <!-- the actual implementation of the service - which is only made public for testing purposes -->
+  <bean id="serverImpl" class="org.logicblaze.lingo.example.ExampleServiceImpl" singleton="true"/>
+
+
+  <!-- JMS ConnectionFactory to use -->
+  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="vm://localhost"/>
+  </bean>
+
+  <bean id="exampleDestination" class="org.activemq.message.ActiveMQTopic">
+    <constructor-arg index="0" value="test.org.logicblaze.lingo.example"/>
+  </bean>
+</beans>
+
+<!-- END SNIPPET: spring -->
