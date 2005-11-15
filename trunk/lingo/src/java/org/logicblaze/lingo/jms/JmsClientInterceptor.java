@@ -42,6 +42,7 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageProducer;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -69,7 +70,6 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     private String jmsType;
     private Map messageProperties;
     private int jmsExpiration = -1;
-    private int jmsPriority = -1;
     private JmsProducerConfig producerConfig = new JmsProducerConfig();
 
     public JmsClientInterceptor() {
@@ -203,15 +203,31 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     }
 
     public int getJmsPriority() {
-        return jmsPriority;
+        return producerConfig.getPriority();
     }
 
     /**
      * Sets the JMS priority of the request message
      */
     public void setJmsPriority(int jmsPriority) {
-        this.jmsPriority = jmsPriority;
+        producerConfig.setPriority(jmsPriority);
     }
+
+
+
+    public int getTimeToLive() {
+        return producerConfig.getTimeToLive();
+    }
+
+
+    /**
+     * Sets the time to live on each message request
+     */
+    public void setTimeToLive(int timeToLive) {
+        producerConfig.setTimeToLive(timeToLive);
+    }
+
+
 
     /**
      * Sets the message properties to be added to each message. Note that the
@@ -289,6 +305,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         if (jmsExpiration >= 0) {
             requestMessage.setJMSExpiration(jmsExpiration);
         }
+        int jmsPriority = getJmsPriority();
         if (jmsPriority >= 0) {
             requestMessage.setJMSPriority(jmsPriority);
         }

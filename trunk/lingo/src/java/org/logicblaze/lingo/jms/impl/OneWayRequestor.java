@@ -29,8 +29,9 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 /**
- * A simple requestor which only supports one-way and so does not need a consumer.
- *
+ * A simple requestor which only supports one-way and so does not need a
+ * consumer.
+ * 
  * @version $Revision$
  */
 public class OneWayRequestor implements Requestor {
@@ -39,53 +40,57 @@ public class OneWayRequestor implements Requestor {
     private JmsProducer producer;
     private Destination serverDestination;
     private long counter;
-    private int deliveryMode = DeliveryMode.NON_PERSISTENT;
-    private int priority = 5;
-    private long timeToLive = 30000;
 
     public OneWayRequestor(JmsProducer producer, Destination serverDestination) {
         this.producer = producer;
         this.serverDestination = serverDestination;
     }
 
-    /**
-     * The default delivery mode of request messages
-     */
-    public int getDeliveryMode() {
-        return deliveryMode;
-    }
-
-    public void setDeliveryMode(int deliveryMode) {
-        this.deliveryMode = deliveryMode;
+    public int getDeliveryMode() throws JMSException {
+        return producer.getMessageProducer().getDeliveryMode();
     }
 
     /**
-     * The default priority of request messages
+     * Sets the default delivery mode of request messages
+     * 
+     * @throws JMSException
      */
-    public int getPriority() {
-        return priority;
+    public void setDeliveryMode(int deliveryMode) throws JMSException {
+        producer.getMessageProducer().setDeliveryMode(deliveryMode);
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public int getPriority() throws JMSException {
+        return producer.getMessageProducer().getPriority();
+    }
+
+    /**
+     * Sets the default priority of request messages
+     * 
+     * @throws JMSException
+     */
+    public void setPriority(int priority) throws JMSException {
+        producer.getMessageProducer().setPriority(priority);
     }
 
     /**
      * The default time to live on request messages
+     * 
+     * @throws JMSException
      */
-    public long getTimeToLive() {
-        return timeToLive;
+    public long getTimeToLive() throws JMSException {
+        return producer.getMessageProducer().getTimeToLive();
     }
 
     /**
      * Sets the maximum time to live for requests
-     */ 
-    public void setTimeToLive(long timeToLive) {
-        this.timeToLive = timeToLive;
+     * @throws JMSException 
+     */
+    public void setTimeToLive(long timeToLive) throws JMSException {
+        producer.getMessageProducer().setTimeToLive(timeToLive);
     }
 
     public void oneWay(Destination destination, Message message) throws JMSException {
-        oneWay(destination, message, timeToLive);
+        oneWay(destination, message, getTimeToLive());
     }
 
     public void oneWay(Destination destination, Message message, long timeToLive) throws JMSException {
@@ -123,14 +128,14 @@ public class OneWayRequestor implements Requestor {
         if (log.isDebugEnabled()) {
             log.debug("Sending message to: " + destination + " message: " + message);
         }
-        producer.getMessageProducer().send(destination, message, deliveryMode, priority, timeToLive);
+        producer.getMessageProducer().send(destination, message, getDeliveryMode(), getPriority(), timeToLive);
     }
 
     /**
      * Creates a new correlation ID. Note that because the correlationID is used
-     * on a per-temporary destination basis, it does not need to be unique across
-     * more than one destination. So a simple counter will suffice.
-     *
+     * on a per-temporary destination basis, it does not need to be unique
+     * across more than one destination. So a simple counter will suffice.
+     * 
      * @return
      */
     public String createCorrelationID() {

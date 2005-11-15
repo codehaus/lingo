@@ -32,7 +32,7 @@ public class JmsProducerConfig {
     private boolean disableMessageID;
     private boolean disableMessageTimestamp;
     private int priority = -1;
-    private int timeToLive = -1;
+    private int timeToLive = 30000;
 
     public void configure(MessageProducer producer) throws JMSException {
         if (deliveryMode > 0) {
