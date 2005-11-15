@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <name>Lingo</name>
   <id>lingo</id>
-  <currentVersion>1.0</currentVersion>
+  <currentVersion>1.1</currentVersion>
 
   <organization>
     <name>LogicBlaze, Inc.</name>
@@ -88,6 +88,11 @@
       <id>1.0</id>
       <name>1.0</name>
       <tag>LINGO_1_0</tag>
+    </version>
+    <version>
+      <id>1.1</id>
+      <name>1.1</name>
+      <tag>LINGO_1_1</tag>
     </version>
   </versions>
   <branches></branches>
