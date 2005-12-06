@@ -17,13 +17,15 @@
  **/
 package org.logicblaze.lingo.jms;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
  * A simple abstraction layer for applications wishing to send JMS messages
- *
+ * 
  * @version $Revision$
  */
 public interface JmsProducer {
@@ -33,4 +35,22 @@ public interface JmsProducer {
     public MessageProducer getMessageProducer();
 
     public void close() throws JMSException;
+
+    /**
+     * Sends a message to the given destination in a way that can be implemented
+     * in JMS 1.0.2b as well as using the JMS 1.1 send() method on
+     * {@link MessageProducer}
+     * 
+     * @throws JMSException if the message could not be sent
+     */
+    public void send(Destination destination, Message message) throws JMSException;
+
+    /**
+     * Sends a message to the given destination in a way that can be implemented
+     * in JMS 1.0.2b as well as using the JMS 1.1 send() method on
+     * {@link MessageProducer}
+     * 
+     * @throws JMSException if the message could not be sent
+     */
+    public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive) throws JMSException;
 }

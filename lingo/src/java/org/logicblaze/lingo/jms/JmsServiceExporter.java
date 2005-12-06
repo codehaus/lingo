@@ -161,7 +161,7 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
      */
     protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result) throws JMSException {
         Message responseMessage = createResponseMessage(producer.getSession(), message, result);
-        producer.getMessageProducer().send(message.getJMSReplyTo(), responseMessage);
+        producer.send(message.getJMSReplyTo(), responseMessage);
     }
 
     /**

@@ -21,15 +21,18 @@ import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.springframework.beans.factory.DisposableBean;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
- * An implementation of the {@link org.logicblaze.lingo.jms.JmsProducer} which is designed to work in
- * message driven POJO type scenarios where the session and producer can be deduced
- * from the current consumption thread & the session can be reused from the consumer.
- *
+ * An implementation of the {@link org.logicblaze.lingo.jms.JmsProducer} which
+ * is designed to work in message driven POJO type scenarios where the session
+ * and producer can be deduced from the current consumption thread & the session
+ * can be reused from the consumer.
+ * 
  * @version $Revision$
  */
 public class JmsProducerImpl implements JmsProducer, DisposableBean {
@@ -70,5 +73,13 @@ public class JmsProducerImpl implements JmsProducer, DisposableBean {
 
     public void destroy() throws Exception {
         close();
+    }
+
+    public void send(Destination destination, Message message) throws JMSException {
+        getMessageProducer().send(destination, message);
+    }
+
+    public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive) throws JMSException {
+        getMessageProducer().send(destination, message, deliveryMode, priority, timeToLive);
     }
 }

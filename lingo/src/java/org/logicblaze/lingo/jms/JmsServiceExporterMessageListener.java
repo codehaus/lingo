@@ -69,6 +69,6 @@ public class JmsServiceExporterMessageListener extends JmsServiceExporterSupport
 
     protected void writeRemoteInvocationResult(Message message, RemoteInvocationResult result) throws JMSException {
         Message responseMessage = createResponseMessage(producer.getSession(), message, result);
-        producer.getMessageProducer().send(message.getJMSReplyTo(), responseMessage);
+        producer.send(message.getJMSReplyTo(), responseMessage);
     }
 }

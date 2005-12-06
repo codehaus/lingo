@@ -128,7 +128,7 @@ public class OneWayRequestor implements Requestor {
         if (log.isDebugEnabled()) {
             log.debug("Sending message to: " + destination + " message: " + message);
         }
-        producer.getMessageProducer().send(destination, message, getDeliveryMode(), getPriority(), timeToLive);
+        producer.send(destination, message, getDeliveryMode(), getPriority(), timeToLive);
     }
 
     /**
