@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.LingoInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
+import org.logicblaze.lingo.MetadataStrategyHelper;
 import org.logicblaze.lingo.MethodMetadata;
 import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.logicblaze.lingo.jms.marshall.DefaultMarshaller;
@@ -65,7 +66,7 @@ public abstract class JmsServiceExporterSupport extends RemoteInvocationBasedExp
             marshaller = new DefaultMarshaller();
         }
         if (metadataStrategy == null) {
-            metadataStrategy = new SimpleMetadataStrategy(true);
+            metadataStrategy = MetadataStrategyHelper.newInstance();
         }
         if (invocationFactory == null) {
             invocationFactory = new LingoRemoteInvocationFactory(metadataStrategy);
