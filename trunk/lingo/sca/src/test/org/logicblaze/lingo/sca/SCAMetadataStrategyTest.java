@@ -71,7 +71,7 @@ public class SCAMetadataStrategyTest extends TestCase {
     }
 
     protected MetadataStrategy createMetadataStrategy() {
-        return new SCAMetadataStrategy();
+        return MetadataStrategyHelper.newInstance();
     }
 
     protected Class getServiceClass() {

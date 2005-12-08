@@ -23,6 +23,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.logicblaze.lingo.LingoInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
+import org.logicblaze.lingo.MetadataStrategyHelper;
 import org.logicblaze.lingo.MethodMetadata;
 import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.logicblaze.lingo.jms.impl.AsyncReplyHandler;
@@ -384,7 +385,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
      * @return
      */
     protected MetadataStrategy createMetadataStrategy() {
-        return new SimpleMetadataStrategy();
+        return MetadataStrategyHelper.newInstance();
     }
 
 }
