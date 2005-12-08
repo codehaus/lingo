@@ -19,6 +19,7 @@ package org.logicblaze.lingo.jms.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.MetadataStrategy;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.marshall.Marshaller;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -28,6 +29,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * @version $Revision$
@@ -37,10 +39,12 @@ public class AsyncReplyHandler extends RemoteInvocationBasedExporter implements 
 
     private Object pojo;
     private Marshaller marshaller;
+    private final MetadataStrategy metadataStrategy;
 
-    public AsyncReplyHandler(Object pojo, Marshaller marshaller) {
+    public AsyncReplyHandler(Object pojo, Marshaller marshaller, MetadataStrategy metadataStrategy) {
         this.pojo = pojo;
         this.marshaller = marshaller;
+        this.metadataStrategy = metadataStrategy;
     }
 
     public boolean handle(Message message) throws JMSException {
@@ -57,9 +61,21 @@ public class AsyncReplyHandler extends RemoteInvocationBasedExporter implements 
         catch (InvocationTargetException e) {
             onException(invocation, e);
         }
-        return false;
+        return isEndSessionMethod(invocation);
     }
 
+
+    protected boolean isEndSessionMethod(RemoteInvocation invocation) {
+        Method method;
+        try {
+            method = pojo.getClass().getMethod(invocation.getMethodName(), invocation.getParameterTypes());
+        }
+        catch (Exception e) {
+            onException(invocation, e);
+            return false;
+        }
+        return metadataStrategy.getMethodMetadata(method).isEndSession();
+    }
 
     protected void onException(RemoteInvocation invocation, Exception e) {
         log.error("Failed to invoke: " + invocation + " on: " + pojo + ". Reason: " + e, e);

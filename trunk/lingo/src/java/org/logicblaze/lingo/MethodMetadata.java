@@ -30,6 +30,7 @@ public class MethodMetadata implements Serializable {
 
     private boolean oneWay;
     private boolean stateful;
+    private boolean endSession;
     private boolean[] remoteParameters;
 
     public MethodMetadata(boolean oneWay) {
@@ -41,10 +42,11 @@ public class MethodMetadata implements Serializable {
         this.remoteParameters = remoteParameters;
     }
 
-    public MethodMetadata(boolean way, boolean[] parameters, boolean stateful) {
-        oneWay = way;
-        remoteParameters = parameters;
+    public MethodMetadata(boolean oneWay, boolean[] remoteParameters, boolean stateful, boolean endSession) {
+        this.oneWay = oneWay;
+        this.remoteParameters = remoteParameters;
         this.stateful = stateful;
+        this.endSession = endSession;
     }
 
     public boolean isOneWay() {
@@ -59,10 +61,19 @@ public class MethodMetadata implements Serializable {
     }
 
     /**
-     * Should sticky load balancing be used to refer to a remote stateful service
+     * Should sticky load balancing be used to refer to a remote stateful
+     * service
      */
     public boolean isStateful() {
         return stateful;
+    }
+
+    /**
+     * Returns whether or not this method ends the session if used on a callback
+     * object. e.g. does this method terminate the use of a callback object
+     */
+    public boolean isEndSession() {
+        return endSession;
     }
 
 }
