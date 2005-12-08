@@ -173,6 +173,17 @@
       <version>1.5-rc1</version>
     </dependency>
 
+    <!-- SCA Annotations -->
+    <dependency>
+      <!--  TODO when its available publically
+      <groupId>org.osoa</groupId>
+       -->
+       
+      <groupId>lingo</groupId>
+      <artifactId>sca-api</artifactId>
+      <version>SNAPSHOT</version>
+    </dependency>
+
     <!-- JMX APIs if on Java 1.4 -->
     <dependency>
       <groupId>mx4j</groupId>
