@@ -42,8 +42,6 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageProducer;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;

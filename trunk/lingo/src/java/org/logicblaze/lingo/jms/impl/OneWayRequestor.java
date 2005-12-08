@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.Requestor;
 
-import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
