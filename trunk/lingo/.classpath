@@ -21,6 +21,8 @@
 	<classpathentry kind="var" path="MAVEN_REPO/backport175/jars/backport175-1.0.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/activemq/jars/activemq-ra-3.2.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/activemq/jars/activemq-3.2.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/org.osoa/jars/sca-api-SNAPSHOT.jar"/>
+	<classpathentry kind="src" path="sca/src/java"/>
+	<classpathentry kind="src" path="sca/src/test"/>
+	<classpathentry kind="var" path="MAVEN_REPO/lingo/jars/sca-api-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
