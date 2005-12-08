@@ -20,15 +20,16 @@ package org.logicblaze.lingo;
 import java.io.Serializable;
 
 /**
- * Represents the Message Exchange Pattern characteristics of a
- * specific method invocation.
- *
+ * Represents the Message Exchange Pattern characteristics of a specific method
+ * invocation.
+ * 
  * @version $Revision$
  */
 public class MethodMetadata implements Serializable {
     private static final long serialVersionUID = 7969481427004071349L;
-    
+
     private boolean oneWay;
+    private boolean stateful;
     private boolean[] remoteParameters;
 
     public MethodMetadata(boolean oneWay) {
@@ -38,6 +39,12 @@ public class MethodMetadata implements Serializable {
     public MethodMetadata(boolean oneWay, boolean[] remoteParameters) {
         this.oneWay = oneWay;
         this.remoteParameters = remoteParameters;
+    }
+
+    public MethodMetadata(boolean way, boolean[] parameters, boolean stateful) {
+        oneWay = way;
+        remoteParameters = parameters;
+        this.stateful = stateful;
     }
 
     public boolean isOneWay() {
@@ -50,4 +57,12 @@ public class MethodMetadata implements Serializable {
     public boolean isRemoteParameter(int i) {
         return remoteParameters != null && remoteParameters[i];
     }
+
+    /**
+     * Should sticky load balancing be used to refer to a remote stateful service
+     */
+    public boolean isStateful() {
+        return stateful;
+    }
+
 }

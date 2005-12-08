@@ -40,6 +40,8 @@ public class DefaultMarshaller implements Marshaller {
 
     private boolean ignoreInvalidMessages;
 
+    private String stickySessionID;
+
     public Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException {
         ObjectMessage message = requestor.getSession().createObjectMessage(invocation);
         appendMessageHeaders(message, requestor, invocation);
@@ -116,7 +118,20 @@ public class DefaultMarshaller implements Marshaller {
      * A strategy method for derived classes to allow them a plugin point to perform custom header processing
      */
     protected void appendMessageHeaders(Message message, Requestor requestor, LingoInvocation invocation) throws JMSException {
+        if (invocation.getMetadata().isStateful()) {
+            message.setStringProperty("JMSXGroupID", getStickySessionID());
+        }
     }
+
+    protected String getStickySessionID() {
+        if (stickySessionID == null) {
+            stickySessionID = "hey";
+            // TODO
+            throw new RuntimeException("TODO: Not Implemented Yet!");
+        }
+        return stickySessionID;
+    }
+
 
     /**
      * A strategy for derived classes to allow them to plug in custom header processing for responses
