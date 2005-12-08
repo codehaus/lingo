@@ -4,3 +4,5 @@ junit*.properties
 
 ActiveMQ
 .fbwarnings
+bin
+.settings
