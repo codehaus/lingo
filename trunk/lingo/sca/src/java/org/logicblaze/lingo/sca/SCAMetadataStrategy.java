@@ -17,9 +17,8 @@
  **/
 package org.logicblaze.lingo.sca;
 
-import org.logicblaze.lingo.CachingMetadataStrategySupport;
 import org.logicblaze.lingo.MetadataStrategy;
-import org.logicblaze.lingo.MethodMetadata;
+import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.osoa.sca.annotations.Callback;
 import org.osoa.sca.annotations.OneWay;
 
@@ -27,34 +26,31 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
- * An implementation of {@link MetadataStrategy} which uses
- * the <a href="http://incubator.apache.org/tuscany/">SCA</a> 
- * annotations to configure the metadata strategy.
+ * An implementation of {@link MetadataStrategy} which uses the <a
+ * href="http://incubator.apache.org/tuscany/">SCA</a> annotations to configure
+ * the metadata strategy.
  * 
  * @version $Revision$
  */
-public class SCAMetadataStrategy extends CachingMetadataStrategySupport {
+public class SCAMetadataStrategy extends SimpleMetadataStrategy {
 
-    private static final long serialVersionUID = 1146367535939318426L;
+    private static final long serialVersionUID = -50969123678085273L;
 
-    protected MethodMetadata createMethodMetadata(Method method) {
-        Annotation annotation = method.getAnnotation(OneWay.class);
-        boolean oneway = annotation != null;
-        
-        boolean[] remoteParams = null;
-        Class[] parameterTypes = method.getParameterTypes();
-        int size = parameterTypes.length;
-        if (size > 0) {
-            remoteParams = new boolean[size];
-            for (int i = 0; i < size; i++) {
-                remoteParams[i] = isRemoteParameter(method, parameterTypes[i], i);
-            }
-        }
-        return new MethodMetadata(oneway, remoteParams);
-   }
-
-    protected boolean isRemoteParameter(Method method, Class parameterType, int index) {
+    @Override
+    public boolean isRemoteParameter(Method method, Class parameterType, int index) {
         Annotation annotation = parameterType.getAnnotation(Callback.class);
-        return annotation != null;
+        if (annotation != null) {
+            return true;
+        }
+        return super.isRemoteParameter(method, parameterType, index);
+    }
+
+    @Override
+    protected boolean isOneWayMethod(Method method) {
+        Annotation annotation = method.getAnnotation(OneWay.class);
+        if (annotation != null) {
+            return true;
+        }
+        return super.isOneWayMethod(method);
     }
 }

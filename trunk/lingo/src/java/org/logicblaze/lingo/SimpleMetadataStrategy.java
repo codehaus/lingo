@@ -52,10 +52,7 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
     }
 
     public MethodMetadata getMethodMetadata(Method method) {
-        boolean oneway = false;
-        if (oneWayForVoidMethods) {
-            oneway = method.getReturnType().equals(void.class) && method.getExceptionTypes().length == 0;
-        }
+        boolean oneway = isOneWayMethod(method);
         boolean[] remoteParams = null;
         Class[] parameterTypes = method.getParameterTypes();
         int size = parameterTypes.length;
@@ -97,6 +94,16 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
             }
         }
         return false;
+    }
+
+    // Implementation methods
+    // -------------------------------------------------------------------------
+    protected boolean isOneWayMethod(Method method) {
+        boolean oneway = false;
+        if (oneWayForVoidMethods) {
+            oneway = method.getReturnType().equals(void.class) && method.getExceptionTypes().length == 0;
+        }
+        return oneway;
     }
 
     protected void populateDefaultRemoteTypes(Set remoteTypes) {
