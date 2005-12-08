@@ -70,6 +70,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     private Map messageProperties;
     private int jmsExpiration = -1;
     private JmsProducerConfig producerConfig = new JmsProducerConfig();
+    private MetadataStrategy metadataStrategy;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -291,6 +292,11 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         producerConfig.setClientID(clientID);
     }
 
+    public MetadataStrategy getMetadataStrategy() {
+        return metadataStrategy;
+    }
+
+    
     // Implementation methods
     // -------------------------------------------------------------------------
 
@@ -358,7 +364,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         }
         if (requestor instanceof MultiplexingRequestor) {
             MultiplexingRequestor multiplexingRequestor = (MultiplexingRequestor) requestor;
-            multiplexingRequestor.registerHandler(correlationID, new AsyncReplyHandler(value, marshaller));
+            multiplexingRequestor.registerHandler(correlationID, new AsyncReplyHandler(value, marshaller, getMetadataStrategy()));
         }
         else {
             throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");
@@ -375,7 +381,8 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
      * is configured
      */
     protected LingoRemoteInvocationFactory createRemoteInvocationFactory() {
-        return new LingoRemoteInvocationFactory(createMetadataStrategy());
+        metadataStrategy = createMetadataStrategy();
+        return new LingoRemoteInvocationFactory(metadataStrategy);
     }
 
     /**

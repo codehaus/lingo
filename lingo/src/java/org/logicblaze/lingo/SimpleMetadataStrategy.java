@@ -62,9 +62,8 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
                 remoteParams[i] = isRemoteParameter(method, parameterTypes[i], i);
             }
         }
-        return new MethodMetadata(oneway, remoteParams);
+        return new MethodMetadata(oneway, remoteParams, isStateful(method), isEndSession(method));
     }
-
     public boolean isOneWayForVoidMethods() {
         return oneWayForVoidMethods;
     }
@@ -106,8 +105,25 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
         return oneway;
     }
 
+
+    /**
+     * Returns true if this method completes a callback object
+     */
+    protected boolean isEndSession(Method method) {
+        return false;
+    }
+
+    /**
+     * Returns whether or not this object is stateful such that sticky load balancing should be used
+     */
+    protected boolean isStateful(Method method) {
+        return false;
+    }
+
     protected void populateDefaultRemoteTypes(Set remoteTypes) {
         remoteTypes.add(Remote.class);
         remoteTypes.add(EventListener.class);
     }
+    
+    
 }
