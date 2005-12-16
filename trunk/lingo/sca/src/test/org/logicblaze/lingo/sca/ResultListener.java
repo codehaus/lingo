@@ -19,16 +19,22 @@ package org.logicblaze.lingo.sca;
 
 import java.util.EventListener;
 
+import org.osoa.sca.annotations.EndSession;
+
 /**
- * An example asynchronous notification listener which
- * can be passed as a parameter across lingo
- *
+ * An example asynchronous notification listener which can be passed as a
+ * parameter across lingo
+ * 
  * @version $Revision$
  */
 public interface ResultListener extends EventListener {
     public void onResult(String data);
 
     // lifecycle end methods
+
+    @EndSession
     public void stop();
+
+    @EndSession
     public void onException(Exception e);
 }
