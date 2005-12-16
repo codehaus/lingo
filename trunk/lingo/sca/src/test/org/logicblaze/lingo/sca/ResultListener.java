@@ -17,9 +17,9 @@
  **/
 package org.logicblaze.lingo.sca;
 
-import java.util.EventListener;
-
 import org.osoa.sca.annotations.EndSession;
+
+import java.util.EventListener;
 
 /**
  * An example asynchronous notification listener which can be passed as a

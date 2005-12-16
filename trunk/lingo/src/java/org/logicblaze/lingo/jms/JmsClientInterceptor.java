@@ -27,7 +27,6 @@ import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
 import org.logicblaze.lingo.MetadataStrategyHelper;
 import org.logicblaze.lingo.MethodMetadata;
-import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.logicblaze.lingo.jms.impl.AsyncReplyHandler;
 import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 import org.logicblaze.lingo.jms.marshall.DefaultMarshaller;
@@ -45,6 +44,7 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
