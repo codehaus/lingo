@@ -22,6 +22,6 @@ package org.logicblaze.lingo.annotations;
  * 
  * @version $Revision$
  */
-public interface Reference {
+public interface AllowsPassByReference {
 
 }
