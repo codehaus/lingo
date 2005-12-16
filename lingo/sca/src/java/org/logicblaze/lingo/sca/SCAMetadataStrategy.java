@@ -20,6 +20,7 @@ package org.logicblaze.lingo.sca;
 import org.logicblaze.lingo.MetadataStrategy;
 import org.logicblaze.lingo.SimpleMetadataStrategy;
 import org.osoa.sca.annotations.Callback;
+import org.osoa.sca.annotations.EndSession;
 import org.osoa.sca.annotations.OneWay;
 
 import java.lang.annotation.Annotation;
@@ -47,10 +48,28 @@ public class SCAMetadataStrategy extends SimpleMetadataStrategy {
 
     @Override
     protected boolean isOneWayMethod(Method method) {
-        Annotation annotation = method.getAnnotation(OneWay.class);
-        if (annotation != null) {
+        if (hasAnnotation(method, OneWay.class)) {
             return true;
         }
         return super.isOneWayMethod(method);
     }
+
+    @Override
+    protected boolean isEndSession(Method method) {
+        if (hasAnnotation(method, EndSession.class)) {
+            return true;
+        }
+        return super.isEndSession(method);
+    }
+
+    @Override
+    protected boolean isStateful(Method method) {
+        // TODO
+        return super.isStateful(method);
+    }
+
+    protected boolean hasAnnotation(Method method, Class type) {
+        return method.getAnnotation(type) != null;
+    }
+
 }

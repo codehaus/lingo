@@ -17,61 +17,35 @@
  **/
 package org.logicblaze.lingo.sca;
 
-import org.logicblaze.lingo.*;
-
-import java.lang.reflect.Method;
-
-import junit.framework.TestCase;
+import org.logicblaze.lingo.MethodMetadata;
 
 /**
  * @version $Revision$
  */
-public class SCAMetadataStrategyTest extends TestCase {
-    protected MetadataStrategy strategy;
-
+public class SCAMetadataStrategyTest extends MetadataTestSupport {
     public void testExampleService_someOneWayMethod() throws Exception {
-        MethodMetadata metadata = strategy.getMethodMetadata(findMethod(getServiceClass(), "someOneWayMethod"));
+        MethodMetadata metadata = strategy.getMethodMetadata(findMethod("someOneWayMethod"));
         assertEquals("oneway", true, metadata.isOneWay());
         assertEquals("param 0 remote", false, metadata.isRemoteParameter(0));
         assertEquals("param 1 remote", false, metadata.isRemoteParameter(1));
     }
 
     public void testExampleService_regularRPC() throws Exception {
-        MethodMetadata metadata = strategy.getMethodMetadata(findMethod(getServiceClass(), "regularRPC"));
+        MethodMetadata metadata = strategy.getMethodMetadata(findMethod("regularRPC"));
         assertEquals("oneway", false, metadata.isOneWay());
         assertEquals("param 0 remote", false, metadata.isRemoteParameter(0));
     }
 
     public void testExampleService_anotherRPC() throws Exception {
-        MethodMetadata metadata = strategy.getMethodMetadata(findMethod(getServiceClass(), "anotherRPC"));
+        MethodMetadata metadata = strategy.getMethodMetadata(findMethod("anotherRPC"));
         assertEquals("oneway", false, metadata.isOneWay());
     }
 
     public void testExampleService_asyncRequestResponse() throws Exception {
-        MethodMetadata metadata = strategy.getMethodMetadata(findMethod(getServiceClass(), "asyncRequestResponse"));
+        MethodMetadata metadata = strategy.getMethodMetadata(findMethod("asyncRequestResponse"));
         assertEquals("oneway", true, metadata.isOneWay());
         assertEquals("param 0 remote", false, metadata.isRemoteParameter(0));
         assertEquals("param 1 remote", true, metadata.isRemoteParameter(1));
-    }
-
-    protected Method findMethod(Class type, String name) throws Exception {
-        Method[] methods = type.getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            Method method = methods[i];
-            if (method.getName().equals(name)) {
-                return method;
-            }
-        }
-        fail("No such method called: " + name + " on type: " + type.getName());
-        return null;
-    }
-
-    protected void setUp() throws Exception {
-        strategy = createMetadataStrategy();
-    }
-
-    protected MetadataStrategy createMetadataStrategy() {
-        return MetadataStrategyHelper.newInstance();
     }
 
     protected Class getServiceClass() {
