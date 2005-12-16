@@ -48,7 +48,8 @@ public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
         pfb.setServiceInterface(ExampleService.class);
         pfb.setServiceUrl("http://myurl");
         pfb.setRemoteInvocationFactory(new LingoRemoteInvocationFactory(new SimpleMetadataStrategy(true)));
-        pfb.setRequestor(createRequestor(getDestinationName()));
+        Requestor requestor = createRequestor(getDestinationName());
+        pfb.setRequestor(requestor);
         configure(pfb);
         
         ExampleService proxy = (ExampleService) pfb.getObject();

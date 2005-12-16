@@ -36,7 +36,7 @@ import javax.jms.Session;
  * @author James Strachan
  * @see JmsProxyFactoryBean
  */
-public class JmsTemplateServiceExporter extends JmsServiceExporterSupport implements InitializingBean {
+public class JmsTemplateServiceExporter extends JmsServiceExporterMessageListener implements InitializingBean {
     private JmsTemplate template;
 
     public void afterPropertiesSet() throws Exception {

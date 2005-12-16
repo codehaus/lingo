@@ -20,18 +20,22 @@ package org.logicblaze.lingo.example;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 /**
  * @version $Revision$
  */
-public class TestResultListener implements ResultListener {
+public class TestResultListener extends Assert implements ResultListener {
     private List results = new ArrayList();
     private Object semaphore = new Object();
     private boolean stopped;
     private Exception onException;
 
-    public synchronized void onResult(String data) {
-        results.add(data);
+    public void onResult(String data) {
+        System.out.println("Our remote callback has been invoked with: " + data);
+
         synchronized (semaphore) {
+            results.add(data);
             semaphore.notifyAll();
         }
     }
@@ -45,13 +49,8 @@ public class TestResultListener implements ResultListener {
         onException = e;
     }
 
-
     public Exception getOnException() {
         return onException;
-    }
-
-    public List getResults() {
-        return results;
     }
 
     public boolean isStopped() {
@@ -79,14 +78,23 @@ public class TestResultListener implements ResultListener {
         long end = System.currentTimeMillis() - start;
 
         System.out.println("End of wait for " + end + " millis");
+
+        List results = getResults();
+        assertEquals("Incorrect number of messages received: " + results, messageCount, results.size());
+    }
+
+    public List getResults() {
+        synchronized (semaphore) {
+            return new ArrayList(results);
+        }
     }
 
     protected boolean hasReceivedResponse() {
-        return results.isEmpty();
+        return getResults().isEmpty();
     }
 
-    protected synchronized boolean hasReceivedResponses(int messageCount) {
-        return results.size() >= messageCount;
+    protected boolean hasReceivedResponses(int messageCount) {
+        return getResults().size() >= messageCount;
     }
 
 }

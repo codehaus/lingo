@@ -20,6 +20,8 @@ package org.logicblaze.lingo.jms;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.LingoInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
@@ -58,6 +60,7 @@ import java.util.WeakHashMap;
  * @see JmsProxyFactoryBean
  */
 public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implements MethodInterceptor, InitializingBean, DisposableBean {
+    private static final Log log = LogFactory.getLog(JmsClientInterceptor.class);
 
     private Map remoteObjects = new WeakHashMap();
     private Requestor requestor;
@@ -106,8 +109,9 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
                 return recreateRemoteInvocationResult(result);
             }
         }
-        catch (JMSException ex) {
-            throw new RemoteAccessException("Cannot access JMS invoker remote service at [" + getServiceUrl() + "]", ex);
+        catch (JMSException e) {
+            log.warn("Remote access error: "  + methodInvocation, e);
+            throw new RemoteAccessException("Cannot access JMS invoker remote service at [" + getServiceUrl() + "]", e);
         }
     }
 
@@ -364,12 +368,28 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         }
         if (requestor instanceof MultiplexingRequestor) {
             MultiplexingRequestor multiplexingRequestor = (MultiplexingRequestor) requestor;
-            multiplexingRequestor.registerHandler(correlationID, new AsyncReplyHandler(value, marshaller, getMetadataStrategy()));
+            multiplexingRequestor.registerHandler(correlationID, createAsyncHandler(value));
         }
         else {
             throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");
         }
         return correlationID;
+    }
+
+    protected AsyncReplyHandler createAsyncHandler(Object value) {
+        AsyncReplyHandler replyHandler = new AsyncReplyHandler(value, marshaller, getMetadataStrategy());
+        replyHandler.setConnectionFactory(connectionFactory);
+        replyHandler.setMarshaller(marshaller);
+        replyHandler.setProducerConfig(producerConfig);
+        replyHandler.setResponseRequestor(getRequestor());
+        replyHandler.setInvocationFactory(getRemoteInvocationFactory());
+        try {
+            replyHandler.afterPropertiesSet();
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Could not create the AsyncHandler: " + e, e);
+        }
+        return replyHandler;
     }
 
     protected Requestor createRequestor() throws JMSException {

@@ -35,16 +35,7 @@ public class DefaultJmsProducer extends JmsProducerImpl {
     private Connection connection;
 
     public static DefaultJmsProducer newInstance(ConnectionFactory factory, JmsProducerConfig config) throws JMSException {
-        Connection connection = factory.createConnection();
-
-        String clientID = config.getClientID();
-        if (clientID != null) {
-            connection.setClientID(clientID);
-        }
-        
-        // lets start the connection in case that we consume on the same connection
-        connection.start();
-
+        Connection connection = config.createConnection(factory);
         return newInstance(connection, config);
     }
 

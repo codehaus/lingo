@@ -17,58 +17,50 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
+import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.MetadataStrategy;
+import org.logicblaze.lingo.jms.JmsServiceExporterMessageListener;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.marshall.Marshaller;
 import org.springframework.remoting.support.RemoteInvocation;
-import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
  * @version $Revision$
  */
-public class AsyncReplyHandler extends RemoteInvocationBasedExporter implements ReplyHandler {
+public class AsyncReplyHandler extends JmsServiceExporterMessageListener implements ReplyHandler {
     private static final Log log = LogFactory.getLog(AsyncReplyHandler.class);
 
-    private Object pojo;
     private Marshaller marshaller;
     private final MetadataStrategy metadataStrategy;
+    private FutureResultHandler futureResult;
 
     public AsyncReplyHandler(Object pojo, Marshaller marshaller, MetadataStrategy metadataStrategy) {
-        this.pojo = pojo;
+        super(pojo);
         this.marshaller = marshaller;
         this.metadataStrategy = metadataStrategy;
     }
 
     public boolean handle(Message message) throws JMSException {
+        if (futureResult != null) {
+            futureResult.handle(message);
+        }
         RemoteInvocation invocation = marshaller.readRemoteInvocation(message);
-        try {
-            invoke(invocation, pojo);
-        }
-        catch (NoSuchMethodException e) {
-            onException(invocation, e);
-        }
-        catch (IllegalAccessException e) {
-            onException(invocation, e);
-        }
-        catch (InvocationTargetException e) {
-            onException(invocation, e);
-        }
+        doInvoke(message, invocation);
         return isEndSessionMethod(invocation);
     }
-
 
     protected boolean isEndSessionMethod(RemoteInvocation invocation) {
         Method method;
         try {
-            method = pojo.getClass().getMethod(invocation.getMethodName(), invocation.getParameterTypes());
+            method = getProxy().getClass().getMethod(invocation.getMethodName(), invocation.getParameterTypes());
         }
         catch (Exception e) {
             onException(invocation, e);
@@ -78,6 +70,11 @@ public class AsyncReplyHandler extends RemoteInvocationBasedExporter implements 
     }
 
     protected void onException(RemoteInvocation invocation, Exception e) {
-        log.error("Failed to invoke: " + invocation + " on: " + pojo + ". Reason: " + e, e);
+        log.error("Failed to invoke: " + invocation + " on: " + getProxy() + ". Reason: " + e, e);
+    }
+
+    public FutureResult newResultHandler() {
+        futureResult = new FutureResultHandler();
+        return futureResult;
     }
 }

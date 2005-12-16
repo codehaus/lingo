@@ -38,13 +38,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link org.logicblaze.lingo.jms.Requestor} which will use a single producer, consumer
- * and temporary topic for resource efficiency, but will use correlation
- * IDs on each message and response to ensure that each threads requests
- * can occur synchronously.
- * <p/>
- * This class can be used concurrently by many different threads at the same time.
- *
+ * A {@link org.logicblaze.lingo.jms.Requestor} which will use a single
+ * producer, consumer and temporary topic for resource efficiency, but will use
+ * correlation IDs on each message and response to ensure that each threads
+ * requests can occur synchronously. <p/> This class can be used concurrently by
+ * many different threads at the same time.
+ * 
  * @version $Revision$
  */
 public class MultiplexingRequestor extends SingleThreadedRequestor implements MessageListener {
@@ -52,15 +51,16 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
 
     private Map requests = new HashMap();
 
-
     public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination) throws JMSException {
         DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
         return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination);
     }
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination, Destination clientDestination) throws JMSException {
+    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination,
+            Destination clientDestination) throws JMSException {
         DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
-        return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination, clientDestination);
+        return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE), producer, serverDestination,
+                clientDestination);
     }
 
     public MultiplexingRequestor(Session session, JmsProducer producer, Destination serverDestination, Destination clientDestination) throws JMSException {
@@ -84,13 +84,32 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
     }
 
     public Message request(Destination destination, Message message, long timeout) throws JMSException {
-        // lets create a correlationID
-        String correlationID = createCorrelationID();
-        FutureResult future = new FutureResultHandler();
-        synchronized (this) {
-            requests.put(correlationID, future);
+        // lets create a correlationID unless we are already given one -
+        // we are already given a correaltionID if we are on the server side
+        // responding to a remote object reference
+        FutureResult future = null;
+        String correlationID = message.getJMSCorrelationID();
+        if (correlationID == null) {
+            correlationID = createCorrelationID();
+            message.setJMSCorrelationID(correlationID);
         }
-        message.setJMSCorrelationID(correlationID);
+        else {
+            synchronized (this) {
+                Object currentHandler = requests.get(correlationID);
+                if (currentHandler instanceof AsyncReplyHandler) {
+                    AsyncReplyHandler handler = (AsyncReplyHandler) currentHandler;
+                    future = handler.newResultHandler();
+                }
+            }
+        }
+        System.out.println("Sending message with correlationID: " + correlationID + " on destination " + destination + " for object: " + this);
+
+        if (future == null) {
+            future = new FutureResultHandler();
+            synchronized (this) {
+                requests.put(correlationID, future);
+            }
+        }
         oneWay(destination, message);
 
         try {
@@ -109,7 +128,6 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         }
     }
 
-    
     /**
      * Processes inbound responses from requests
      */
@@ -117,13 +135,16 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         try {
             String correlationID = message.getJMSCorrelationID();
 
+            System.out.println("Received message with correlationID: " + correlationID + " on message " + message + " for object: " + this);
+
             // lets notify the monitor for this response
             ReplyHandler handler = null;
             synchronized (this) {
                 handler = (ReplyHandler) requests.get(correlationID);
             }
             if (handler == null) {
-                log.warn("Response received for unknown request: " + message);
+                log.warn("Response received for unknown correlationID: " + correlationID + " request: " + message);
+                System.out.println("#### Response received for unknown correlationID: " + correlationID + " request: " + message);
             }
             else {
                 boolean complete = handler.handle(message);
@@ -150,7 +171,7 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
     }
 
     // Implementation methods
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     protected JMSException createJMSException(Exception e) {
         JMSException answer = new JMSException(e.toString());
