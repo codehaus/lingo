@@ -27,15 +27,27 @@ import java.util.Map;
  * 
  * @version $Revision$
  */
-public abstract class CachingMetadataStrategySupport implements MetadataStrategy {
+public class CachingMetadataStrategy implements MetadataStrategy {
 
+    private static final long serialVersionUID = -6008790663804471523L;
+    
+    private MetadataStrategy proxy;
     private Map cache;
     private int cacheSize = 5000;
+
+    public CachingMetadataStrategy(MetadataStrategy proxy) {
+        this.proxy = proxy;
+    }
+
+    public CachingMetadataStrategy(MetadataStrategy proxy, Map cache) {
+        this.proxy = proxy;
+        this.cache = cache;
+    }
 
     public MethodMetadata getMethodMetadata(Method method) {
         MethodMetadata answer = (MethodMetadata) getCache().get(method);
         if (answer == null) {
-            answer = createMethodMetadata(method);
+            answer = proxy.getMethodMetadata(method);
             getCache().put(method, answer);
         }
         return answer;
@@ -64,12 +76,6 @@ public abstract class CachingMetadataStrategySupport implements MetadataStrategy
 
     // Implementation methods
     // -------------------------------------------------------------------------
-
-    /**
-     * Factory method to create the metadata object for the given method
-     */
-    protected abstract MethodMetadata createMethodMetadata(Method method);
-
     protected Map createCache() {
         return new LRUCache(getCacheSize());
     }

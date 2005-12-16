@@ -18,15 +18,14 @@
 package org.logicblaze.lingo.jms;
 
 import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
-import org.logicblaze.lingo.jms.impl.OneWayRequestor;
+import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.remoting.support.RemoteInvocationResult;
 
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.Topic;
@@ -41,9 +40,7 @@ import javax.jms.Topic;
  * @author James Strachan
  * @see JmsProxyFactoryBean
  */
-public class JmsServiceExporter extends JmsServiceExporterSupport implements InitializingBean, DisposableBean {
-    private JmsProducer producer;
-    private ConnectionFactory connectionFactory;
+public class JmsServiceExporter extends JmsServiceExporterMessageListener implements InitializingBean, DisposableBean {
     private Destination destination;
     private MessageConsumer consumer;
     private String messageSelector;
@@ -51,22 +48,6 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
     private boolean noLocal;
 
     public void afterPropertiesSet() throws Exception {
-        if (producer == null) {
-            if (connectionFactory == null) {
-                throw new IllegalArgumentException("requestor or connectionFactory is required");
-            }
-            else {
-                producer = DefaultJmsProducer.newInstance(connectionFactory, getProducerConfig());
-            }
-        }
-        Requestor responseRequestor = getResponseRequestor();
-        if (responseRequestor == null) {
-            // responseRequestor = new
-            // MultiplexingRequestor(producer.getSession(), producer, null);
-            // setResponseRequestor(responseRequestor);
-            setResponseRequestor(new OneWayRequestor(producer, null));
-        }
-
         super.afterPropertiesSet();
 
         // do we have a destination specified, if so consume
@@ -80,26 +61,7 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
         if (consumer != null) {
             consumer.close();
         }
-    }
-
-    public JmsProducer getProducer() {
-        return producer;
-    }
-
-    public void setProducer(JmsProducer producer) {
-        this.producer = producer;
-    }
-
-    public ConnectionFactory getConnectionFactory() {
-        return connectionFactory;
-    }
-
-    /**
-     * Used to create a default {@link JmsProducer} if no producer is explicitly
-     * configured.
-     */
-    public void setConnectionFactory(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
+        super.destroy();
     }
 
     public Destination getDestination() {
@@ -129,7 +91,8 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
     }
 
     /**
-     * Sets whether or not topic subscriptions should receive locally produced messages
+     * Sets whether or not topic subscriptions should receive locally produced
+     * messages
      */
     public void setNoLocal(boolean noLocal) {
         this.noLocal = noLocal;
@@ -149,26 +112,12 @@ public class JmsServiceExporter extends JmsServiceExporterSupport implements Ini
     // Implementation methods
     // -------------------------------------------------------------------------
 
-    /**
-     * Send the given RemoteInvocationResult as a JMS message to the originator
-     * 
-     * @param message
-     *            current HTTP message
-     * @param result
-     *            the RemoteInvocationResult object
-     * @throws javax.jms.JMSException
-     *             if thrown by trying to send the message
-     */
-    protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result) throws JMSException {
-        Message responseMessage = createResponseMessage(producer.getSession(), message, result);
-        producer.send(message.getJMSReplyTo(), responseMessage);
-    }
 
     /**
      * Factory method to create the consumer
      */
     protected MessageConsumer createConsumer() throws JMSException {
-        Session session = producer.getSession();
+        Session session = getProducer().getSession();
         if (subscriberName != null) {
             if (destination instanceof Topic) {
                 Topic topic = (Topic) destination;

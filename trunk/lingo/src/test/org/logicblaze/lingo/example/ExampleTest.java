@@ -26,7 +26,27 @@ import org.logicblaze.lingo.SpringTestSupport;
  */
 public class ExampleTest extends SpringTestSupport {
 
-    public void testClient() throws Exception {
+    public void testAsyncRequestResponse() throws Exception {
+        // START SNIPPET: async
+
+        // lets lookup the client in Spring
+        // (we could be using DI here instead)
+        ExampleService service = (ExampleService) getBean("client");
+
+        // async request-response
+        TestResultListener listener = new TestResultListener();
+        service.asyncRequestResponse("IBM", listener);
+
+        // the server side will now invoke the listener
+        // objects's methods asynchronously
+        // END SNIPPET: async
+
+        listener.waitForAsyncResponses(2);
+
+        System.out.println("Found results: " + listener.getResults());
+    }
+
+    public void testSyncRequestResponse() throws Exception {
         // START SNIPPET: simple
 
         // lets lookup the client in Spring
@@ -36,18 +56,6 @@ public class ExampleTest extends SpringTestSupport {
         // regular synchronous request-response
         int i = service.regularRPC("Foo");
         System.out.println("Found result: " + i);
-
-        // async request-response
-        TestResultListener listener = new TestResultListener();
-        service.asyncRequestResponse("IBM", listener);
-
-        // the server side will now invoke the listener
-        // objects's methods asynchronously
-        // END SNIPPET: simple
-
-        listener.waitForAsyncResponses(2);
-
-        System.out.println("Found results: " + listener.getResults());
     }
 
     public void testOneWayMethodCall() throws Exception {

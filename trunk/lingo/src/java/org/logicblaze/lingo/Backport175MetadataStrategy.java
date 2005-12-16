@@ -18,44 +18,44 @@
 package org.logicblaze.lingo;
 
 import org.codehaus.backport175.reader.Annotations;
-import org.logicblaze.lingo.annotations.Async;
+import org.logicblaze.lingo.annotations.EndSession;
+import org.logicblaze.lingo.annotations.OneWay;
 
 import java.lang.reflect.Method;
 
 /**
- * An implementation of {@link MetadataStrategy} which uses
- * the <a href="http://backport175.codehaus.org/">Backport175</a> 
- * library for working with annotations on Java 1.x and 5 platforms.
+ * An implementation of {@link MetadataStrategy} which uses the <a
+ * href="http://backport175.codehaus.org/">Backport175</a> library for working
+ * with annotations on Java 1.x and 5 platforms.
  * 
  * @version $Revision$
  */
-public class Backport175MetadataStrategy extends CachingMetadataStrategySupport {
+public class Backport175MetadataStrategy extends SimpleMetadataStrategy {
 
     private static final long serialVersionUID = 3266417144621024889L;
 
-    // TODO delegate to simple strategy until we can use parameter based annotations
-    private SimpleMetadataStrategy delegate = new SimpleMetadataStrategy();
-    
-    protected MethodMetadata createMethodMetadata(Method method) {
-        boolean oneway = Annotations.isAnnotationPresent(Async.class, method);
-        
-        if (oneway) {
-            System.out.println("#### found Async annotation!!!");
-        }
-        
-        boolean[] remoteParams = null;
-        Class[] parameterTypes = method.getParameterTypes();
-        int size = parameterTypes.length;
-        if (size > 0) {
-            remoteParams = new boolean[size];
-            for (int i = 0; i < size; i++) {
-                remoteParams[i] = isRemoteParameter(method, parameterTypes[i], i);
-            }
-        }
-        return new MethodMetadata(oneway, remoteParams);
-   }
-
-    protected boolean isRemoteParameter(Method method, Class parameterType, int index) {
-        return delegate.isRemoteParameter(method, parameterType, index);
+    public boolean isRemoteParameter(Method method, Class parameterType, int index) {
+        // TODO
+        return super.isRemoteParameter(method, parameterType, index);
     }
+
+    protected boolean isEndSession(Method method) {
+        if (Annotations.isAnnotationPresent(EndSession.class, method)) {
+            return true;
+        }
+        return super.isEndSession(method);
+    }
+
+    protected boolean isOneWayMethod(Method method) {
+        if (Annotations.isAnnotationPresent(OneWay.class, method)) {
+            return true;
+        }
+        return super.isOneWayMethod(method);
+    }
+
+    protected boolean isStateful(Method method) {
+        // TODO
+        return super.isStateful(method);
+    }
+
 }

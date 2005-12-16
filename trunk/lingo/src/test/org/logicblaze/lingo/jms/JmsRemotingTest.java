@@ -323,10 +323,12 @@ public class JmsRemotingTest extends JmsTestSupport {
 
 
     protected void configure(JmsServiceExporter exporter) throws Exception {
+        exporter.setConnectionFactory(connectionFactory);
         exporter.afterPropertiesSet();
     }
 
     protected void configure(JmsProxyFactoryBean pfb) throws JMSException {
+        pfb.setConnectionFactory(connectionFactory);
         pfb.afterPropertiesSet();
     }
 

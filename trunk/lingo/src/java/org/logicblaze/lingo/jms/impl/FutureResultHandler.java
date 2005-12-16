@@ -21,17 +21,19 @@ import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 
 import org.logicblaze.lingo.jms.ReplyHandler;
 
+import javax.jms.JMSException;
 import javax.jms.Message;
 
 /**
- * A {@link FutureResult} which implements {@link org.logicblaze.lingo.jms.ReplyHandler} so that it can be used as a handler
- * for a correlation ID
- *
+ * A {@link FutureResult} which implements
+ * {@link org.logicblaze.lingo.jms.ReplyHandler} so that it can be used as a
+ * handler for a correlation ID
+ * 
  * @version $Revision$
  */
 public class FutureResultHandler extends FutureResult implements ReplyHandler {
 
-    public boolean handle(Message message) {
+    public boolean handle(Message message) throws JMSException {
         set(message);
         return true;
     }

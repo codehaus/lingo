@@ -17,6 +17,8 @@
  **/
 package org.logicblaze.lingo.jms;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 
@@ -46,6 +48,24 @@ public class JmsProducerConfig {
         if (timeToLive >= 0) {
             producer.setTimeToLive(timeToLive);
         }
+    }
+
+    /**
+     * Creates a new JMS connection and starts it
+     * @throws JMSException 
+     */
+    public Connection createConnection(ConnectionFactory factory) throws JMSException {
+        Connection connection = factory.createConnection();
+
+        if (clientID != null) {
+            connection.setClientID(clientID);
+        }
+
+        // lets start the connection in case that we consume on the same
+        // connection
+        connection.start();
+
+        return connection;
     }
 
     // Properties
@@ -89,14 +109,15 @@ public class JmsProducerConfig {
     public void setTimeToLive(int timeToLive) {
         this.timeToLive = timeToLive;
     }
-    
+
     public String getClientID() {
         return clientID;
     }
 
     /**
-     * Sets the JMS connections unique clientID. This is optional unless you wish to use durable topic subscriptions. 
-     * Only one connection can have a given clientID at any time.
+     * Sets the JMS connections unique clientID. This is optional unless you
+     * wish to use durable topic subscriptions. Only one connection can have a
+     * given clientID at any time.
      */
     public void setClientID(String clientID) {
         this.clientID = clientID;
