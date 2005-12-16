@@ -17,13 +17,9 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
-import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;

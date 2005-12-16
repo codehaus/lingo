@@ -17,11 +17,11 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import java.util.List;
+import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 
 import javax.jms.DeliveryMode;
 
-import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
+import java.util.List;
 
 /**
  *
