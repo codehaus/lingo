@@ -18,8 +18,6 @@
 package org.logicblaze.lingo;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.logicblaze.lingo.jms.impl.DefaultResultJoinStragegy;
-import org.logicblaze.lingo.jms.impl.ResultJoinStrategy;
 
 import java.lang.reflect.Method;
 import java.rmi.Remote;
