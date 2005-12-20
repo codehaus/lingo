@@ -17,8 +17,6 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import org.logicblaze.lingo.jms.impl.ResultJoinHandler;
-
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;

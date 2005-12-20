@@ -18,7 +18,6 @@
 package org.logicblaze.lingo;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.logicblaze.lingo.jms.impl.ResultJoinStrategy;
 import org.logicblaze.lingo.util.LRUCache;
 
 import java.lang.reflect.Method;

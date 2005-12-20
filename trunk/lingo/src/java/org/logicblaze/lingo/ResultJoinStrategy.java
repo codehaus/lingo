@@ -15,7 +15,7 @@
  * limitations under the License. 
  * 
  **/
-package org.logicblaze.lingo.jms.impl;
+package org.logicblaze.lingo;
 
 import org.springframework.remoting.support.RemoteInvocationResult;
 

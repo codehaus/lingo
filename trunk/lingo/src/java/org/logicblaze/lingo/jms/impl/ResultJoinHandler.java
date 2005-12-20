@@ -19,6 +19,7 @@ package org.logicblaze.lingo.jms.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.ResultJoinStrategy;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.marshall.Marshaller;
 import org.springframework.remoting.support.RemoteInvocationResult;
