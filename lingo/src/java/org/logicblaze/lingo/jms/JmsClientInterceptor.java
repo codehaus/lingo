@@ -93,6 +93,30 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         setRemoteInvocationFactory(factory);
     }
 
+    public void afterPropertiesSet() throws JMSException {
+        RemoteInvocationFactory factory = getRemoteInvocationFactory();
+        if (!(factory instanceof LingoRemoteInvocationFactory)) {
+            throw new IllegalArgumentException("remoteInvocationFactory must be an instance of LingoRemoteInvocationFactory but was: " + factory);
+
+        }
+        else {
+            LingoRemoteInvocationFactory invocationFactory = (LingoRemoteInvocationFactory) factory;
+            invocationFactory.setMetadataStrategy(getMetadataStrategy());
+        }
+        if (requestor == null) {
+            if (connectionFactory == null) {
+                throw new IllegalArgumentException("requestor or connectionFactory is required");
+            }
+            else {
+                requestor = createRequestor();
+            }
+        }
+        if (marshaller == null) {
+            // default to standard JMS marshaling
+            marshaller = new DefaultMarshaller();
+        }
+    }
+
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
             return "JMS invoker proxy for service URL [" + getServiceUrl() + "]";
@@ -107,7 +131,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
                 requestor.oneWay(destination, requestMessage);
                 return null;
             }
-            else if (!isMultipleResponse(methodInvocation, metadata)){
+            else if (!isMultipleResponse(methodInvocation, metadata)) {
                 Message response = requestor.request(destination, requestMessage);
                 RemoteInvocationResult result = marshaller.extractInvocationResult(response);
                 return recreateRemoteInvocationResult(result);
@@ -120,28 +144,8 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
             }
         }
         catch (JMSException e) {
-            log.warn("Remote access error: "  + methodInvocation, e);
+            log.warn("Remote access error: " + methodInvocation, e);
             throw new RemoteAccessException("Cannot access JMS invoker remote service at [" + getServiceUrl() + "]", e);
-        }
-    }
-
-    public void afterPropertiesSet() throws JMSException {
-        RemoteInvocationFactory factory = getRemoteInvocationFactory();
-        if (!(factory instanceof LingoRemoteInvocationFactory)) {
-            throw new IllegalArgumentException("remoteInvocationFactory must be an instance of LingoRemoteInvocationFactory but was: " + factory);
-
-        }
-        if (requestor == null) {
-            if (connectionFactory == null) {
-                throw new IllegalArgumentException("requestor or connectionFactory is required");
-            }
-            else {
-                requestor = createRequestor();
-            }
-        }
-        if (marshaller == null) {
-            // default to standard JMS marshaling
-            marshaller = new DefaultMarshaller();
         }
     }
 
@@ -227,12 +231,9 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         producerConfig.setPriority(jmsPriority);
     }
 
-
-
     public int getTimeToLive() {
         return producerConfig.getTimeToLive();
     }
-
 
     /**
      * Sets the time to live on each message request
@@ -240,8 +241,6 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     public void setTimeToLive(int timeToLive) {
         producerConfig.setTimeToLive(timeToLive);
     }
-
-
 
     /**
      * Sets the message properties to be added to each message. Note that the
@@ -307,19 +306,26 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     }
 
     public MetadataStrategy getMetadataStrategy() {
+        if (metadataStrategy == null) {
+            metadataStrategy = createMetadataStrategy();
+        }
         return metadataStrategy;
     }
 
-    
+    public void setMetadataStrategy(MetadataStrategy metadataStrategy) {
+        this.metadataStrategy = metadataStrategy;
+    }
+
     public boolean isMultipleResponsesExpected() {
         return multipleResponsesExpected;
     }
 
     /**
-     * Sets whether or not multiple response messages are expected. Typically 
-     * multiple responses are only expected when the {@link #getDestination()} method
-     * returns a {@link Topic} but there could be circumstances when sending a request to
-     * a queue results in messages being fanned out to many servers which could all respond.
+     * Sets whether or not multiple response messages are expected. Typically
+     * multiple responses are only expected when the {@link #getDestination()}
+     * method returns a {@link Topic} but there could be circumstances when
+     * sending a request to a queue results in messages being fanned out to many
+     * servers which could all respond.
      */
     public void setMultipleResponsesExpected(boolean multipleResponsesExpected) {
         this.multipleResponsesExpected = multipleResponsesExpected;
@@ -329,8 +335,8 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     // -------------------------------------------------------------------------
 
     /**
-     * Returns true if this method expects multiple response messages such as when sending a message
-     * over a topic.
+     * Returns true if this method expects multiple response messages such as
+     * when sending a message over a topic.
      */
     protected boolean isMultipleResponse(MethodInvocation methodInvocation, MethodMetadata metadata) {
         return (getDestination() instanceof Topic) || isMultipleResponsesExpected();
@@ -438,8 +444,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
      * is configured
      */
     protected LingoRemoteInvocationFactory createRemoteInvocationFactory() {
-        metadataStrategy = createMetadataStrategy();
-        return new LingoRemoteInvocationFactory(metadataStrategy);
+        return new LingoRemoteInvocationFactory(getMetadataStrategy());
     }
 
     /**

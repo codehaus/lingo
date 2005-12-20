@@ -153,8 +153,6 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         try {
             String correlationID = message.getJMSCorrelationID();
 
-            System.out.println("Received message with correlationID: " + correlationID + " on message " + message + " for object: " + this);
-
             // lets notify the monitor for this response
             ReplyHandler handler = null;
             synchronized (this) {
@@ -162,7 +160,6 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
             }
             if (handler == null) {
                 log.warn("Response received for unknown correlationID: " + correlationID + " request: " + message);
-                System.out.println("#### Response received for unknown correlationID: " + correlationID + " request: " + message);
             }
             else {
                 boolean complete = handler.handle(message);

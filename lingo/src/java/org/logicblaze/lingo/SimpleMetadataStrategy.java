@@ -45,7 +45,7 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
 
     private boolean oneWayForVoidMethods;
     private Set remoteTypes;
-    private ResultJoinStrategy resultJoinStrategy = new DefaultResultJoinStragegy();
+    private ResultJoinStrategy resultJoinStrategy = new DefaultResultJoinStrategy();
 
     public SimpleMetadataStrategy() {
     }

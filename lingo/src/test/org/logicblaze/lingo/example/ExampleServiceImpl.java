@@ -20,6 +20,8 @@ package org.logicblaze.lingo.example;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Set;
+
 import junit.framework.Assert;
 
 /**
@@ -31,6 +33,7 @@ public class ExampleServiceImpl extends Assert implements ExampleService {
     private static volatile String lastMethod;
     private Object[] lastArguments;
     private int delay = 1000;
+    private Set cheese;
 
     public synchronized void someOneWayMethod(String name, int age) {
         System.out.println("#### starting server side method for: " + name + " with age: " + age + " on instance: " + this);
@@ -111,6 +114,15 @@ public class ExampleServiceImpl extends Assert implements ExampleService {
 
     public void setDelay(int delay) {
         this.delay = delay;
+    }
+
+    
+    public Set getCheese() {
+        return cheese;
+    }
+
+    public void setCheese(Set cheese) {
+        this.cheese = cheese;
     }
 
     public void clear() {
