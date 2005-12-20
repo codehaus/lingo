@@ -127,6 +127,25 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         }
     }
 
+    public void request(Destination destination, Message message, ReplyHandler handler) throws JMSException {
+        String correlationID = message.getJMSCorrelationID();
+        if (correlationID == null) {
+            correlationID = createCorrelationID();
+            message.setJMSCorrelationID(correlationID);
+        }
+        synchronized (this) {
+            Object currentHandler = requests.get(correlationID);
+            if (currentHandler instanceof AsyncReplyHandler) {
+                AsyncReplyHandler remoteObjectHandler = (AsyncReplyHandler) currentHandler;
+                remoteObjectHandler.setParent(handler);
+            }
+            else {
+                requests.put(correlationID, handler);
+            }
+        }
+        oneWay(destination, message);
+    }
+
     /**
      * Processes inbound responses from requests
      */

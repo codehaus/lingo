@@ -17,6 +17,10 @@
  **/
 package org.logicblaze.lingo;
 
+import org.aopalliance.intercept.MethodInvocation;
+import org.logicblaze.lingo.jms.impl.DefaultResultJoinStragegy;
+import org.logicblaze.lingo.jms.impl.ResultJoinStrategy;
+
 import java.lang.reflect.Method;
 import java.rmi.Remote;
 import java.util.EventListener;
@@ -26,23 +30,24 @@ import java.util.Set;
 
 /**
  * A simple metadata strategy which uses POJO naming conventions.
- *
- * By default all method invocations are synchronous to avoid surprising users of Spring Remoting. However
- * if you set the {@link #setOneWayForVoidMethods(boolean)} value to true then all void methods which do
- * not throw checked exceptions become asynchronous one way methods.
- *
- * <p/>
- * Also any object which implements the {@link Remote} interface or the {@link EventListener}
- * are assumed to be remote and so a remote proxy is used to allow remote notifications and asynchronous
- * messaging.
- *
+ * 
+ * By default all method invocations are synchronous to avoid surprising users
+ * of Spring Remoting. However if you set the
+ * {@link #setOneWayForVoidMethods(boolean)} value to true then all void methods
+ * which do not throw checked exceptions become asynchronous one way methods.
+ * 
+ * <p/> Also any object which implements the {@link Remote} interface or the
+ * {@link EventListener} are assumed to be remote and so a remote proxy is used
+ * to allow remote notifications and asynchronous messaging.
+ * 
  * @version $Revision$
  */
 public class SimpleMetadataStrategy implements MetadataStrategy {
     private static final long serialVersionUID = 3314789109318386510L;
-    
+
     private boolean oneWayForVoidMethods;
     private Set remoteTypes;
+    private ResultJoinStrategy resultJoinStrategy = new DefaultResultJoinStragegy();
 
     public SimpleMetadataStrategy() {
     }
@@ -64,12 +69,25 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
         }
         return new MethodMetadata(oneway, remoteParams, isStateful(method), isEndSession(method));
     }
+
     public boolean isOneWayForVoidMethods() {
         return oneWayForVoidMethods;
     }
 
     public void setOneWayForVoidMethods(boolean oneWayForVoidMethods) {
         this.oneWayForVoidMethods = oneWayForVoidMethods;
+    }
+
+    public ResultJoinStrategy getResultJoinStrategy(MethodInvocation methodInvocation, MethodMetadata metadata) {
+        return getResultJoinStrategy();
+    }
+
+    public ResultJoinStrategy getResultJoinStrategy() {
+        return resultJoinStrategy;
+    }
+
+    public void setResultJoinStrategy(ResultJoinStrategy joinStrategy) {
+        this.resultJoinStrategy = joinStrategy;
     }
 
     public Set getRemoteTypes() {
@@ -79,7 +97,6 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
         }
         return remoteTypes;
     }
-
 
     public void setRemoteTypes(Set remoteTypes) {
         this.remoteTypes = remoteTypes;
@@ -105,7 +122,6 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
         return oneway;
     }
 
-
     /**
      * Returns true if this method completes a callback object
      */
@@ -114,7 +130,8 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
     }
 
     /**
-     * Returns whether or not this object is stateful such that sticky load balancing should be used
+     * Returns whether or not this object is stateful such that sticky load
+     * balancing should be used
      */
     protected boolean isStateful(Method method) {
         return false;
@@ -124,6 +141,5 @@ public class SimpleMetadataStrategy implements MetadataStrategy {
         remoteTypes.add(Remote.class);
         remoteTypes.add(EventListener.class);
     }
-    
-    
+
 }

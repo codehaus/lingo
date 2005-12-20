@@ -17,6 +17,8 @@
  **/
 package org.logicblaze.lingo;
 
+import org.aopalliance.intercept.MethodInvocation;
+import org.logicblaze.lingo.jms.impl.ResultJoinStrategy;
 import org.logicblaze.lingo.util.LRUCache;
 
 import java.lang.reflect.Method;
@@ -51,6 +53,10 @@ public class CachingMetadataStrategy implements MetadataStrategy {
             getCache().put(method, answer);
         }
         return answer;
+    }
+
+    public ResultJoinStrategy getResultJoinStrategy(MethodInvocation methodInvocation, MethodMetadata metadata) {
+        return proxy.getResultJoinStrategy(methodInvocation, metadata);
     }
 
     // Properties

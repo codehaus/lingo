@@ -20,6 +20,7 @@ package org.logicblaze.lingo.jms.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.JmsProducer;
+import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.Requestor;
 
 import javax.jms.Destination;
@@ -115,6 +116,10 @@ public class OneWayRequestor implements Requestor {
 
     public Message request(Destination destination, Message message, long timeout) throws JMSException {
         throw new JMSException("request(Destination, Message, long) not implemented for OneWayRequestor");
+    }
+
+    public void request(Destination destination, Message requestMessage, ReplyHandler handler) throws JMSException {
+        throw new JMSException("request(Destination, Message, ReplyHandler) not implemented for OneWayRequestor");
     }
 
     protected void populateHeaders(Message message) throws JMSException {

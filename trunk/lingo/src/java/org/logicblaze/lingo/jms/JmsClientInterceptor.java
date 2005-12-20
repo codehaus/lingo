@@ -28,7 +28,9 @@ import org.logicblaze.lingo.MetadataStrategy;
 import org.logicblaze.lingo.MetadataStrategyHelper;
 import org.logicblaze.lingo.MethodMetadata;
 import org.logicblaze.lingo.jms.impl.AsyncReplyHandler;
+import org.logicblaze.lingo.jms.impl.ResultJoinHandler;
 import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
+import org.logicblaze.lingo.jms.impl.ResultJoinStrategy;
 import org.logicblaze.lingo.jms.marshall.DefaultMarshaller;
 import org.logicblaze.lingo.jms.marshall.Marshaller;
 import org.springframework.aop.support.AopUtils;
@@ -44,6 +46,7 @@ import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.Topic;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -74,6 +77,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     private int jmsExpiration = -1;
     private JmsProducerConfig producerConfig = new JmsProducerConfig();
     private MetadataStrategy metadataStrategy;
+    private boolean multipleResponsesExpected;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -103,9 +107,15 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
                 requestor.oneWay(destination, requestMessage);
                 return null;
             }
-            else {
+            else if (!isMultipleResponse(methodInvocation, metadata)){
                 Message response = requestor.request(destination, requestMessage);
                 RemoteInvocationResult result = marshaller.extractInvocationResult(response);
+                return recreateRemoteInvocationResult(result);
+            }
+            else {
+                ResultJoinHandler handler = createResultJoinHandler(methodInvocation, metadata);
+                requestor.request(destination, requestMessage, handler);
+                RemoteInvocationResult result = handler.waitForResult();
                 return recreateRemoteInvocationResult(result);
             }
         }
@@ -301,8 +311,30 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     }
 
     
+    public boolean isMultipleResponsesExpected() {
+        return multipleResponsesExpected;
+    }
+
+    /**
+     * Sets whether or not multiple response messages are expected. Typically 
+     * multiple responses are only expected when the {@link #getDestination()} method
+     * returns a {@link Topic} but there could be circumstances when sending a request to
+     * a queue results in messages being fanned out to many servers which could all respond.
+     */
+    public void setMultipleResponsesExpected(boolean multipleResponsesExpected) {
+        this.multipleResponsesExpected = multipleResponsesExpected;
+    }
+
     // Implementation methods
     // -------------------------------------------------------------------------
+
+    /**
+     * Returns true if this method expects multiple response messages such as when sending a message
+     * over a topic.
+     */
+    protected boolean isMultipleResponse(MethodInvocation methodInvocation, MethodMetadata metadata) {
+        return (getDestination() instanceof Topic) || isMultipleResponsesExpected();
+    }
 
     protected void populateHeaders(Message requestMessage) throws JMSException {
         if (correlationID != null) {
@@ -374,6 +406,11 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
             throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");
         }
         return correlationID;
+    }
+
+    protected ResultJoinHandler createResultJoinHandler(MethodInvocation methodInvocation, MethodMetadata metadata) {
+        ResultJoinStrategy joinStrategy = getMetadataStrategy().getResultJoinStrategy(methodInvocation, metadata);
+        return new ResultJoinHandler(marshaller, joinStrategy);
     }
 
     protected AsyncReplyHandler createAsyncHandler(Object value) {

@@ -40,7 +40,7 @@ public class AsyncReplyHandler extends JmsServiceExporterMessageListener impleme
 
     private Marshaller marshaller;
     private final MetadataStrategy metadataStrategy;
-    private FutureResultHandler futureResult;
+    private ReplyHandler parent;
 
     public AsyncReplyHandler(Object pojo, Marshaller marshaller, MetadataStrategy metadataStrategy) {
         super(pojo);
@@ -49,12 +49,20 @@ public class AsyncReplyHandler extends JmsServiceExporterMessageListener impleme
     }
 
     public boolean handle(Message message) throws JMSException {
-        if (futureResult != null) {
-            futureResult.handle(message);
+        if (parent != null) {
+            parent.handle(message);
         }
         RemoteInvocation invocation = marshaller.readRemoteInvocation(message);
         doInvoke(message, invocation);
         return isEndSessionMethod(invocation);
+    }
+
+    public ReplyHandler getParent() {
+        return parent;
+    }
+
+    public void setParent(ReplyHandler parent) {
+        this.parent = parent;
     }
 
     protected boolean isEndSessionMethod(RemoteInvocation invocation) {
@@ -74,7 +82,8 @@ public class AsyncReplyHandler extends JmsServiceExporterMessageListener impleme
     }
 
     public FutureResult newResultHandler() {
-        futureResult = new FutureResultHandler();
+        FutureResultHandler futureResult = new FutureResultHandler();
+        setParent(futureResult);
         return futureResult;
     }
 }
