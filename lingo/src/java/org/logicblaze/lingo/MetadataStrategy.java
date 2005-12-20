@@ -17,6 +17,10 @@
  **/
 package org.logicblaze.lingo;
 
+import org.aopalliance.intercept.MethodInvocation;
+import org.logicblaze.lingo.jms.impl.ResultJoinHandler;
+import org.logicblaze.lingo.jms.impl.ResultJoinStrategy;
+
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
@@ -33,4 +37,11 @@ public interface MetadataStrategy extends Serializable {
      * Generates the method specific metadata for the given method invocation
      */
     public MethodMetadata getMethodMetadata(Method method);
+
+    /**
+     * Returns the strategy for joining multiple results together when communicating with multiple back end
+     * servers over topics.
+     */
+    public ResultJoinStrategy getResultJoinStrategy(MethodInvocation methodInvocation, MethodMetadata metadata);
+
 }

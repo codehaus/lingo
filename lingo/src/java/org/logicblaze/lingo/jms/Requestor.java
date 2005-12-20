@@ -17,6 +17,8 @@
  **/
 package org.logicblaze.lingo.jms;
 
+import org.logicblaze.lingo.jms.impl.ResultJoinHandler;
+
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -71,6 +73,12 @@ public interface Requestor {
      * if the timeout is zero
      */
     Message receive(long timeout) throws JMSException;
+
+    /**
+     * Sends a request and provides a handler for all responses until the request is considered
+     * dead (or it is timed out).
+     */
+    void request(Destination destination, Message requestMessage, ReplyHandler handler) throws JMSException;
 
     /**
      * Provides access to the underlying JMS session so that you can
