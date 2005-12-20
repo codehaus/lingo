@@ -76,7 +76,7 @@ public interface Requestor {
      * Sends a request and provides a handler for all responses until the request is considered
      * dead (or it is timed out).
      */
-    void request(Destination destination, Message requestMessage, ReplyHandler handler) throws JMSException;
+    void request(Destination destination, Message requestMessage, ReplyHandler handler, long timeout) throws JMSException;
 
     /**
      * Provides access to the underlying JMS session so that you can

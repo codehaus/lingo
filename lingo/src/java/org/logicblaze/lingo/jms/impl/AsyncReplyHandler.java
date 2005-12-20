@@ -17,6 +17,7 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
+import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 
 import org.apache.commons.logging.Log;
@@ -65,6 +66,12 @@ public class AsyncReplyHandler extends JmsServiceExporterMessageListener impleme
         this.parent = parent;
     }
 
+    public FutureTask newResultHandler() {
+        FutureHandler futureResult = new FutureHandler();
+        setParent(futureResult);
+        return futureResult;
+    }
+
     protected boolean isEndSessionMethod(RemoteInvocation invocation) {
         Method method;
         try {
@@ -79,11 +86,5 @@ public class AsyncReplyHandler extends JmsServiceExporterMessageListener impleme
 
     protected void onException(RemoteInvocation invocation, Exception e) {
         log.error("Failed to invoke: " + invocation + " on: " + getProxy() + ". Reason: " + e, e);
-    }
-
-    public FutureResult newResultHandler() {
-        FutureResultHandler futureResult = new FutureResultHandler();
-        setParent(futureResult);
-        return futureResult;
     }
 }

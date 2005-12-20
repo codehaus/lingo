@@ -118,8 +118,8 @@ public class OneWayRequestor implements Requestor {
         throw new JMSException("request(Destination, Message, long) not implemented for OneWayRequestor");
     }
 
-    public void request(Destination destination, Message requestMessage, ReplyHandler handler) throws JMSException {
-        throw new JMSException("request(Destination, Message, ReplyHandler) not implemented for OneWayRequestor");
+    public void request(Destination destination, Message requestMessage, ReplyHandler handler, long timeout) throws JMSException {
+        throw new JMSException("request(Destination, Message, ReplyHandler, long) not implemented for OneWayRequestor");
     }
 
     protected void populateHeaders(Message message) throws JMSException {
