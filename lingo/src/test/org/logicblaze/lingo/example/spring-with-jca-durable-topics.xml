@@ -81,7 +81,7 @@
     <property name="brokerURL" value="tcp://localhost:61626"/>
   </bean>
 
-  <bean id="exampleDestination" class="org.activemq.message.ActiveMQTopic">
+  <bean id="exampleDestination" class="org.activemq.command.ActiveMQTopic">
     <constructor-arg index="0" value="test.org.logicblaze.lingo.jca.topicExample"/>
   </bean>
 </beans>

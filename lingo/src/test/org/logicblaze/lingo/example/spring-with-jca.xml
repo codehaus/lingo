@@ -99,7 +99,7 @@
   </bean>
 
   <bean id="exampleDestination"
-    class="org.activemq.message.ActiveMQQueue">
+    class="org.activemq.command.ActiveMQQueue">
     <constructor-arg index="0"
       value="test.org.logicblaze.lingo.jca.example" />
   </bean>
