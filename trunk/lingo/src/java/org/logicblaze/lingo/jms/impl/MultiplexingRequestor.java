@@ -102,7 +102,6 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
                 }
             }
         }
-        System.out.println("Sending message with correlationID: " + correlationID + " on destination " + destination + " for object: " + this);
 
         if (future == null) {
             future = new FutureResultHandler();
