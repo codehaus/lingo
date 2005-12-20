@@ -11,17 +11,15 @@
     <property name="destination" ref="exampleDestination"/>
 
     <!-- lets enable async one ways on the client -->
-    <property name="remoteInvocationFactory" ref="invocationFactory"/>
+    <property name="metadataStrategy" ref="metadataStrategy"/>
   </bean>
-
-  <bean id="invocationFactory" class="org.logicblaze.lingo.LingoRemoteInvocationFactory">
-    <constructor-arg>
-      <bean class="org.logicblaze.lingo.SimpleMetadataStrategy">
-        <!-- enable async one ways -->
-        <constructor-arg value="true"/>
-      </bean>
-    </constructor-arg>
+  
+  <!-- define the metadata strategy -->
+  <bean id="metadataStrategy" class="org.logicblaze.lingo.SimpleMetadataStrategy">
+    <!-- enable async one ways -->
+    <constructor-arg value="true"/>
   </bean>
+  
   <!-- END SNIPPET: client -->
 
 
@@ -31,7 +29,7 @@
     <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
     <property name="connectionFactory" ref="jmsFactory"/>
     <property name="destination" ref="exampleDestination"/>
-    <property name="invocationFactory" ref="invocationFactory"/>
+    <property name="metadataStrategy" ref="metadataStrategy"/>
   </bean>
 
   <!-- the actual implementation of the service - which is only made public for testing purposes -->

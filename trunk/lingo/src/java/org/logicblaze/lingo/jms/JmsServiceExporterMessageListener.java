@@ -206,6 +206,14 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
         return proxy;
     }
 
+    public MetadataStrategy getMetadataStrategy() {
+        return metadataStrategy;
+    }
+
+    public void setMetadataStrategy(MetadataStrategy metadataStrategy) {
+        this.metadataStrategy = metadataStrategy;
+    }
+
     // Implementation methods
     // -------------------------------------------------------------------------
 
@@ -289,7 +297,9 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
         JmsProxyFactoryBean factory = new JmsProxyFactoryBean();
         factory.setDestination(message.getJMSReplyTo());
         String correlationID = (String) argument;
-        System.out.println("Creating a server side remote proxy for correlationID: " + correlationID);
+        if (log.isDebugEnabled()) {
+            log.debug("Creating a server side remote proxy for correlationID: " + correlationID);
+        }
         factory.setCorrelationID(correlationID);
         factory.setMarshaller(getMarshaller());
         factory.setRemoteInvocationFactory(invocationFactory);

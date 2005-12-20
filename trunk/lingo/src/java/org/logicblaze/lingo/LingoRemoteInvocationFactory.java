@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A factory of remote invocation instances which includes the extra
- * Lingo metadata.
- *
+ * A factory of remote invocation instances which includes the extra Lingo
+ * metadata.
+ * 
  * @version $Revision$
  */
 public class LingoRemoteInvocationFactory implements RemoteInvocationFactory {
@@ -46,6 +46,14 @@ public class LingoRemoteInvocationFactory implements RemoteInvocationFactory {
         return new LingoInvocation(methodInvocation, metadata);
     }
 
+    public MetadataStrategy getMetadataStrategy() {
+        return metadataStrategy;
+    }
+
+    public void setMetadataStrategy(MetadataStrategy metadataStrategy) {
+        this.metadataStrategy = metadataStrategy;
+    }
+
     protected synchronized MethodMetadata getMethodMetadata(MethodInvocation methodInvocation) {
         Method method = methodInvocation.getMethod();
         MethodMetadata answer = (MethodMetadata) cache.get(method);
@@ -61,5 +69,5 @@ public class LingoRemoteInvocationFactory implements RemoteInvocationFactory {
         }
         return answer;
     }
-    
+
 }

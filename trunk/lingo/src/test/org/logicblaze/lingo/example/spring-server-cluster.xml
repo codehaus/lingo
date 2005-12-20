@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- START SNIPPET: spring -->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <!-- client side proxy-->
+  <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+    <!-- lets enable async one ways on the client -->
+    <property name="metadataStrategy">
+      <bean class="org.logicblaze.lingo.SimpleMetadataStrategy">
+        <!-- enable async one ways -->
+        <constructor-arg value="true"/>
+        <property name="resultJoinStrategy">
+          <bean class="org.logicblaze.lingo.DefaultResultJoinStrategy">
+            <property name="minimumResults" value="2"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <!-- server A -->
+  <bean id="serverA" class="org.logicblaze.lingo.jms.JmsServiceExporter" singleton="true">
+    <property name="service">
+	  <bean class="org.logicblaze.lingo.example.ExampleServiceImpl">
+	  	<property name="cheese">
+	  	  <set>
+	  	  	<value>Brie</value>
+	  	  	<value>Edam</value>
+	  	  </set>
+	  	</property>
+	  </bean>
+    </property>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+  </bean>
+
+  <!-- server B -->
+  <bean id="serverB" class="org.logicblaze.lingo.jms.JmsServiceExporter" singleton="true">
+    <property name="service">
+	  <bean class="org.logicblaze.lingo.example.ExampleServiceImpl">
+	  	<property name="cheese">
+	  	  <set>
+	  	  	<value>Edam</value>
+	  	  	<value>Cheddar</value>
+	  	  </set>
+	  	</property>
+	  </bean>
+    </property>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+  </bean>
+
+  <!-- JMS ConnectionFactory to use -->
+  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="vm://localhost"/>
+  </bean>
+
+  <bean id="exampleDestination" class="org.activemq.message.ActiveMQTopic">
+    <constructor-arg index="0" value="test.org.logicblaze.lingo.example.cluster"/>
+  </bean>
+</beans>
+
+<!-- END SNIPPET: spring -->

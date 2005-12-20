@@ -17,6 +17,8 @@
  **/
 package org.logicblaze.lingo.example;
 
+import java.util.Set;
+
 /**
  * @version $Revision$
  */
@@ -26,6 +28,8 @@ public interface ExampleService {
     public int regularRPC(String name);
     public void anotherRPC() throws Exception;
 
+    public Set getCheese();
+    
     /**
      * @org.logicblaze.lingo.annotations.Async
      * 
