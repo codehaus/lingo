@@ -42,7 +42,7 @@
     </property>
   </bean>
 
-  <bean id="exampleDestination" class="org.activemq.message.ActiveMQQueue">
+  <bean id="exampleDestination" class="org.activemq.command.ActiveMQQueue">
     <constructor-arg index="0">
       <value>test.org.logicblaze.lingo.example</value>
     </constructor-arg>

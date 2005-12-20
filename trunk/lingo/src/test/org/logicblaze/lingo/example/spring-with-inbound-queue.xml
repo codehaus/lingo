@@ -30,11 +30,11 @@
     <property name="brokerURL" value="vm://localhost"/>
   </bean>
 
-  <bean id="serviceDestination" class="org.activemq.message.ActiveMQQueue">
+  <bean id="serviceDestination" class="org.activemq.command.ActiveMQQueue">
     <constructor-arg index="0" value="test.org.logicblaze.lingo.example2.service"/>
   </bean>
 
-  <bean id="responseDestination" class="org.activemq.message.ActiveMQQueue">
+  <bean id="responseDestination" class="org.activemq.command.ActiveMQQueue">
     <constructor-arg index="0" value="test.org.logicblaze.lingo.example2.response"/>
   </bean>
 </beans>

@@ -6,3 +6,4 @@ ActiveMQ
 .fbwarnings
 bin
 .settings
+activemq-data
