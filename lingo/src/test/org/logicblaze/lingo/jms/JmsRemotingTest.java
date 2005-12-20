@@ -18,7 +18,7 @@
 package org.logicblaze.lingo.jms;
 
 import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.message.ActiveMQQueue;
+import org.activemq.command.ActiveMQQueue;
 import org.aopalliance.intercept.MethodInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;
@@ -313,10 +313,6 @@ public class JmsRemotingTest extends JmsTestSupport {
     protected void tearDown() throws Exception {
         if (connection != null) {
             connection.close();
-        }
-        if (connectionFactory instanceof ActiveMQConnectionFactory) {
-            ActiveMQConnectionFactory amqConnectionFactory = (ActiveMQConnectionFactory) connectionFactory;
-            amqConnectionFactory.stop();
         }
         super.tearDown();
     }
