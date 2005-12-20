@@ -190,15 +190,21 @@
       <artifactId>mx4j</artifactId>
       <version>3.0.1</version>
     </dependency>
+    <dependency>
+    	<groupId>mx4j</groupId>
+        <artifactId>mx4j-remote</artifactId>
+        <version>3.0.1</version>
+    </dependency>
+       
 
     <!-- default JMS provider -->
     <dependency>
       <id>activemq</id>
-      <version>3.2</version>
+      <version>4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <id>activemq+ra</id>
-      <version>3.2</version>
+      <version>4.0-SNAPSHOT</version>
       <properties>
         <lib>true</lib>
       </properties>
@@ -243,6 +249,10 @@
       <id>backport175</id>
       <version>1.0</version>
     </dependency>
+   <dependency>
+      <id>backport-util-concurrent</id>
+      <version>2.0_01_pd</version>
+   </dependency>
 
   </dependencies>
 
