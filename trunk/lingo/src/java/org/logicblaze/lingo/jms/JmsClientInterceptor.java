@@ -78,6 +78,8 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     private JmsProducerConfig producerConfig = new JmsProducerConfig();
     private MetadataStrategy metadataStrategy;
     private boolean multipleResponsesExpected;
+    private long multipleResponseTimeout = 5000L;
+    private long remoteReferenceTimeout = 60000L;
 
     public JmsClientInterceptor() {
         setRemoteInvocationFactory(createRemoteInvocationFactory());
@@ -138,7 +140,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
             }
             else {
                 ResultJoinHandler handler = createResultJoinHandler(methodInvocation, metadata);
-                requestor.request(destination, requestMessage, handler);
+                requestor.request(destination, requestMessage, handler, getMultipleResponseTimeout());
                 RemoteInvocationResult result = handler.waitForResult();
                 return recreateRemoteInvocationResult(result);
             }
@@ -331,6 +333,31 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         this.multipleResponsesExpected = multipleResponsesExpected;
     }
 
+    public long getRemoteReferenceTimeout() {
+        return remoteReferenceTimeout;
+    }
+
+    /**
+     * Sets the maximum amout of time an inactive remote object reference will
+     * keep around until it is garbage collected.
+     */
+    public void setRemoteReferenceTimeout(long remoteReferenceTimeout) {
+        this.remoteReferenceTimeout = remoteReferenceTimeout;
+    }
+
+    public long getMultipleResponseTimeout() {
+        return multipleResponseTimeout;
+    }
+
+    /**
+     * Sets the maximum amount of time to wait for multiple results to come back
+     * if communicating with multiple servers and aggregating together the
+     * results.
+     */
+    public void setMultipleResponseTimeout(long multipleResponseTimeout) {
+        this.multipleResponseTimeout = multipleResponseTimeout;
+    }
+
     // Implementation methods
     // -------------------------------------------------------------------------
 
@@ -406,7 +433,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         }
         if (requestor instanceof MultiplexingRequestor) {
             MultiplexingRequestor multiplexingRequestor = (MultiplexingRequestor) requestor;
-            multiplexingRequestor.registerHandler(correlationID, createAsyncHandler(value));
+            multiplexingRequestor.registerHandler(correlationID, createAsyncHandler(value), getRemoteReferenceTimeout());
         }
         else {
             throw new IllegalArgumentException("You can only pass remote references with a MultiplexingRequestor");

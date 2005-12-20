@@ -17,7 +17,10 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,9 +37,6 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * A {@link org.logicblaze.lingo.jms.Requestor} which will use a single
  * producer, consumer and temporary topic for resource efficiency, but will use
@@ -49,7 +49,7 @@ import java.util.Map;
 public class MultiplexingRequestor extends SingleThreadedRequestor implements MessageListener {
     private static final Log log = LogFactory.getLog(MultiplexingRequestor.class);
 
-    private Map requests = new HashMap();
+    private RequestHandlerMap requestMap = new DefaultRequestHandlerMap();
 
     public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination) throws JMSException {
         DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
@@ -72,10 +72,8 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         this(session, producer, serverDestination, null);
     }
 
-    public void registerHandler(String correlationID, ReplyHandler handler) {
-        synchronized (this) {
-            requests.put(correlationID, handler);
-        }
+    public void registerHandler(String correlationID, ReplyHandler handler, long timeout) {
+        requestMap.put(correlationID, handler, timeout);
     }
 
     public Message request(Destination destination, Message message) throws JMSException {
@@ -87,27 +85,24 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         // lets create a correlationID unless we are already given one -
         // we are already given a correaltionID if we are on the server side
         // responding to a remote object reference
-        FutureResult future = null;
+        FutureTask future = null;
         String correlationID = message.getJMSCorrelationID();
         if (correlationID == null) {
             correlationID = createCorrelationID();
             message.setJMSCorrelationID(correlationID);
         }
         else {
-            synchronized (this) {
-                Object currentHandler = requests.get(correlationID);
-                if (currentHandler instanceof AsyncReplyHandler) {
-                    AsyncReplyHandler handler = (AsyncReplyHandler) currentHandler;
-                    future = handler.newResultHandler();
-                }
+            ReplyHandler currentHandler = requestMap.get(correlationID);
+            if (currentHandler instanceof AsyncReplyHandler) {
+                AsyncReplyHandler handler = (AsyncReplyHandler) currentHandler;
+                future = handler.newResultHandler();
             }
         }
 
         if (future == null) {
-            future = new FutureResultHandler();
-            synchronized (this) {
-                requests.put(correlationID, future);
-            }
+            FutureHandler futureHandler = new FutureHandler();
+            future = futureHandler;
+            requestMap.put(correlationID, futureHandler, timeout);
         }
         oneWay(destination, message);
 
@@ -115,11 +110,8 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
             if (timeout < 0) {
                 return (Message) future.get();
             }
-            else if (timeout == 0) {
-                return (Message) future.peek();
-            }
             else {
-                return (Message) future.timedGet(timeout);
+                return (Message) future.get(timeout, TimeUnit.MILLISECONDS);
             }
         }
         catch (Exception e) {
@@ -127,20 +119,20 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         }
     }
 
-    public void request(Destination destination, Message message, ReplyHandler handler) throws JMSException {
+    public void request(Destination destination, Message message, ReplyHandler handler, long timeout) throws JMSException {
         String correlationID = message.getJMSCorrelationID();
         if (correlationID == null) {
             correlationID = createCorrelationID();
             message.setJMSCorrelationID(correlationID);
         }
-        synchronized (this) {
-            Object currentHandler = requests.get(correlationID);
+        synchronized (requestMap) {
+            ReplyHandler currentHandler = requestMap.get(correlationID);
             if (currentHandler instanceof AsyncReplyHandler) {
                 AsyncReplyHandler remoteObjectHandler = (AsyncReplyHandler) currentHandler;
                 remoteObjectHandler.setParent(handler);
             }
             else {
-                requests.put(correlationID, handler);
+                requestMap.put(correlationID, handler, timeout);
             }
         }
         oneWay(destination, message);
@@ -154,19 +146,14 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
             String correlationID = message.getJMSCorrelationID();
 
             // lets notify the monitor for this response
-            ReplyHandler handler = null;
-            synchronized (this) {
-                handler = (ReplyHandler) requests.get(correlationID);
-            }
+            ReplyHandler handler = requestMap.get(correlationID);
             if (handler == null) {
                 log.warn("Response received for unknown correlationID: " + correlationID + " request: " + message);
             }
             else {
                 boolean complete = handler.handle(message);
                 if (complete) {
-                    synchronized (this) {
-                        requests.remove(correlationID);
-                    }
+                    requestMap.remove(correlationID);
                 }
             }
         }
@@ -185,9 +172,19 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         super.doSend(destination, message, timeout);
     }
 
+    // Properties
+    // -------------------------------------------------------------------------
+    public RequestHandlerMap getRequestMap() {
+        return requestMap;
+    }
+
+    public void setRequestMap(RequestHandlerMap requests) {
+        this.requestMap = requests;
+    }
+
+
     // Implementation methods
     // -------------------------------------------------------------------------
-
     protected JMSException createJMSException(Exception e) {
         JMSException answer = new JMSException(e.toString());
         answer.setLinkedException(e);

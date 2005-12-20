@@ -18,6 +18,8 @@
 package org.logicblaze.lingo.jms.impl;
 
 import EDU.oswego.cs.dl.util.concurrent.FutureResult;
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 
 import org.logicblaze.lingo.jms.ReplyHandler;
 
@@ -31,7 +33,21 @@ import javax.jms.Message;
  * 
  * @version $Revision$
  */
-public class FutureResultHandler extends FutureResult implements ReplyHandler {
+public class FutureHandler extends FutureTask implements ReplyHandler {
+
+    private static final Callable EMPTY_CALLABLE = new Callable() {
+        public Object call() throws Exception {
+            return null;
+        }
+    };
+
+    public FutureHandler() {
+        super(EMPTY_CALLABLE);
+    }
+
+    public synchronized void set(Object result) {
+        super.set(result);
+    }
 
     public boolean handle(Message message) throws JMSException {
         set(message);
