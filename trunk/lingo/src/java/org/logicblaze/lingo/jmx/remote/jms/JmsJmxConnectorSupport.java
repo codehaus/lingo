@@ -43,32 +43,39 @@ class JmsJmxConnectorSupport {
      * The default destination group name
      */
     static final String MBEAN_GROUP_NAME = "*";
-    
+
     static URI getProviderURL(JMXServiceURL serviceURL) throws IOException {
         String protocol = serviceURL.getProtocol();
-        if ("jms".equals(protocol)) throw new MalformedURLException("Wrong protocol " + protocol + " expecting jms ");
-        try{
-            return  new URI(serviceURL.getURLPath());
-        }catch(URISyntaxException e){
+        if (!"jms".equals(protocol))
+            throw new MalformedURLException("Wrong protocol " + protocol + " expecting jms ");
+        try {
+            String path = serviceURL.getURLPath();
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            return new URI(path);
+        }
+        catch (URISyntaxException e) {
             e.printStackTrace();
             throw new IOException(e.toString());
         }
     }
-    
-    static void populateProperties(Object value, URI url) throws IOException{
+
+    static void populateProperties(Object value, URI url) throws IOException {
         String query = url.getQuery();
-        if(query!=null){
-            try{
-                Map map=URISupport.parseQuery(query);
-                if(map!=null&&!map.isEmpty()){
-                    IntrospectionSupport.setProperties(value,map);
+        if (query != null) {
+            try {
+                Map map = URISupport.parseQuery(query);
+                if (map != null && !map.isEmpty()) {
+                    IntrospectionSupport.setProperties(value, map);
                 }
-            }catch(URISyntaxException e){
+            }
+            catch (URISyntaxException e) {
                 e.printStackTrace();
                 throw new IOException(e.toString());
             }
-            
+
         }
     }
-	
+
 }

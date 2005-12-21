@@ -47,7 +47,7 @@ public class JmxRemoteTest extends TestCase {
         JMXServiceURL url = new JMXServiceURL("service:jmx:jms:///vm://localhost");
                 // Create and start the RMIConnectorServer
         Map env = new HashMap();
-        env.put("jmx.remote.protocol.provider.pkgs","|org.logicblaze.lingo.jmx.remote|");
+        env.put("jmx.remote.protocol.provider.pkgs","org.logicblaze.lingo.jmx.remote.provider");
         connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
         connectorServer.start();
         
