@@ -17,12 +17,16 @@
  **/
 package org.logicblaze.lingo.util;
 
-import edu.emory.mathcs.backport.java.util.Queue;
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.command.ActiveMQQueue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import junit.framework.TestCase;
 
@@ -32,7 +36,7 @@ import junit.framework.TestCase;
  */
 public class JmsQueueTest extends TestCase {
 
-    protected Queue queue;
+    protected BlockingQueue queue;
 
     public void testQueueOperations() throws Exception {
         assertTrue("queue should be empty", queue.isEmpty());
@@ -42,11 +46,11 @@ public class JmsQueueTest extends TestCase {
         assertEquals("size()", 1, queue.size());
         assertTrue("queue should be non empty", !queue.isEmpty());
 
-        queue.add("2");
+        queue.offer("2");
         assertEquals("size()", 2, queue.size());
         assertTrue("queue should be non empty", !queue.isEmpty());
 
-        queue.add("3");
+        queue.offer("3", 1000, TimeUnit.MILLISECONDS);
         assertEquals("size()", 3, queue.size());
         assertTrue("queue should be non empty", !queue.isEmpty());
 
@@ -62,15 +66,68 @@ public class JmsQueueTest extends TestCase {
 
         System.out.println("Created a queue: " + queue);
 
-        
         // now lets remove some stuff
         Object value = queue.remove();
         assertEquals("remove()", "1", value);
-        
-        
+
         value = queue.poll();
         assertEquals("poll()", "2", value);
-        
+        assertEquals("size()", 1, queue.size());
+        assertTrue("queue should be non empty", !queue.isEmpty());
+
+        queue.clear();
+        assertTrue("queue should be empty", queue.isEmpty());
+        assertEquals("size()", 0, queue.size());
+
+        assertTrue("remainingCapacity", queue.remainingCapacity() > 0);
+    }
+
+    /*
+    public void testRemoveAll() throws Exception {
+        List sample = Arrays.asList(new Object[] { "A", "B", "C" });
+        queue.addAll(sample);
+        assertEquals("size()", 3, queue.size());
+        queue.removeAll(sample);
+        assertEquals("size()", 0, queue.size());
+    }
+    */
+
+    public void testDrain() throws Exception {
+        List sample = Arrays.asList(new Object[] { "A", "B", "C" });
+        queue.addAll(sample);
+        assertEquals("size()", 3, queue.size());
+
+        List list = new ArrayList();
+        queue.drainTo(list);
+
+        assertEquals("size()", 0, queue.size());
+
+        assertEquals("size of drained list", 3, list.size());
+    }
+
+    public void testDrainConstrained() throws Exception {
+        List sample = Arrays.asList(new Object[] { "A", "B", "C" });
+        queue.addAll(sample);
+        assertEquals("size()", 3, queue.size());
+
+        List list = new ArrayList();
+        queue.drainTo(list, 2);
+
+        assertEquals("size()", 1, queue.size());
+
+        assertEquals("size of drained list", 2, list.size());
+    }
+
+    public void testRemoveOnEmptyQueue() throws Exception {
+        assertEquals("poll()", null, queue.poll());
+        try {
+            queue.remove();
+            fail("Should have thrown exception: NoSuchElementException");
+        }
+        catch (NoSuchElementException e) {
+            System.out.println("Caught expected exception: " + e);
+        }
+
     }
 
     protected void setUp() throws Exception {
@@ -84,7 +141,7 @@ public class JmsQueueTest extends TestCase {
         }
     }
 
-    protected Queue createQueue() {
+    protected BlockingQueue createQueue() {
         JmsClient client = new JmsClient(new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false"), new ActiveMQQueue(getName()));
         return new JmsQueue(client);
     }

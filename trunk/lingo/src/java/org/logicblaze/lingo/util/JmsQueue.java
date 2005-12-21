@@ -259,6 +259,23 @@ public class JmsQueue extends AbstractCollection implements BlockingQueue {
         return count;
     }
 
+    public void clear() {
+        while (true) {
+            Object value = poll();
+            if (value == null) {
+                break;
+            }
+        }
+    }
+
+    public boolean removeAll(Collection coll) {
+        throw new UnsupportedOperationException("removeAll() is not supported");
+    }
+
+    public boolean retainAll(Collection c) {
+        throw new UnsupportedOperationException("retainAll() is not supported");
+    }
+
     // Extension APIs
     // -------------------------------------------------------------------------
     public void close() {

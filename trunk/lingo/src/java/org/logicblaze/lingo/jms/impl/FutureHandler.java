@@ -17,6 +17,7 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
+import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 
