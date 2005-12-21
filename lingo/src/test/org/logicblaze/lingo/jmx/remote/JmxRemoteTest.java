@@ -17,15 +17,19 @@
  **/
 package org.logicblaze.lingo.jmx.remote;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import javax.management.*;
+import org.activemq.broker.BrokerFactory;
+import org.activemq.broker.BrokerService;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
-import org.activemq.broker.BrokerFactory;
-import org.activemq.broker.BrokerService;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.TestCase;
 
 /**

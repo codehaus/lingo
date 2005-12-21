@@ -14,13 +14,15 @@
  */
 package org.logicblaze.lingo.jmx.remote.provider.jms;
 
-import java.io.IOException;
-import java.util.Map;
+import org.logicblaze.lingo.jmx.remote.jms.JmsJmxConnectorServer;
+
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerProvider;
 import javax.management.remote.JMXServiceURL;
-import org.logicblaze.lingo.jmx.remote.jms.JmsJmxConnectorServer;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @version $Revision$
