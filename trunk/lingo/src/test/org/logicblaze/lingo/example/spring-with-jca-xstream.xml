@@ -6,7 +6,7 @@
 <beans>
 
   <!-- embedded JMS broker -->
-  <bean id="broker" class="org.activemq.spring.BrokerFactoryBean" singleton="true">
+  <bean id="broker" class="org.activemq.xbean.BrokerFactoryBean" singleton="true">
     <property name="config" value="classpath:org/logicblaze/lingo/broker.xml"/>
   </bean>
 
