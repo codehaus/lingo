@@ -18,7 +18,6 @@
 package org.logicblaze.lingo.jms.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
-import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -18,13 +18,12 @@
 
 package org.logicblaze.lingo.jmx.remote.jms;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import org.activemq.ActiveMQConnectionFactory;
+import org.activemq.command.ActiveMQTopic;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.jms.JmsProxyFactoryBean;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.management.ListenerNotFoundException;
@@ -39,11 +38,10 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServerErrorException;
 import javax.management.remote.JMXServiceURL;
 import javax.security.auth.Subject;
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.command.ActiveMQTopic;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.logicblaze.lingo.jms.JmsProxyFactoryBean;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
 
 /**
  * <p>The client end of a JMX API connector.  An object of this type can

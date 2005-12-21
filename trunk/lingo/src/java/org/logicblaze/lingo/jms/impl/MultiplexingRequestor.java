@@ -18,8 +18,6 @@
 package org.logicblaze.lingo.jms.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;

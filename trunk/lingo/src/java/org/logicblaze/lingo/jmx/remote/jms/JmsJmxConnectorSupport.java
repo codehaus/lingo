@@ -18,14 +18,16 @@
 
 package org.logicblaze.lingo.jmx.remote.jms;
 
+import org.activemq.util.IntrospectionSupport;
+import org.activemq.util.URISupport;
+
+import javax.management.remote.JMXServiceURL;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
-import javax.management.remote.JMXServiceURL;
-import org.activemq.util.IntrospectionSupport;
-import org.activemq.util.URISupport;
 
 /**
  * @version $Revision$
