@@ -89,6 +89,7 @@ public class JmsJmxConnectorServer extends JMXConnectorServer {
             service.setDestination(new ActiveMQTopic(destinationName));
             service.setConnectionFactory(fac);
             service.setService(getMBeanServer());
+            service.setServiceInterface(MBeanServer.class);
             service.afterPropertiesSet();
             stopped = false;
         }catch(Exception e){
