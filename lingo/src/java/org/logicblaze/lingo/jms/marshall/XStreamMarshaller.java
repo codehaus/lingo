@@ -45,7 +45,9 @@ public class XStreamMarshaller extends DefaultMarshaller {
     public Message createResponseMessage(Session session, RemoteInvocationResult result, Message requestMessage)
             throws JMSException {
         String xml = toXML(result);
-        return session.createTextMessage(xml);
+        TextMessage message = session.createTextMessage(xml);
+        appendMessageHeaders(message, session, result);
+        return message;
     }
 
     public RemoteInvocationResult extractInvocationResult(Message message) throws JMSException {
@@ -64,6 +66,22 @@ public class XStreamMarshaller extends DefaultMarshaller {
             return (RemoteInvocation) fromXML(text);
         }
         return super.readRemoteInvocation(message);
+    }
+    
+    public Message createObjectMessage(Session session, Object value) throws JMSException {
+        String xml = toXML(value);
+        TextMessage message = session.createTextMessage(xml);
+        appendMessageHeaders(message, session, value);
+        return message;
+    }
+
+    public Object readMessage(Message message) throws JMSException {
+        if (message instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) message;
+            String text = textMessage.getText();
+            return fromXML(text);
+        }
+        return super.readMessage(message);
     }
 
     // Properties

@@ -67,4 +67,17 @@ public interface Marshaller {
      * @return the RemoteInvocation object
      */
     RemoteInvocation readRemoteInvocation(Message message) throws JMSException;
+    
+    /**
+     * Creates a message for a Java Object for when distributing objects in collections
+     */
+    Message createObjectMessage(Session session, Object value) throws JMSException;
+
+    /**
+     * Extracts the body from the given JMS message
+     * @throws JMSException 
+     */
+    Object readMessage(Message message) throws JMSException;
+
+
 }
