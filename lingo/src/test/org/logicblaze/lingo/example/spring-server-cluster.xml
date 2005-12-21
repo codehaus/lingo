@@ -10,6 +10,8 @@
     <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
     <property name="connectionFactory" ref="jmsFactory"/>
     <property name="destination" ref="exampleDestination"/>
+    <property name="persistentDelivery" value="false"/>
+    
     <!-- lets enable async one ways on the client -->
     <property name="metadataStrategy">
       <bean class="org.logicblaze.lingo.SimpleMetadataStrategy">
@@ -60,7 +62,7 @@
 
   <!-- JMS ConnectionFactory to use -->
   <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="vm://localhost"/>
+    <property name="brokerURL" value="vm://localhost?broker.persistent=false"/>
   </bean>
 
   <bean id="exampleDestination" class="org.activemq.command.ActiveMQTopic">
