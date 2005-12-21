@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC  "-//ACTIVEMQ//DTD//EN" "http://activemq.org/dtd/activemq.dtd">
-<beans>
 
-  <broker>
-    <connector>
-      <tcpServerTransport uri="tcp://localhost:61626" backlog="1000" useAsyncSend="true" maxOutstandingMessages="50"/>
-    </connector>
-    <persistence>
-      <cachePersistence>
-        <jdbcPersistence dataSourceRef="db"/>
-      </cachePersistence>
-    </persistence>
+<beans xmlns="http://activemq.org/config/1.0">
+
+  <broker persistent="false">
+
+    <transportConnectors>
+      <transportConnector uri="tcp://localhost:61626" />
+    </transportConnectors>
   </broker>
 
-  <bean id="db" class="org.hsqldb.jdbc.jdbcDataSource">
-    <property name="database"><value>jdbc:hsqldb:mem:activemq</value></property>
-    <property name="user"><value>sa</value></property>
-    <property name="password"><value></value></property>
-  </bean>
 </beans>
