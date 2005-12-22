@@ -17,6 +17,7 @@
  **/
 package org.logicblaze.lingo.jms;
 
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -30,6 +31,7 @@ import javax.jms.Session;
  */
 public interface JmsProducer {
 
+    public Connection getConnection();
     public Session getSession();
 
     public MessageProducer getMessageProducer();
