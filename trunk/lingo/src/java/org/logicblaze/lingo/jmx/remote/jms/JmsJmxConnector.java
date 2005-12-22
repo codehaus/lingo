@@ -23,12 +23,14 @@ import org.activemq.command.ActiveMQTopic;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.JmsProxyFactoryBean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.NotificationBroadcaster;
+import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
@@ -59,12 +61,14 @@ import java.util.Map;
 public class JmsJmxConnector implements JMXConnector {
     
     private static final Log log = LogFactory.getLog(JMXConnector.class);
+    private NotificationBroadcasterSupport connectionNotifier = new NotificationBroadcasterSupport();
+    private AtomicLong notificationNumber = new AtomicLong();
     private Map env;
     private String destinationName;
     private String destinationGroupName = JmsJmxConnectorSupport.MBEAN_GROUP_NAME;
     private String destinationServerName = JmsJmxConnectorSupport.MBEAN_SERVER_NAME;
     private URI jmsURL; 
-    JmsProxyFactoryBean proxy;
+    private JmsProxyFactoryBean proxy;
     
     /**
      * Create a JmsJmxConnector
@@ -130,6 +134,7 @@ public class JmsJmxConnector implements JMXConnector {
             proxy.setDestination(new ActiveMQTopic(destinationName));
             proxy.setConnectionFactory(fac);
             proxy.afterPropertiesSet();
+            sendConnectionNotificationOpened();
         }catch(JMSException e){
            log.error("Failed to connect: " + e,e);
            IOException ioe = new IOException(e.getMessage());
@@ -232,6 +237,7 @@ public class JmsJmxConnector implements JMXConnector {
     public void close() throws IOException{
         try{
             proxy.destroy();
+            sendConnectionNotificationClosed();
         }catch(Exception e){
            log.error("Failed to destroy proxy: " + e,e);
            throw new IOException(e.getMessage());
@@ -270,7 +276,7 @@ public class JmsJmxConnector implements JMXConnector {
     addConnectionNotificationListener(NotificationListener listener,
                       NotificationFilter filter,
                       Object handback){
-        
+        connectionNotifier.addNotificationListener(listener, filter, handback);
     }
 
     /**
@@ -295,7 +301,7 @@ public class JmsJmxConnector implements JMXConnector {
     public void
     removeConnectionNotificationListener(NotificationListener listener)
         throws ListenerNotFoundException{
-        
+        connectionNotifier.removeNotificationListener(listener);
     }
 
     /**
@@ -322,7 +328,7 @@ public class JmsJmxConnector implements JMXConnector {
                              NotificationFilter f,
                              Object handback)
         throws ListenerNotFoundException{
-        
+        connectionNotifier.removeNotificationListener(l, f, handback);
     }
 
     /**
@@ -340,6 +346,25 @@ public class JmsJmxConnector implements JMXConnector {
     public String getConnectionId(){
         return proxy.getClientID();
     }
+    
+    private void sendConnectionNotificationOpened(){
+        JMXConnectionNotification notification=new JMXConnectionNotification(JMXConnectionNotification.OPENED,this,
+                        getConnectionId(),notificationNumber.incrementAndGet(),"Connection opened",null);
+        connectionNotifier.sendNotification(notification);
+    }
 
+    private void sendConnectionNotificationClosed(){
+        JMXConnectionNotification notification=new JMXConnectionNotification(JMXConnectionNotification.CLOSED,this,
+                        getConnectionId(),notificationNumber.incrementAndGet(),"Connection closed",null);
+        connectionNotifier.sendNotification(notification);
+    }
+
+    private void sendConnectionNotificationFailed(String message){
+        JMXConnectionNotification notification=new JMXConnectionNotification(JMXConnectionNotification.FAILED,this,
+                        getConnectionId(),notificationNumber.incrementAndGet(),message,null);
+        connectionNotifier.sendNotification(notification);
+    }
+
+    
 	
 }

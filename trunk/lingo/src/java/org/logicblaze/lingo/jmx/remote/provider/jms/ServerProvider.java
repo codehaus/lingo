@@ -14,14 +14,14 @@
  */
 package org.logicblaze.lingo.jmx.remote.provider.jms;
 
-import org.logicblaze.lingo.jmx.remote.jms.JmsJmxConnectorServer;
-
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerProvider;
 import javax.management.remote.JMXServiceURL;
+import org.logicblaze.lingo.jmx.remote.jms.JmsJmxConnectorServer;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Map;
 
 /**
@@ -37,6 +37,8 @@ public class ServerProvider implements JMXConnectorServerProvider{
      * @throws IOException 
      */
     public JMXConnectorServer newJMXConnectorServer(JMXServiceURL url,Map environment,MBeanServer server) throws IOException{
+        String protocol = url.getProtocol();
+        if (!"jms".equals(protocol)) throw new MalformedURLException("Wrong protocol " + protocol + " for provider " + this);
         return new JmsJmxConnectorServer(url,environment,server);
     }
 }
