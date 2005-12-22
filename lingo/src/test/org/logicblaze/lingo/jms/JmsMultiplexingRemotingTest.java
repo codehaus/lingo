@@ -24,6 +24,7 @@ import org.logicblaze.lingo.example.ExampleServiceImpl;
 import org.logicblaze.lingo.example.TestResultListener;
 import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 
+import javax.jms.Destination;
 import javax.jms.Session;
 
 import java.util.List;
@@ -40,7 +41,6 @@ public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
         exporter = new JmsServiceExporter();
         exporter.setServiceInterface(ExampleService.class);
         exporter.setService(target);
-        exporter.setProducer(createJmsProducer());
         configure(exporter);
         subscribeToQueue(exporter, getDestinationName());
 
@@ -68,6 +68,6 @@ public class JmsMultiplexingRemotingTest extends JmsRemotingTest {
     protected Requestor createRequestor(String name) throws Exception {
         Session session = createSession();
         JmsProducer producer = createJmsProducer();
-        return new MultiplexingRequestor(session, producer, session.createQueue(name));
+        return new MultiplexingRequestor(connection, session, producer.getMessageProducer(), session.createQueue(name), null, false);
     }
 }

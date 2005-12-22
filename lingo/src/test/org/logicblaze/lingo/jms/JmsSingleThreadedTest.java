@@ -25,11 +25,11 @@ public class JmsSingleThreadedTest extends JmsTestSupport {
             ;
         }
 
-        requestor.oneWay(null, session.createTextMessage("bonson"), 1);
+        requestor.send(null, session.createTextMessage("bonson"), 1);
         Thread.sleep(50);
         assertNull(receiver.receive(1));
 
-        requestor.oneWay(null, session.createTextMessage("bonson2"), -1);
+        requestor.send(null, session.createTextMessage("bonson2"), -1);
         TextMessage message = (TextMessage) receiver.receive(1000);
         assertNotNull(message);
         assertEquals("bonson2", message.getText());
@@ -46,11 +46,11 @@ public class JmsSingleThreadedTest extends JmsTestSupport {
             ;
         }
 
-        requestor.oneWay(null, session.createTextMessage("bonson"), 1);
+        requestor.send(null, session.createTextMessage("bonson"), 1);
         Thread.sleep(50);
         assertNull(receiver.receive(1));
 
-        requestor.oneWay(null, session.createTextMessage("bonson2"), -1);
+        requestor.send(null, session.createTextMessage("bonson2"), -1);
         TextMessage message = (TextMessage) receiver.receive(1000);
         assertNotNull(message);
         assertEquals("bonson2", message.getText());

@@ -17,15 +17,14 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
-import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.JmsProducerConfig;
-import org.logicblaze.lingo.jms.Requestor;
 
-import javax.jms.ConnectionFactory;
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
@@ -37,54 +36,50 @@ import javax.jms.TemporaryTopic;
  * @version $Revision$
  */
 public class SingleThreadedRequestor extends OneWayRequestor {
-    private Session session;
     private Destination inboundDestination;
     private MessageConsumer receiver;
     private boolean deleteTemporaryDestinationsOnClose;
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination serverDestination) throws JMSException {
-        JmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
-        return new SingleThreadedRequestor(producer.getSession(), producer, serverDestination);
-    }
-
-    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination, Destination clientDestination) throws JMSException {
-        super(producer, serverDestination);
-        this.session = session;
+    public SingleThreadedRequestor(JmsProducerConfig config, Destination serverDestination, Destination clientDestination) throws JMSException {
+        super(config, serverDestination);
         this.inboundDestination = clientDestination;
-        if (inboundDestination == null) {
-            inboundDestination = createTemporaryDestination(session);
-        }
-        receiver = session.createConsumer(inboundDestination);
     }
 
-    public SingleThreadedRequestor(Session session, JmsProducer producer, Destination serverDestination) throws JMSException {
-        this(session, producer, serverDestination, null);
+    public SingleThreadedRequestor(Connection connection, Session session, MessageProducer producer, Destination serverDestination,
+            Destination clientDestination, boolean ownsConnection) throws JMSException {
+        super(connection, session, producer, serverDestination, ownsConnection);
+        this.inboundDestination = clientDestination;
+    }
+    
+    public SingleThreadedRequestor(Connection connection, Session session, MessageProducer producer, Destination serverDestination, boolean ownsConnection) throws JMSException {
+        this(connection, session, producer, serverDestination, createTemporaryDestination(session), ownsConnection);
     }
 
     public Message request(Destination destination, Message message) throws JMSException {
-        oneWay(destination, message);
+        populateHeaders(message);
+        send(destination, message);
         long timeout = getTimeToLive();
         return receive(timeout);
     }
 
     public Message request(Destination destination, Message message, long timeout) throws JMSException {
-        oneWay(destination, message, timeout);
+        populateHeaders(message);
+        send(destination, message, timeout);
         return receive(timeout);
     }
 
     public Message receive(long timeout) throws JMSException {
         if (timeout < 0) {
-            return receiver.receive();
+            return getReceiver().receive();
         }
         else if (timeout == 0) {
-            return receiver.receiveNoWait();
+            return getReceiver().receiveNoWait();
         }
-        return receiver.receive(timeout);
+        return getReceiver().receive(timeout);
     }
 
     public synchronized void close() throws JMSException {
         // producer and consumer created by constructor are implicitly closed.
-        session.close();
         super.close();
 
         if (deleteTemporaryDestinationsOnClose) {
@@ -95,8 +90,6 @@ public class SingleThreadedRequestor extends OneWayRequestor {
                 ((TemporaryTopic) inboundDestination).delete();
             }
         }
-
-        session = null;
         inboundDestination = null;
     }
 
@@ -112,7 +105,7 @@ public class SingleThreadedRequestor extends OneWayRequestor {
 
     // Implementation methods
     // -------------------------------------------------------------------------
-    protected TemporaryQueue createTemporaryDestination(Session session) throws JMSException {
+    protected static TemporaryQueue createTemporaryDestination(Session session) throws JMSException {
         return session.createTemporaryQueue();
     }
 
@@ -120,8 +113,18 @@ public class SingleThreadedRequestor extends OneWayRequestor {
         message.setJMSReplyTo(inboundDestination);
     }
 
-    protected MessageConsumer getReceiver() {
+    protected MessageConsumer getReceiver() throws JMSException {
+        if (receiver == null) {
+            if (inboundDestination == null) {
+                inboundDestination = createTemporaryDestination(getSession());
+            }
+            receiver = getSession().createConsumer(inboundDestination);
+        }
         return receiver;
+    }
+
+    public Destination getInboundDestination() throws JMSException {
+        return inboundDestination;
     }
 
 }

@@ -17,6 +17,7 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
+import apple.awt.CImage;
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -24,18 +25,19 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.FailedToProcessResponse;
-import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.Requestor;
 import org.logicblaze.lingo.util.DefaultTimeoutMap;
 import org.logicblaze.lingo.util.TimeoutMap;
 
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
@@ -52,31 +54,37 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
 
     private TimeoutMap requestMap = new DefaultTimeoutMap();
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config,
-            Destination serverDestination) throws JMSException {
-        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
-        return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE),
-                producer, serverDestination);
+    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination destination, Destination responseDestination)
+            throws JMSException {
+        Connection connection = config.createConnection(connectionFactory);
+        Session session = config.createSession(connection);
+        MessageProducer producer = config.createMessageProducer(session);
+        return new MultiplexingRequestor(connection, session, producer, destination, responseDestination, true);
     }
 
-    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config,
-            Destination serverDestination, Destination clientDestination) throws JMSException {
-        DefaultJmsProducer producer = DefaultJmsProducer.newInstance(connectionFactory, config);
-        return new MultiplexingRequestor(producer.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE),
-                producer, serverDestination, clientDestination);
+    public static Requestor newInstance(ConnectionFactory connectionFactory, JmsProducerConfig config, Destination destination) throws JMSException {
+        Connection connection = config.createConnection(connectionFactory);
+        Session session = config.createSession(connection);
+        MessageProducer producer = config.createMessageProducer(session);
+        Destination responseDestination = config.createTemporaryDestination(session);
+        return new MultiplexingRequestor(connection, session, producer, destination, responseDestination, true);
     }
 
-    public MultiplexingRequestor(Session session, JmsProducer producer, Destination serverDestination,
-            Destination clientDestination) throws JMSException {
-        super(session, producer, serverDestination, clientDestination);
+    public MultiplexingRequestor(JmsProducerConfig config, Destination serverDestination, Destination clientDestination) throws JMSException {
+        super(config, serverDestination, clientDestination);
+        init();
+    }
+
+    public MultiplexingRequestor(Connection connection, Session session, MessageProducer producer, Destination serverDestination,
+            Destination clientDestination, boolean ownsConnection) throws JMSException {
+        super(connection, session, producer, serverDestination, clientDestination, ownsConnection);
+        init();
+    }
+
+    private void init() throws JMSException {
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
         this.requestMap = new DefaultTimeoutMap(executor, 1000L);
         getReceiver().setMessageListener(this);
-    }
-
-    public MultiplexingRequestor(Session session, JmsProducer producer, Destination serverDestination)
-            throws JMSException {
-        this(session, producer, serverDestination, null);
     }
 
     public void registerHandler(String correlationID, ReplyHandler handler, long timeout) {
@@ -111,7 +119,8 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
             future = futureHandler;
             requestMap.put(correlationID, futureHandler, timeout);
         }
-        oneWay(destination, message);
+        populateHeaders(message);
+        send(destination, message);
 
         try {
             if (timeout < 0) {
@@ -126,8 +135,7 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
         }
     }
 
-    public void request(Destination destination, Message message, ReplyHandler handler, long timeout)
-            throws JMSException {
+    public void request(Destination destination, Message message, ReplyHandler handler, long timeout) throws JMSException {
         String correlationID = message.getJMSCorrelationID();
         if (correlationID == null) {
             correlationID = createCorrelationID();
@@ -143,7 +151,8 @@ public class MultiplexingRequestor extends SingleThreadedRequestor implements Me
                 requestMap.put(correlationID, handler, timeout);
             }
         }
-        oneWay(destination, message);
+        populateHeaders(message);
+        send(destination, message);
     }
 
     /**

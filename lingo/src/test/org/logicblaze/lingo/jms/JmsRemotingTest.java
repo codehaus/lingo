@@ -52,7 +52,6 @@ public class JmsRemotingTest extends JmsTestSupport {
         exporter = new JmsServiceExporter();
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
-        exporter.setProducer(createJmsProducer());
         configure(exporter);
         subscribeToQueue(exporter, getDestinationName());
 
@@ -124,7 +123,6 @@ public class JmsRemotingTest extends JmsTestSupport {
         exporter = new JmsServiceExporter();
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
-        exporter.setProducer(createJmsProducer());
         configure(exporter);
         subscribeToQueue(exporter, getDestinationName());
 
@@ -168,7 +166,6 @@ public class JmsRemotingTest extends JmsTestSupport {
         final JmsServiceExporter exporter = new JmsServiceExporter();
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
-        exporter.setProducer(createJmsProducer());
         configure(exporter);
         subscribeToQueue(exporter, getDestinationName());
 
@@ -197,7 +194,6 @@ public class JmsRemotingTest extends JmsTestSupport {
         final JmsServiceExporter exporter = new JmsServiceExporter();
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
-        exporter.setProducer(createJmsProducer());
         exporter.setRemoteInvocationExecutor(new DefaultRemoteInvocationExecutor() {
             public Object invoke(RemoteInvocation invocation, Object targetObject)
                     throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -245,7 +241,6 @@ public class JmsRemotingTest extends JmsTestSupport {
         final JmsServiceExporter exporter = new JmsServiceExporter();
         exporter.setServiceInterface(ITestBean.class);
         exporter.setService(target);
-        exporter.setProducer(createJmsProducer());
         exporter.setRemoteInvocationExecutor(new DefaultRemoteInvocationExecutor() {
             public Object invoke(RemoteInvocation invocation, Object targetObject)
                     throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {

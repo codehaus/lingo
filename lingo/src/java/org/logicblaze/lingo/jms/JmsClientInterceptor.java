@@ -130,7 +130,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
             Message requestMessage = marshaller.createRequestMessage(requestor, invocation);
             populateHeaders(requestMessage);
             if (metadata.isOneWay()) {
-                requestor.oneWay(destination, requestMessage);
+                requestor.send(destination, requestMessage);
                 return null;
             }
             else if (!isMultipleResponse(methodInvocation, metadata)) {
@@ -338,7 +338,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     }
 
     /**
-     * Sets the maximum amout of time an inactive remote object reference will
+     * Sets the maximum amount of time an inactive remote object reference will
      * keep around until it is garbage collected.
      */
     public void setRemoteReferenceTimeout(long remoteReferenceTimeout) {

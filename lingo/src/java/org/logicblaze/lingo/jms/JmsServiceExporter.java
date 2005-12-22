@@ -113,7 +113,7 @@ public class JmsServiceExporter extends JmsServiceExporterMessageListener implem
      * Factory method to create the consumer
      */
     protected MessageConsumer createConsumer() throws JMSException {
-        Session session = getProducer().getSession();
+        Session session = getResponseRequestor().getSession();
         if (subscriberName != null) {
             if (destination instanceof Topic) {
                 Topic topic = (Topic) destination;
