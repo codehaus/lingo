@@ -17,6 +17,7 @@
  **/
 package org.logicblaze.lingo.jms;
 
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -78,6 +79,11 @@ public interface Requestor {
      */
     void request(Destination destination, Message requestMessage, ReplyHandler handler, long timeout) throws JMSException;
 
+    /**
+     * Provides access to the underlying Connection this requestor is using
+     */
+    Connection getConnection();
+    
     /**
      * Provides access to the underlying JMS session so that you can
      * create messages.

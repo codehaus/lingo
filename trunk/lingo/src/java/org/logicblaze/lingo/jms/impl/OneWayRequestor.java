@@ -23,6 +23,7 @@ import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.ReplyHandler;
 import org.logicblaze.lingo.jms.Requestor;
 
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -83,7 +84,8 @@ public class OneWayRequestor implements Requestor {
 
     /**
      * Sets the maximum time to live for requests
-     * @throws JMSException 
+     * 
+     * @throws JMSException
      */
     public void setTimeToLive(long timeToLive) throws JMSException {
         producer.getMessageProducer().setTimeToLive(timeToLive);
@@ -96,6 +98,10 @@ public class OneWayRequestor implements Requestor {
     public void oneWay(Destination destination, Message message, long timeToLive) throws JMSException {
         populateHeaders(message);
         doSend(destination, message, timeToLive);
+    }
+
+    public Connection getConnection() {
+        return producer.getConnection();
     }
 
     public Session getSession() {
