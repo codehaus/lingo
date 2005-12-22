@@ -14,11 +14,9 @@
  */
 package org.logicblaze.lingo.jmx.remote;
 
-import java.util.Random;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
-import quicktime.app.actions.NextImageAction;
 import mx4j.AbstractDynamicMBean;
 /**
  * This is based haviliy on the DynamicService example from the mx4j project
