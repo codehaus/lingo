@@ -57,13 +57,13 @@ public abstract class JmsTestSupport extends TestCase {
     protected Requestor createRequestor(String serverDestinationName) throws Exception {
         Session session = createSession();
         JmsProducer producer = createJmsProducer();
-        return new SingleThreadedRequestor(session, producer, session.createQueue(serverDestinationName));
+        return new SingleThreadedRequestor(connection, session, producer.getMessageProducer(), session.createQueue(serverDestinationName), false);
     }
 
     protected Requestor createRequestor(String serverDestinationName, String clientDestinationName) throws Exception {
         Session session = createSession();
         JmsProducer producer = createJmsProducer();
-        return new SingleThreadedRequestor(session, producer, session.createQueue(serverDestinationName));
+        return new SingleThreadedRequestor(connection, session, producer.getMessageProducer(), session.createQueue(serverDestinationName), false);
     }
 
     protected void closeSession(JmsProxyFactoryBean factoryBean) throws JMSException {

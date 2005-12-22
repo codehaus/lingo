@@ -19,8 +19,11 @@ package org.logicblaze.lingo.jms;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
 
 /**
  * A simple bean of JMS producer configuration options.
@@ -29,7 +32,10 @@ import javax.jms.MessageProducer;
  */
 public class JmsProducerConfig {
 
+    private ConnectionFactory connectionFactory;
     private String clientID;
+    private boolean transactedMode = false;
+    private int acknowledgementMode = Session.AUTO_ACKNOWLEDGE;
     private int deliveryMode;
     private boolean disableMessageID;
     private boolean disableMessageTimestamp;
@@ -52,7 +58,20 @@ public class JmsProducerConfig {
 
     /**
      * Creates a new JMS connection and starts it
-     * @throws JMSException 
+     * 
+     * @throws JMSException
+     */
+    public Connection createConnection() throws JMSException {
+        if (connectionFactory == null) {
+            throw new IllegalArgumentException("Property connectionFactory not specified");
+        }
+        return createConnection(connectionFactory);
+    }
+
+    /**
+     * Creates a new JMS connection and starts it
+     * 
+     * @throws JMSException
      */
     public Connection createConnection(ConnectionFactory factory) throws JMSException {
         Connection connection = factory.createConnection();
@@ -66,6 +85,26 @@ public class JmsProducerConfig {
         connection.start();
 
         return connection;
+    }
+
+    /**
+     * Creates a new JMS session
+     */
+    public Session createSession(Connection connection) throws JMSException {
+        return connection.createSession(transactedMode, acknowledgementMode);
+    }
+
+    /**
+     * Creates a new producer on the given session
+     */
+    public MessageProducer createMessageProducer(Session session) throws JMSException {
+        MessageProducer producer = session.createProducer(null);
+        configure(producer);
+        return producer;
+    }
+
+    public Destination createTemporaryDestination(Session session) throws JMSException {
+        return session.createTemporaryQueue();
     }
 
     // Properties
@@ -122,4 +161,29 @@ public class JmsProducerConfig {
     public void setClientID(String clientID) {
         this.clientID = clientID;
     }
+
+    public int getAcknowledgementMode() {
+        return acknowledgementMode;
+    }
+
+    public void setAcknowledgementMode(int acknowledgementMode) {
+        this.acknowledgementMode = acknowledgementMode;
+    }
+
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    public boolean isTransactedMode() {
+        return transactedMode;
+    }
+
+    public void setTransactedMode(boolean transactedMode) {
+        this.transactedMode = transactedMode;
+    }
+
 }

@@ -59,8 +59,6 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
 
     private Object proxy;
     private ConnectionFactory connectionFactory;
-    private Connection connection;
-    private JmsProducer producer;
     private Requestor responseRequestor;
     private JmsProducerConfig producerConfig = new JmsProducerConfig();
     private boolean ignoreFailures;
@@ -82,13 +80,8 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
                 throw new IllegalArgumentException("proxy is required");
             }
         }
-        if (producer == null) {
-            producer = DefaultJmsProducer.newInstance(getConnection(), getProducerConfig(), false);
-        }
         if (responseRequestor == null) {
-            // lets create a new session
-            Session session = getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
-            responseRequestor = new MultiplexingRequestor(session, producer, null);
+            responseRequestor = MultiplexingRequestor.newInstance(connectionFactory, producerConfig, null);
         }
         if (marshaller == null) {
             marshaller = new DefaultMarshaller();
@@ -112,8 +105,8 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
     }
 
     public void destroy() throws Exception {
-        if (connection != null) {
-            connection.close();
+        if (responseRequestor != null) {
+            responseRequestor.close();
         }
     }
 
@@ -216,22 +209,6 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
 
     // Implementation methods
     // -------------------------------------------------------------------------
-
-    /**
-     * Lazily creates if necessary a connection to use.
-     * 
-     * @throws JMSException
-     */
-    protected Connection getConnection() throws JMSException {
-        if (connection == null) {
-            if (connectionFactory == null) {
-                throw new IllegalArgumentException("requestor or connectionFactory is required");
-            }
-            connection = getProducerConfig().createConnection(connectionFactory);
-        }
-        return connection;
-    }
-
     protected void doInvoke(Message message, RemoteInvocation invocation) throws JMSException {
         if (invocation != null) {
             boolean oneway = false;
@@ -319,15 +296,6 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
             throw new RuntimeException(text, e);
         }
     }
-
-    public JmsProducer getProducer() {
-        return producer;
-    }
-
-    public void setProducer(JmsProducer producer) {
-        this.producer = producer;
-    }
-
     /**
      * Send the given RemoteInvocationResult as a JMS message to the originator
      * 
@@ -339,7 +307,7 @@ public class JmsServiceExporterMessageListener extends RemoteInvocationBasedExpo
      *             if thrown by trying to send the message
      */
     protected void writeRemoteInvocationResult(final Message message, final RemoteInvocationResult result) throws JMSException {
-        Message responseMessage = createResponseMessage(producer.getSession(), message, result);
-        producer.send(message.getJMSReplyTo(), responseMessage);
+        Message responseMessage = createResponseMessage(getResponseRequestor().getSession(), message, result);
+        getResponseRequestor().send(message.getJMSReplyTo(), responseMessage);
     }
 }
