@@ -15,14 +15,12 @@
  * limitations under the License. 
  * 
  **/
-package org.logicblaze.lingo.util;
+package org.logicblaze.lingo.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.logicblaze.lingo.jms.JmsProducer;
-import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
 import org.logicblaze.lingo.jms.marshall.DefaultMarshaller;
 import org.logicblaze.lingo.jms.marshall.Marshaller;

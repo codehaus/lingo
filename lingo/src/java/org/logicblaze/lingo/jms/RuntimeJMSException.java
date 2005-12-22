@@ -15,7 +15,7 @@
  * limitations under the License. 
  * 
  **/
-package org.logicblaze.lingo.util;
+package org.logicblaze.lingo.jms;
 
 import javax.jms.JMSException;
 
