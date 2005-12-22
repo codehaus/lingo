@@ -17,48 +17,99 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
+import org.logicblaze.lingo.jms.JmsProducer;
 import org.logicblaze.lingo.jms.JmsProducerConfig;
+import org.springframework.beans.factory.DisposableBean;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 /**
- * A default implementation of the {@link org.logicblaze.lingo.jms.JmsProducer} which contains a reference to the
- * connection, session and producer so that it can easily close down all its resources properly.
- *
+ * An implementation of the {@link org.logicblaze.lingo.jms.JmsProducer} which
+ * contains a reference to the connection, session and producer so that it can
+ * easily close down all its resources properly. The connection may be owned by
+ * another object and so it may not be automatically closed.
+ * 
  * @version $Revision$
  */
-public class DefaultJmsProducer extends JmsProducerImpl {
+public class DefaultJmsProducer implements JmsProducer, DisposableBean {
 
     private Connection connection;
+    private Session session;
+    private MessageProducer producer;
+    private boolean ownsConnection = true;
 
     public static DefaultJmsProducer newInstance(ConnectionFactory factory, JmsProducerConfig config) throws JMSException {
         Connection connection = config.createConnection(factory);
-        return newInstance(connection, config);
+        return newInstance(connection, config, true);
     }
 
-    public static DefaultJmsProducer newInstance(Connection connection, JmsProducerConfig config) throws JMSException {
+    public static DefaultJmsProducer newInstance(Connection connection, JmsProducerConfig config, boolean ownsConnection) throws JMSException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        return new DefaultJmsProducer(connection, session, config);
+        return new DefaultJmsProducer(connection, session, config, ownsConnection);
     }
 
-    public DefaultJmsProducer(Connection connection, Session session, JmsProducerConfig config) throws JMSException {
-        super(session, config);
+    public DefaultJmsProducer(Connection connection, Session session, MessageProducer producer, boolean ownsConnection) throws JMSException {
         this.connection = connection;
+        this.session = session;
+        this.producer = producer;
+        this.ownsConnection = ownsConnection;
+    }
+
+    public DefaultJmsProducer(Connection connection, Session session, JmsProducerConfig config, boolean ownsConnection) throws JMSException {
+        this.connection = connection;
+        this.session = session;
+        this.ownsConnection = ownsConnection;
+        this.producer = session.createProducer(null);
+        config.configure(producer);
     }
 
     public Connection getConnection() {
         return connection;
     }
 
+    public Session getSession() {
+        return session;
+    }
+
+    public MessageProducer getMessageProducer() {
+        return producer;
+    }
+
     public void close() throws JMSException {
-        super.close();
+        if (producer != null) {
+            MessageProducer tmp = producer;
+            producer = null;
+            tmp.close();
+        }
+        if (session != null) {
+            Session tmp = session;
+            session = null;
+            tmp.close();
+        }
         if (connection != null) {
             Connection tmp = connection;
             connection = null;
-            tmp.close();
+            if (ownsConnection) {
+                tmp.close();
+            }
         }
+    }
+
+    public void destroy() throws Exception {
+        close();
+    }
+
+    public void send(Destination destination, Message message) throws JMSException {
+        getMessageProducer().send(destination, message);
+    }
+
+    public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive) throws JMSException {
+        getMessageProducer().send(destination, message, deliveryMode, priority, timeToLive);
     }
 }
