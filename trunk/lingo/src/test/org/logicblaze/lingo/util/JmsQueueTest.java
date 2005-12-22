@@ -22,6 +22,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.command.ActiveMQQueue;
+import org.logicblaze.lingo.jms.JmsClient;
+import org.logicblaze.lingo.jms.JmsQueue;
 
 import java.util.ArrayList;
 import java.util.Arrays;

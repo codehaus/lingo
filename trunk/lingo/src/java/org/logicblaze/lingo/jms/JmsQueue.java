@@ -15,7 +15,7 @@
  * limitations under the License. 
  * 
  **/
-package org.logicblaze.lingo.util;
+package org.logicblaze.lingo.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;

@@ -15,26 +15,18 @@
  * limitations under the License. 
  * 
  **/
-package org.logicblaze.lingo.jms.impl;
+package org.logicblaze.lingo.util;
 
-import org.logicblaze.lingo.jms.ReplyHandler;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import junit.framework.TestCase;
 
 /**
  * 
  * @version $Revision$
  */
-public class RequestHandlerMapTest extends TestCase {
-    protected DefaultRequestHandlerMap map = new DefaultRequestHandlerMap(200);
-    protected ReplyHandler handler = new ReplyHandler() {
-        public boolean handle(Message message) throws JMSException {
-            return false;
-        }
-    };
+public class TimeoutMapTest extends TestCase {
+    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    protected DefaultTimeoutMap map = new DefaultTimeoutMap(executor, 200);
     protected long timeout = 500L;
     protected int loop = 10;
 
@@ -42,37 +34,41 @@ public class RequestHandlerMapTest extends TestCase {
         String medium = "Recent";
         String longLived = "Old";
         String quick = "Quick";
+        
+        String mediumValue = "Value of Recent";
+        String longValue = "Value of Long";
+        String quickValue = "Value of Quick";
 
-        map.put(quick, handler, timeout / 10);
+        map.put(quick, quickValue, timeout / 10);
         Thread.sleep(timeout);
-        map.purgeOldRequests();
+        map.purge();
         assertEntry(quick, null);
 
-        map.put(medium, handler, timeout);
-        assertEntry(medium, handler);
+        map.put(medium, mediumValue, timeout);
+        assertEntry(medium, mediumValue);
 
-        map.put(longLived, handler, timeout * 100);
-        assertEntry(longLived, handler);
-        assertEquals("handler should still be there for: " + longLived, handler, map.get(longLived));
+        map.put(longLived, longValue, timeout * 100);
+        assertEntry(longLived, longValue);
+        assertEquals("handler should still be there for: " + longLived, longValue, map.get(longLived));
 
 
         for (int i = 0; i < loop; i++) {
             System.out.println("Sleeping at loop: " + i);
             Thread.sleep(timeout / 2);
 
-            assertEntry(medium, handler);
+            assertEntry(medium, mediumValue);
         }
 
         Thread.sleep(timeout * 2);
 
         assertEntry(medium, null);
-        assertEntry(longLived, handler);
+        assertEntry(longLived, longValue);
 
     }
     
-    protected void assertEntry(String correlationID, ReplyHandler expected) {
-        ReplyHandler actual = map.get(correlationID);
-        assertEquals("handler for: " + correlationID, expected, actual);
+    protected void assertEntry(Object key, Object expected) {
+        Object actual = map.get(key);
+        assertEquals("value for: " + key, expected, actual);
     }
 
 }
