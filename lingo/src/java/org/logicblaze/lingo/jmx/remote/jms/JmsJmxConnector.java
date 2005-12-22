@@ -344,7 +344,7 @@ public class JmsJmxConnector implements JMXConnector {
      * conventions for connection IDs.
      */
     public String getConnectionId(){
-        return proxy.getClientID();
+        return toString(); //really need to fix this!
     }
     
     private void sendConnectionNotificationOpened(){
