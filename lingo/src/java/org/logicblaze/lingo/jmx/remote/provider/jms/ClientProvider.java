@@ -17,13 +17,14 @@
  **/
 package org.logicblaze.lingo.jmx.remote.provider.jms;
 
-import org.logicblaze.lingo.jmx.remote.jms.JmsJmxConnector;
 
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorProvider;
 import javax.management.remote.JMXServiceURL;
+import org.logicblaze.lingo.jmx.remote.jms.JmsJmxConnector;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Map;
 
 /**
@@ -31,8 +32,17 @@ import java.util.Map;
  */
 public class ClientProvider implements JMXConnectorProvider
 {
+    /**
+     * Construct a new JMXConnector
+     * @param url
+     * @param environment
+     * @return the nerw Connector
+     * @throws IOException
+     */
    public JMXConnector newJMXConnector(JMXServiceURL url, Map environment) throws IOException
    {
+       String protocol = url.getProtocol();
+       if (!"jms".equals(protocol)) throw new MalformedURLException("Wrong protocol " + protocol + " for provider " + this);
       JMXConnector result =  new JmsJmxConnector(environment,url);
       return result;
    }
