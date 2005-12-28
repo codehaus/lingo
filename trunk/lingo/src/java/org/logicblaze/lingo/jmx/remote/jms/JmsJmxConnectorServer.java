@@ -22,7 +22,9 @@ import org.activemq.ActiveMQConnectionFactory;
 import org.activemq.command.ActiveMQTopic;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.jms.JmsProducerConfig;
 import org.logicblaze.lingo.jms.JmsServiceExporter;
+import org.logicblaze.lingo.jms.impl.MultiplexingRequestor;
 
 import javax.jms.ConnectionFactory;
 import javax.management.MBeanServer;
@@ -58,6 +60,8 @@ public class JmsJmxConnectorServer extends JMXConnectorServer {
     private String destinationServerName = JmsJmxConnectorSupport.MBEAN_SERVER_NAME;
     private volatile boolean stopped = true;
     private JmsServiceExporter service;
+    private MultiplexingRequestor requestor;
+    private MBeanJmsServerConnectionImpl jmsServerConnection;
     private URI jmsURL;
     
     
@@ -90,8 +94,11 @@ public class JmsJmxConnectorServer extends JMXConnectorServer {
             }
             service.setDestination(new ActiveMQTopic(destinationName));
             service.setConnectionFactory(fac);
-            service.setService(getMBeanServer());
-            service.setServiceInterface(MBeanServer.class);
+            service.setServiceInterface(MBeanJmsServerConnection.class);
+            this.requestor = (MultiplexingRequestor) MultiplexingRequestor.newInstance(fac,new JmsProducerConfig(),null);
+            service.setResponseRequestor(requestor);
+            this.jmsServerConnection = new MBeanJmsServerConnectionImpl(getMBeanServer(),requestor.getConnection());
+            service.setService(jmsServerConnection);
             service.afterPropertiesSet();
             stopped = false;
         }catch(Exception e){

@@ -24,9 +24,9 @@ import mx4j.AbstractDynamicMBean;
  * @version $Revision$
  */
 public class SimpleService extends AbstractDynamicMBean implements Runnable{
-    public static final int MAX_COUNTER_VALUE=10;
     private boolean running;
-    private int simpleCounter = MAX_COUNTER_VALUE/2;
+    private int simpleCounter=0;
+    private int simpleValue = 0;
 
     public void start(){
         if(!running){
@@ -42,9 +42,7 @@ public class SimpleService extends AbstractDynamicMBean implements Runnable{
 
     public void run(){
         while(running){
-           
             simpleCounter++;
-            
             try{
                 Thread.sleep(250);
             }catch(InterruptedException e){
@@ -53,10 +51,9 @@ public class SimpleService extends AbstractDynamicMBean implements Runnable{
         }
     }
 
-    
-    
     /**
-     * @param simpleCounter The simpleCounter to set.
+     * @param simpleCounter
+     *            The simpleCounter to set.
      */
     public void setSimpleCounter(int simpleCounter){
         this.simpleCounter=simpleCounter;
@@ -68,13 +65,26 @@ public class SimpleService extends AbstractDynamicMBean implements Runnable{
     public int getSimpleCounter(){
         return simpleCounter;
     }
+    
+    /**
+     * @return Returns the simpleValue.
+     */
+    public int getSimpleValue(){
+        return simpleValue;
+    }
 
-    //
-    // JMX part.
-    // Note how short is :)
-    //
+    /**
+     * @param simpleValue The simpleValue to set.
+     */
+    public void setSimpleValue(int simpleValue){
+        this.simpleValue=simpleValue;
+    }
+
+   
     protected MBeanAttributeInfo[] createMBeanAttributeInfo(){
-        return new MBeanAttributeInfo[] { new MBeanAttributeInfo("SimpleCounter","int","test simpleCounter",true,false,false) };
+        return new MBeanAttributeInfo[] {
+                new MBeanAttributeInfo("SimpleCounter","int","test simpleCounter",true,false,false),
+                new MBeanAttributeInfo("SimpleValue","int","test simpleValue",true,true,false) };
     }
 
     protected MBeanOperationInfo[] createMBeanOperationInfo(){

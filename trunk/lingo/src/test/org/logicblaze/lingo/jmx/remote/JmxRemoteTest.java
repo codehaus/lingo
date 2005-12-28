@@ -18,6 +18,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.management.Attribute;
 import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
@@ -34,6 +35,7 @@ import javax.management.remote.JMXServiceURL;
 import junit.framework.TestCase;
 import org.activemq.broker.BrokerFactory;
 import org.activemq.broker.BrokerService;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  
@@ -43,13 +45,18 @@ public class JmxRemoteTest extends TestCase{
     private BrokerService broker;
     private JMXConnectorServer connectorServer;
     private JMXConnector connector;
+    private ObjectName serviceName;
+    private SimpleService service;
 
     protected void setUp() throws Exception{
         broker=BrokerFactory.createBroker(new URI("broker:(tcp://localhost:6000)/localhost?persistent=false"));
         broker.start();
         server=MBeanServerFactory.createMBeanServer();
         //register a DynamicService from mx4j
-        SimpleService service = new SimpleService();
+        service = new SimpleService();
+        
+        serviceName= new ObjectName("examples","mbean","simple");
+        server.registerMBean(service,serviceName);
         // start the connector server
         //JMXServiceURL url=new JMXServiceURL("service:jmx:jms:///vm://localhost");
         JMXServiceURL url=new JMXServiceURL("service:jmx:jms:///tcp://localhost:6000");
@@ -81,12 +88,14 @@ public class JmxRemoteTest extends TestCase{
             System.out.println("bean info = "+beanInfo.getDescription());
             System.out.println("attrs = " + beanInfo.getAttributes());
         }
+        Attribute attr = new Attribute("SimpleValue",new Integer(10));
+        connection.setAttribute(serviceName,attr);
+        Object value = connection.getAttribute(serviceName, "SimpleValue");
+        assertTrue(value.equals(new Integer(10)));
     }
     
     public void testNotificationsJmx() throws Exception{
-        SimpleService serviceMBean=new SimpleService();
-        ObjectName serviceName=new ObjectName("examples","mbean","simple");
-        server.registerMBean(serviceMBean,serviceName);
+        
         // Now let's register a Monitor
         // We would like to know if we have peaks in activity, so we can use JMX's
         // GaugeMonitor
@@ -98,7 +107,7 @@ public class JmxRemoteTest extends TestCase{
         // Setup the monitor: we want to know if a threshold is exceeded
         monitorMBean.setNotifyHigh(true);
         monitorMBean.setNotifyLow(true);
-        // Setup the monitor: we're interested in absolute values of the number of clients
+       
         monitorMBean.setDifferenceMode(false);
         // Setup the monitor: link to the service MBean
         monitorMBean.addObservedObject(serviceName);
@@ -107,11 +116,25 @@ public class JmxRemoteTest extends TestCase{
         monitorMBean.setGranularityPeriod(50L);
         // Setup the monitor: register a listener
         MBeanServerConnection connection=connector.getMBeanServerConnection();
+        final AtomicBoolean notificationSet = new AtomicBoolean(false);
+        //Add a notification listener to the connection - to 
+        //test for notifications across lingo
         connection.addNotificationListener(monitorName, new NotificationListener(){
             public void handleNotification(Notification notification,Object handback){
                 System.out.println("Notification = " + notification);
+                synchronized(notificationSet){
+                    notificationSet.set(true);
+                    notificationSet.notify();
+                }
             }}, null, null);
-        Thread.sleep(5000);
+        service.start();
+        monitorMBean.start();
+        synchronized(notificationSet){
+            if (!notificationSet.get()){
+                notificationSet.wait(5000);
+            }
+        }
+        assertTrue(notificationSet.get());
        
     }
     
