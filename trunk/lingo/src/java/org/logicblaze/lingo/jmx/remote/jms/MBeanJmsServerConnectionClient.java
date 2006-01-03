@@ -32,7 +32,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
-import org.activemq.util.IdGenerator;
+import org.apache.activemq.util.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;

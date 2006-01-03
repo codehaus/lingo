@@ -17,7 +17,7 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import org.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.aopalliance.intercept.MethodInvocation;
 import org.logicblaze.lingo.LingoRemoteInvocationFactory;
 import org.logicblaze.lingo.MetadataStrategy;

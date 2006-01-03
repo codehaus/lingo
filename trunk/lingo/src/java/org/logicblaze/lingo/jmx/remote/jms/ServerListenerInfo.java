@@ -26,10 +26,10 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.management.Notification;
 import javax.management.NotificationListener;
-import org.activemq.advisory.AdvisorySupport;
-import org.activemq.command.ActiveMQDestination;
-import org.activemq.command.ActiveMQMessage;
-import org.activemq.command.RemoveInfo;
+import org.apache.activemq.advisory.AdvisorySupport;
+import org.apache.activemq.command.ActiveMQDestination;
+import org.apache.activemq.command.ActiveMQMessage;
+import org.apache.activemq.command.RemoveInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 /**

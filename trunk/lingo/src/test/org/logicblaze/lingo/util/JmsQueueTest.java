@@ -20,8 +20,8 @@ package org.logicblaze.lingo.util;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.command.ActiveMQQueue;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.logicblaze.lingo.jms.JmsClient;
 import org.logicblaze.lingo.jms.JmsQueue;
 
