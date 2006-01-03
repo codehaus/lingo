@@ -18,8 +18,8 @@
 
 package org.logicblaze.lingo.jmx.remote.jms;
 
-import org.activemq.ActiveMQConnectionFactory;
-import org.activemq.command.ActiveMQTopic;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.logicblaze.lingo.jms.JmsProducerConfig;

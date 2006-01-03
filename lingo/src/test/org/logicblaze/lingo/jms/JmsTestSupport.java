@@ -17,7 +17,7 @@
  **/
 package org.logicblaze.lingo.jms;
 
-import org.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.logicblaze.lingo.jms.impl.DefaultJmsProducer;
 import org.logicblaze.lingo.jms.impl.SingleThreadedRequestor;
 

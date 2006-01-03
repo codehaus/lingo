@@ -6,7 +6,7 @@
 <beans>
 
   <!-- embedded JMS broker -->
-  <bean id="broker" class="org.activemq.xbean.BrokerFactoryBean" singleton="true">
+  <bean id="broker" class="org.apache.activemq.xbean.BrokerFactoryBean" singleton="true">
     <property name="config" value="classpath:org/logicblaze/lingo/broker.xml"/>
   </bean>
 
@@ -43,7 +43,7 @@
 
     <!-- the JCA Resource Adapter -->
     <property name="resourceAdapter">
-      <bean id="activeMQResourceAdapter" class="org.activemq.ra.ActiveMQResourceAdapter">
+      <bean id="activeMQResourceAdapter" class="org.apache.activemq.ra.ActiveMQResourceAdapter">
         <property name="serverUrl" value="tcp://localhost:61626"/>
       </bean>
     </property>
@@ -56,7 +56,7 @@
 
     <!-- subscription details -->
     <property name="activationSpec">
-      <bean class="org.activemq.ra.ActiveMQActivationSpec">
+      <bean class="org.apache.activemq.ra.ActiveMQActivationSpec">
         <property name="destination" value="test.org.logicblaze.lingo.jca.xstreamExample"/>
         <property name="destinationType" value="javax.jms.Queue"/>
       </bean>
@@ -79,11 +79,11 @@
   <!-- END SNIPPET: client -->
   
   <!-- JMS ConnectionFactory to use -->
-  <bean id="jmsFactory" class="org.activemq.ActiveMQConnectionFactory">
+  <bean id="jmsFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
     <property name="brokerURL" value="tcp://localhost:61626"/>
   </bean>
 
-  <bean id="exampleDestination" class="org.activemq.command.ActiveMQQueue">
+  <bean id="exampleDestination" class="org.apache.activemq.command.ActiveMQQueue">
     <constructor-arg index="0" value="test.org.logicblaze.lingo.jca.xstreamExample"/>
   </bean>
 </beans>

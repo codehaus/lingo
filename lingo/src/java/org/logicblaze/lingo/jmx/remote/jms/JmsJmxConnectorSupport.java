@@ -18,8 +18,8 @@
 
 package org.logicblaze.lingo.jmx.remote.jms;
 
-import org.activemq.util.IntrospectionSupport;
-import org.activemq.util.URISupport;
+import org.apache.activemq.util.IntrospectionSupport;
+import org.apache.activemq.util.URISupport;
 
 import javax.management.remote.JMXServiceURL;
 
