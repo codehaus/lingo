@@ -60,15 +60,28 @@ public class JmxRemoteTest extends TestCase{
         // start the connector server
         //JMXServiceURL url=new JMXServiceURL("service:jmx:jms:///vm://localhost");
         
-        // START SNIPPET: jmx 
-        JMXServiceURL url=new JMXServiceURL("service:jmx:jms:///tcp://localhost:6000");
-        Map env=new HashMap();
-        env.put("jmx.remote.protocol.provider.pkgs","org.logicblaze.lingo.jmx.remote.provider");
-        connectorServer=JMXConnectorServerFactory.newJMXConnectorServer(url,env,server);
+        //START SNIPPET: serverJMX 
+        //The url to the JMS service
+        JMXServiceURL serverURL=new JMXServiceURL("service:jmx:jms:///tcp://localhost:6000");
+        Map serverEnv=new HashMap();
+        serverEnv.put("jmx.remote.protocol.provider.pkgs","org.logicblaze.lingo.jmx.remote.provider");
+        connectorServer=JMXConnectorServerFactory.newJMXConnectorServer(serverURL,serverEnv,server);
         connectorServer.start();
+        //END SNIPPET: serverJMX 
+        
+        //START SNIPPET: clientJMX 
+        //Now connect the client-side
+        //The URL to the JMS service
+        JMXServiceURL clientURL=new JMXServiceURL("service:jmx:jms:///tcp://localhost:6000");
+        Map clientEnv=new HashMap();
+        clientEnv.put("jmx.remote.protocol.provider.pkgs","org.logicblaze.lingo.jmx.remote.provider");
+        JMXConnector clientConnector= JMXConnectorFactory.connect(clientURL, clientEnv);
         // Connect a JSR 160 JMXConnector to the server side
-        connector=JMXConnectorFactory.connect(url,env);
-        // END SNIPPET: jmx 
+        connector=JMXConnectorFactory.connect(clientURL,clientEnv);
+        //now test the Connection
+        MBeanServerConnection connection=connector.getMBeanServerConnection();
+        //END SNIPPET: clientJMX 
+        
     }
 
     protected void tearDown() throws Exception{
