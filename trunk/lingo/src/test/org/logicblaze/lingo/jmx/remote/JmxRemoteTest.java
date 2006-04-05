@@ -59,15 +59,16 @@ public class JmxRemoteTest extends TestCase{
         server.registerMBean(service,serviceName);
         // start the connector server
         //JMXServiceURL url=new JMXServiceURL("service:jmx:jms:///vm://localhost");
+        
+        // START SNIPPET: jmx 
         JMXServiceURL url=new JMXServiceURL("service:jmx:jms:///tcp://localhost:6000");
-        // Create and start the RMIConnectorServer
         Map env=new HashMap();
         env.put("jmx.remote.protocol.provider.pkgs","org.logicblaze.lingo.jmx.remote.provider");
         connectorServer=JMXConnectorServerFactory.newJMXConnectorServer(url,env,server);
         connectorServer.start();
         // Connect a JSR 160 JMXConnector to the server side
         connector=JMXConnectorFactory.connect(url,env);
-        
+        // END SNIPPET: jmx 
     }
 
     protected void tearDown() throws Exception{
