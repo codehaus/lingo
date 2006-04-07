@@ -263,8 +263,12 @@
     </dependency>
    <dependency>
       <id>backport-util-concurrent</id>
-      <version>2.0_01_pd</version>
+      <version>2.1</version>
    </dependency>
+    <dependency>
+      <id>sysunit</id>
+      <version>1.0-beta-13</version>
+    </dependency>
 
   </dependencies>
 
