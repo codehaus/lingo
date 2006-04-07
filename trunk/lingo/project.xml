@@ -297,6 +297,7 @@
       <excludes>
         <!--  not got backport working yet -->
         <exclude>**/ExampleAsyncWithBackport175Test.*</exclude>
+        <exclude>**/WriteLockDeadLockTest.*</exclude>
       </excludes>
     </unitTest>
 
