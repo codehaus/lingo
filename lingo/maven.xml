@@ -4,6 +4,7 @@
   <goal name="default" prereqs="clean, jar:install-snapshot" />
 
   <postGoal name="clean">
+    <delete dir="${basedir}/activemq-data" />
     <delete dir="${basedir}/ActiveMQ" />
   </postGoal>
 
