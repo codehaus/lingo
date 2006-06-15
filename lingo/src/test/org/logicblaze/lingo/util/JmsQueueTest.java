@@ -144,7 +144,11 @@ public class JmsQueueTest extends TestCase {
     }
 
     protected BlockingQueue createQueue() {
-        JmsClient client = new JmsClient(new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false"), new ActiveMQQueue(getName()));
+        JmsClient client = new JmsClient(new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false"), new ActiveMQQueue(getDestinationName()));
         return new JmsQueue(client);
+    }
+
+    protected String getDestinationName() {
+        return getClass().getName() + "." + getName();
     }
 }

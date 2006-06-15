@@ -26,5 +26,5 @@
 	<classpathentry kind="var" path="MAVEN_REPO/backport-util-concurrent/jars/backport-util-concurrent-2.0_01_pd.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/xbean/jars/xbean-spring-2.0.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/sysunit/jars/sysunit-1.0-beta-13.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
