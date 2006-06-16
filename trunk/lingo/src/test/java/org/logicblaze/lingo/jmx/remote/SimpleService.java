@@ -18,8 +18,9 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import mx4j.AbstractDynamicMBean;
+
 /**
- * This is based haviliy on the DynamicService example from the mx4j project
+ * This is based heavily on the DynamicService example from the mx4j project
  * 
  * @version $Revision$
  */
