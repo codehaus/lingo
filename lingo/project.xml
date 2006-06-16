@@ -303,7 +303,7 @@
         <exclude>**/ExampleAsyncWithBackport175Test.*</exclude>
         <exclude>**/WriteLockDeadLockTest.*</exclude>
         
-        
+        <!--  http://jira.codehaus.org/browse/LINGO-25 -->
         <exclude>**/JmsQueueTest.*</exclude>
       </excludes>
     </unitTest>
