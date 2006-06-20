@@ -3,6 +3,24 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <version>1.2</version>  <name>Lingo</name>  <description>    Lingo is a POJO based remoting and messaging framework  </description>  <organization>    <name>LogicBlaze, Inc.</name>    <url>http://www.logicblaze.com/</url>  </organization>  <licenses>    <license>      <name>The Apache Software License, Version 2.0</name>      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>      <distribution>repo</distribution>    </license>  </licenses>
 
+  <ciManagement>
+    <system>continuum</system>
+    <url>http://ci.gbuild.org/continuum</url>
+    <notifiers>
+      <notifier>
+        <configuration>
+          <address>scm@lingo.codehaus.org</address>
+        </configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+  
+  <scm>
+    <connection>scm:svn:https://svn.codehaus.org/lingo/trunk/lingo/</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/lingo/trunk/lingo/</developerConnection>
+    <url>https://svn.codehaus.org/lingo/trunk/lingo/</url>
+  </scm>
+  
   <repositories>    <!-- AMQ 4 release -->    <repository>      <id>activemq-tmp-repo</id>      <name>ActiveMQ Maven2 Temp Repository</name>      <url>        http://people.apache.org/~chirino/incubator-activemq-4.0/maven2      </url>    </repository>
     <repository>
       <id>apache-snapshots</id>
