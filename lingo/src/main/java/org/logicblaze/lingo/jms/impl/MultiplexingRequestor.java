@@ -17,7 +17,6 @@
  **/
 package org.logicblaze.lingo.jms.impl;
 
-import apple.awt.CImage;
 import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
