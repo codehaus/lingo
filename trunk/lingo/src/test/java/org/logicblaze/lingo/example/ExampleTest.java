@@ -47,7 +47,7 @@ public class ExampleTest extends SpringTestSupport {
     }
 
     public void testSyncRequestResponse() throws Exception {
-        // START SNIPPET: simple
+        // START SNIPPET: sync
 
         // lets lookup the client in Spring
         // (we could be using DI here instead)
@@ -56,6 +56,7 @@ public class ExampleTest extends SpringTestSupport {
         // regular synchronous request-response
         int i = service.regularRPC("Foo");
         System.out.println("Found result: " + i);
+        // END SNIPPET: sync
     }
 
     public void testOneWayMethodCall() throws Exception {
