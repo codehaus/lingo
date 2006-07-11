@@ -1,74 +1,15 @@
 <project
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <version>1.1-SNAPSHOT</version>  <name>Lingo</name>  <description>    Lingo is a POJO based remoting and messaging framework  </description>  <organization>    <name>LogicBlaze, Inc.</name>    <url>http://www.logicblaze.com/</url>  </organization>  <licenses>    <license>      <name>The Apache Software License, Version 2.0</name>      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>      <distribution>repo</distribution>    </license>  </licenses>
-
-  <ciManagement>
-    <system>continuum</system>
-    <url>http://ci.gbuild.org/continuum</url>
-    <notifiers>
-      <notifier>
-        <configuration>
-          <address>scm@lingo.codehaus.org</address>
-        </configuration>
-      </notifier>
-    </notifiers>
-  </ciManagement>
+  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <description>    Lingo is a POJO based remoting and messaging framework  </description>
   
-  <scm>
-    <connection>scm:svn:https://svn.codehaus.org/lingo/trunk</connection>
-    <developerConnection>scm:svn:https://${maven.username}@svn.codehaus.org/lingo/trunk</developerConnection>
-    <url>https://svn.codehaus.org/lingo/trunk/lingo/</url>
-  </scm>
+  <parent>
+    <groupId>org.logicblaze.lingo</groupId>
+    <artifactId>lingo-parent</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
   
-  <repositories>    <!-- AMQ 4 release -->    <repository>      <id>activemq-tmp-repo</id>      <name>ActiveMQ Maven2 Temp Repository</name>      <url>        http://people.apache.org/~chirino/incubator-activemq-4.0/maven2      </url>    </repository>
-    <repository>
-      <id>apache-snapshots</id>
-      <name>Snapshot repository</name>
-      <url>http://people.apache.org/maven-snapshot-repository/</url>
-    </repository>
-    <repository>
-      <id>codehaus</id>
-      <name>Codehaus repository</name>
-      <url>http://repository.codehaus.org/</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache-snapshots</id>
-      <name>Snapshot repository</name>
-      <url>http://people.apache.org/maven-snapshot-repository/</url>
-    </pluginRepository>
-  </pluginRepositories>
-
-  <distributionManagement>
-    <repository>
-      <id>lingo</id>
-      <name>Lingo Central Repository</name>
-      <url>dav:https://dav.codehaus.org/repository/lingo/</url>
-    </repository>
-    <snapshotRepository>
-      <id>lingo-snapshots</id>
-      <name>Lingo Central Development Repository</name>
-      <url>
-        dav:https://dav.codehaus.org/snapshots.repository/lingo/
-      </url>
-    </snapshotRepository>
-    <site>
-      <id>lingo-site</id>
-      <url>dav:https://dav.codehaus.org/lingo/</url>
-    </site>
-  </distributionManagement>
-
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-webdav</artifactId>
-        <version>1.0-beta-1</version>
-      </extension>
-    </extensions>
-
     <plugins>      <!-- 
         <plugin>
         <groupId>org.apache.xbean</groupId>
@@ -85,12 +26,7 @@
         </executions>
         </plugin>
       -->      <plugin>        <groupId>org.apache.maven.plugins</groupId>        <artifactId>maven-compiler-plugin</artifactId>        <configuration>          <source>1.4</source>          <target>1.4</target>        </configuration>      </plugin>      <plugin>        <groupId>org.apache.maven.plugins</groupId>        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.3-SNAPSHOT</version>        <configuration>          <forkMode>pertest</forkMode>
-          <childDelegation>true</childDelegation>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <useFile>true</useFile>
-          <argLine>-Xmx512M</argLine>
-          <excludes>
+        <configuration>          <excludes>
             <exclude>**/JmxRemoteTest.*</exclude>
             <exclude>**/JmsXStreamTest.*</exclude>
             <exclude>**/WriteLockDeadLockTest.*</exclude>
@@ -98,7 +34,6 @@
             <exclude>**/ExampleAsyncWithBackport175Test.*</exclude>
             <exclude>**/JmsQueueTest.*</exclude>
           </excludes>        </configuration>      </plugin>    </plugins>
-
   </build>  <dependencies>
     <dependency>      <groupId>commons-logging</groupId>      <artifactId>commons-logging</artifactId>      <version>1.0.4</version>    </dependency>
     <dependency>      <groupId>org.apache.xbean</groupId>      <artifactId>xbean-spring</artifactId>      <version>2.3</version>      <scope>runtime</scope>      <optional>true</optional>    </dependency>    <dependency>      <groupId>backport-util-concurrent</groupId>      <artifactId>backport-util-concurrent</artifactId>      <version>2.1</version>      <optional>false</optional>    </dependency>    <dependency>      <groupId>hsqldb</groupId>      <artifactId>hsqldb</artifactId>      <version>1.7.3.3</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>commons-collections</groupId>      <artifactId>commons-collections</artifactId>      <version>3.1</version>      <scope>compile</scope>    </dependency>    <dependency>      <groupId>commons-dbcp</groupId>      <artifactId>commons-dbcp</artifactId>      <version>1.2</version>      <scope>test</scope>      <exclusions>        <exclusion>          <groupId>xerces</groupId>          <artifactId>xercesImpl</artifactId>        </exclusion>        <exclusion>          <groupId>xml-apis</groupId>          <artifactId>xml-apis</artifactId>        </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-jms_1.1_spec</artifactId>      <version>1.0</version>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>      <version>1.0</version>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-servlet_2.4_spec</artifactId>      <version>1.0</version>      <optional>true</optional>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>      <version>1.0</version>      <optional>true</optional>    </dependency>    <dependency>      <groupId>geronimo</groupId>      <artifactId>geronimo-transaction</artifactId>      <version>1.0</version>      <scope>compile</scope>      <exclusions>        <!--  
