@@ -1,7 +1,7 @@
 <project
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <version>1.2</version>  <name>Lingo</name>  <description>    Lingo is a POJO based remoting and messaging framework  </description>  <organization>    <name>LogicBlaze, Inc.</name>    <url>http://www.logicblaze.com/</url>  </organization>  <licenses>    <license>      <name>The Apache Software License, Version 2.0</name>      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>      <distribution>repo</distribution>    </license>  </licenses>
+  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <version>1.1-SNAPSHOT</version>  <name>Lingo</name>  <description>    Lingo is a POJO based remoting and messaging framework  </description>  <organization>    <name>LogicBlaze, Inc.</name>    <url>http://www.logicblaze.com/</url>  </organization>  <licenses>    <license>      <name>The Apache Software License, Version 2.0</name>      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>      <distribution>repo</distribution>    </license>  </licenses>
 
   <ciManagement>
     <system>continuum</system>
@@ -16,8 +16,8 @@
   </ciManagement>
   
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/lingo/trunk/lingo/</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/lingo/trunk/lingo/</developerConnection>
+    <connection>scm:svn:https://svn.codehaus.org/lingo/trunk</connection>
+    <developerConnection>scm:svn:https://${maven.username}@svn.codehaus.org/lingo/trunk</developerConnection>
     <url>https://svn.codehaus.org/lingo/trunk/lingo/</url>
   </scm>
   
@@ -26,6 +26,11 @@
       <id>apache-snapshots</id>
       <name>Snapshot repository</name>
       <url>http://people.apache.org/maven-snapshot-repository/</url>
+    </repository>
+    <repository>
+      <id>codehaus</id>
+      <name>Codehaus repository</name>
+      <url>http://repository.codehaus.org/</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -55,13 +60,12 @@
     </site>
   </distributionManagement>
 
-
   <build>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
-        <version>1.0-beta-1-SNAPSHOT</version>
+        <version>1.0-beta-1</version>
       </extension>
     </extensions>
 
@@ -87,7 +91,12 @@
           <useFile>true</useFile>
           <argLine>-Xmx512M</argLine>
           <excludes>
-            <exclude>**/DefaultStoreBrokerTest.*</exclude>
+            <exclude>**/JmxRemoteTest.*</exclude>
+            <exclude>**/JmsXStreamTest.*</exclude>
+            <exclude>**/WriteLockDeadLockTest.*</exclude>
+            <exclude>**/ExampleWithJCAWithXStreamTest.*</exclude>
+            <exclude>**/ExampleAsyncWithBackport175Test.*</exclude>
+            <exclude>**/JmsQueueTest.*</exclude>
           </excludes>        </configuration>      </plugin>    </plugins>
 
   </build>  <dependencies>
@@ -107,7 +116,7 @@
     <dependency>
       <groupId>org.jencks</groupId>
       <artifactId>jencks</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
