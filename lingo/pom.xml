@@ -1,14 +1,25 @@
-<project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <description>    Lingo is a POJO based remoting and messaging framework  </description>
-  
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>
+  <name>Lingo</name>
+
+  <description>Lingo is a POJO based remoting and messaging framework</description>
+
   <parent>
     <groupId>org.logicblaze.lingo</groupId>
     <artifactId>lingo-parent</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
-  
+
+  <repositories>
+    <!-- temporary hack to allow folks to load the root pom -->
+    <repository>
+      <id>codehaus</id>
+      <name>Codehaus snapshot repository</name>
+      <url>http://snapshots.repository.codehaus.org/</url>
+    </repository>
+  </repositories>
+
+
   <build>
     <plugins>      <!-- 
         <plugin>
