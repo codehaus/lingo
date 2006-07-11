@@ -13,29 +13,10 @@
   <repositories>
     <!-- temporary hack to allow folks to load the root pom -->
     <repository>
-      <id>codehaus</id>
+      <id>codehaus-snapshot-repo</id>
       <name>Codehaus snapshot repository</name>
       <url>http://snapshots.repository.codehaus.org/</url>
     </repository>
-    <!-- AMQ 4 release -->
-    <repository>
-      <id>activemq-tmp-repo</id>
-      <name>ActiveMQ Maven2 Temp Repository</name>
-      <url>
-        http://people.apache.org/~chirino/incubator-activemq-4.0/maven2
-      </url>
-    </repository>
-    <repository>
-      <id>apache-snapshots</id>
-      <name>Snapshot repository</name>
-      <url>http://people.apache.org/maven-snapshot-repository/</url>
-    </repository>
-    <repository>
-      <id>codehaus</id>
-      <name>Codehaus repository</name>
-      <url>http://repository.codehaus.org/</url>
-    </repository>
-
   </repositories>
 
 
