@@ -278,16 +278,16 @@
 
   <build>
     <nagEmailAddress>dev@lingo.codehaus.org</nagEmailAddress>
-    <sourceDirectory>src/java</sourceDirectory>
-    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <unitTestSourceDirectory>src/main/test</unitTestSourceDirectory>
 
     <integrationUnitTestSourceDirectory />
     <aspectSourceDirectory />
 
-    <unitTest>
+	  <unitTest>
       <resources>
         <resource>
-          <directory>src/test</directory>
+          <directory>src/main/test</directory>
           <includes>
             <include>**/*.properties</include>
             <include>**/*.xml</include>
