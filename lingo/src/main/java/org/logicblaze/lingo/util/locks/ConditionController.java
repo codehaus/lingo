@@ -86,7 +86,7 @@ public class ConditionController {
                 signalCount++;
             }
             else {
-                ConditionListener listener = (ConditionListener) listeners.remove();
+                ConditionListener listener = (ConditionListener) listeners.removeFirst();
                 listener.onSignal(id);
             }
         }
@@ -107,7 +107,7 @@ public class ConditionController {
             }
             else {
                 while (!listeners.isEmpty()) {
-                    ConditionListener listener = (ConditionListener) listeners.remove();
+                    ConditionListener listener = (ConditionListener) listeners.removeFirst();
                     listener.onSignalAll(id);
                 }
             }
