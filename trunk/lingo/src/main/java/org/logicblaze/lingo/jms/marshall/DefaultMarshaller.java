@@ -33,18 +33,28 @@ import javax.jms.TextMessage;
 import java.io.Serializable;
 
 /**
- * Represents the strategy of marshalling of requests and responses in and out
- * of JMS messages
+ * Represents the strategy of object marshalling of requests and responses in and out
+ * of JMS messages. Collaborates with {@link HeaderMarshaller} which captures the strategy
+ * for JMS header marshalling.
  * 
- * @version $Revision$
+ * @version $Revision: 84 $
  */
-public class DefaultMarshaller implements Marshaller {
+public class DefaultMarshaller implements Marshaller, HeaderMarshaller {
 
     private static final Log log = LogFactory.getLog(DefaultMarshaller.class);
 
     private boolean ignoreInvalidMessages;
 
-    private String stickySessionID;
+    //required lingo header marshaller
+    protected HeaderMarshaller nativeHeaderMarshaller = new NativeHeaderMarshaller();
+
+    //user customizable HeaderMarshaller
+    protected HeaderMarshaller headerMarshaller;
+
+
+    public void setHeaderMarshaller(HeaderMarshaller headerMarshaller) {
+        this.headerMarshaller = headerMarshaller;
+    }
 
     public Message createRequestMessage(Requestor requestor, LingoInvocation invocation) throws JMSException {
         ObjectMessage message = requestor.getSession().createObjectMessage(invocation);
@@ -140,54 +150,34 @@ public class DefaultMarshaller implements Marshaller {
         return null;
     }
 
-    /**
-     * A strategy method for derived classes to allow them a plugin point to
-     * perform custom header processing
-     */
-    protected void appendMessageHeaders(Message message, Requestor requestor, LingoInvocation invocation) throws JMSException {
-        if (invocation.getMetadata().isStateful()) {
-            message.setStringProperty("JMSXGroupID", getStickySessionID());
-        }
+
+    public void appendMessageHeaders(Message message, Requestor requestor, LingoInvocation invocation) throws JMSException {
+        nativeHeaderMarshaller.appendMessageHeaders(message, requestor, invocation);
+        if(headerMarshaller != null) headerMarshaller.appendMessageHeaders(message, requestor, invocation);
     }
 
-    protected void appendMessageHeaders(Message message, Session session, Object value) {
+    public void appendMessageHeaders(Message message, Session session, Object value) {
+        nativeHeaderMarshaller.appendMessageHeaders(message, session, value);
+        if(headerMarshaller != null) headerMarshaller.appendMessageHeaders(message, session, value);
     }
 
-    protected String getStickySessionID() {
-        if (stickySessionID == null) {
-            stickySessionID = "hey";
-            // TODO
-            throw new RuntimeException("TODO: Not Implemented Yet!");
-        }
-        return stickySessionID;
+    public void addResponseMessageHeaders(ObjectMessage answer, RemoteInvocationResult result, Message requestMessage) throws JMSException {
+        nativeHeaderMarshaller.addResponseMessageHeaders(answer, result, requestMessage);
+        if(headerMarshaller != null) headerMarshaller.addResponseMessageHeaders(answer, result, requestMessage);
     }
 
-    /**
-     * A strategy for derived classes to allow them to plug in custom header
-     * processing for responses
-     */
-    protected void addResponseMessageHeaders(ObjectMessage answer, RemoteInvocationResult result, Message requestMessage) throws JMSException {
+    public void handleInvocationHeaders(Message message) {
+        nativeHeaderMarshaller.handleInvocationHeaders(message);
+        if(headerMarshaller != null) headerMarshaller.handleInvocationHeaders(message);
     }
 
-    /**
-     * A strategy method to allow derived classes to process the headers in a
-     * special way
-     */
-    protected void handleInvocationHeaders(Message message) {
+    public final void handleInvocationResultHeaders(Message message) {
+        nativeHeaderMarshaller.handleInvocationResultHeaders(message);
+        if(headerMarshaller != null) headerMarshaller.handleInvocationResultHeaders(message);
     }
 
-    /**
-     * A strategy method to allow derived classes to process the headers in a
-     * special way
-     */
-    protected void handleInvocationResultHeaders(Message message) {
+    public final void handleMessageHeaders(Message message) {
+        nativeHeaderMarshaller.handleMessageHeaders(message);
+        if(headerMarshaller != null) headerMarshaller.handleMessageHeaders(message);
     }
-
-    /**
-     * A strategy method to allow derived classes to process the headers in a
-     * special way
-     */
-    protected void handleMessageHeaders(Message message) {
-    }
-
 }
