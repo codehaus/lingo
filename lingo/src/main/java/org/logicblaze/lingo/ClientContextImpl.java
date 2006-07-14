@@ -1,7 +1,7 @@
 package org.logicblaze.lingo;
 
 /**
- * Default implmentation of {@link ClientContext}. USed by {@link ClientContextHolder}.
+ * Default implmentation of {@link ClientContext}. Used by {@link ClientContextHolder}.
  *
  * @author Sanjiv Jivan
  * @since 1.5
