@@ -18,6 +18,7 @@
 package org.logicblaze.lingo.example;
 
 import java.util.Set;
+import java.util.Locale;
 
 /**
  * @version $Revision$
@@ -37,4 +38,8 @@ public interface ExampleService {
      * @param listener
      */
     public void asyncRequestResponse(String stock, ResultListener listener);
+
+    public String whoAmI();
+
+    public Locale whereAmI();
 }
