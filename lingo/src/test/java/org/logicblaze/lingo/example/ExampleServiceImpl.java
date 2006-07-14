@@ -17,12 +17,14 @@
  **/
 package org.logicblaze.lingo.example;
 
+import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.logicblaze.lingo.ClientContextHolder;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Set;
-
-import junit.framework.Assert;
+import java.util.Locale;
 
 /**
  * @version $Revision$
@@ -88,6 +90,14 @@ public class ExampleServiceImpl extends Assert implements ExampleService {
             System.out.println("#### error: " + e);
             e.printStackTrace();
         }
+    }
+
+    public String whoAmI() {
+        return ClientContextHolder.getUserName();
+    }
+
+    public Locale whereAmI() {
+        return LocaleContextHolder.getLocale();
     }
 
     // Properties
