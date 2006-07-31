@@ -7,7 +7,7 @@
 
   <ciManagement>
     <system>continuum</system>
-    <url>http://ci.gbuild.org/continuum</url>
+        <url>http://goopen.org:8080/continuum</url>
     <notifiers>
       <notifier>
         <configuration>
