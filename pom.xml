@@ -18,11 +18,11 @@
   </ciManagement>
   
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/lingo/trunk</connection>
-    <developerConnection>scm:svn:https://${maven.username}@svn.codehaus.org/lingo/trunk</developerConnection>
-    <url>https://svn.codehaus.org/lingo/trunk/lingo/</url>
+    <connection>scm:svn:http://svn.codehaus.org/lingo/trunk</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/lingo/trunk</developerConnection>
+    <url>http://svn.codehaus.org/lingo/trunk/lingo/</url>
   </scm>
-  
+      
   <repositories>    <!-- AMQ 4 release -->    <repository>      <id>activemq-tmp-repo</id>      <name>ActiveMQ Maven2 Temp Repository</name>      <url>        http://people.apache.org/~chirino/incubator-activemq-4.0/maven2      </url>    </repository>
     <repository>
       <id>apache-snapshots</id>
