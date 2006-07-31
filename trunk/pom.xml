@@ -1,7 +1,7 @@
 <project
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo-parent</artifactId>  <version>1.1-SNAPSHOT</version>  <name>Lingo</name>  <packaging>pom</packaging>
+  xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo-parent</artifactId>  <version>1.1-SNAPSHOT</version>  <name>Lingo-Parent</name>  <packaging>pom</packaging>
 
   <description>    Lingo is a POJO based remoting and messaging framework  </description>  <organization>    <name>LogicBlaze, Inc.</name>    <url>http://www.logicblaze.com/</url>  </organization>  <licenses>    <license>      <name>The Apache Software License, Version 2.0</name>      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>      <distribution>repo</distribution>    </license>  </licenses>
 
