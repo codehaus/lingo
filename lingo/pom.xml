@@ -1,1 +1,417 @@
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">  <modelVersion>4.0.0</modelVersion>  <groupId>org.logicblaze.lingo</groupId>  <artifactId>lingo</artifactId>  <name>Lingo</name>  <description>Lingo is a POJO based remoting and messaging framework</description>  <parent>    <groupId>org.logicblaze.lingo</groupId>    <artifactId>lingo-parent</artifactId>    <version>1.1-SNAPSHOT</version>  </parent>  <repositories>    <!-- temporary hack to allow folks to load the root pom -->    <repository>      <id>codehaus-snapshot-repo</id>      <name>Codehaus snapshot repository</name>      <url>http://snapshots.repository.codehaus.org/</url>    </repository>  </repositories>  <build>    <plugins>      <!--        <plugin>        <groupId>org.apache.xbean</groupId>        <artifactId>maven-xbean-plugin</artifactId>        <executions>        <execution>        <configuration>        <namespace>http://lingo.codehaus.org/1.2</namespace>        </configuration>        <goals>        <goal>mapping</goal>        </goals>        </execution>        </executions>        </plugin>      -->      <plugin>        <groupId>org.apache.maven.plugins</groupId>        <artifactId>maven-compiler-plugin</artifactId>        <configuration>          <source>1.4</source>          <target>1.4</target>        </configuration>      </plugin>      <plugin>        <groupId>org.apache.maven.plugins</groupId>        <artifactId>maven-surefire-plugin</artifactId>        <configuration>          <excludes>            <exclude>**/JmxRemoteTest.*</exclude>            <exclude>**/JmsXStreamTest.*</exclude>            <exclude>**/WriteLockDeadLockTest.*</exclude>            <exclude>**/ExampleWithJCAWithXStreamTest.*</exclude>            <exclude>**/ExampleAsyncWithBackport175Test.*</exclude>            <exclude>**/JmsQueueTest.*</exclude>          </excludes>        </configuration>      </plugin>    </plugins>  </build>  <dependencies>    <dependency>      <groupId>commons-logging</groupId>      <artifactId>commons-logging</artifactId>      <version>1.0.4</version>    </dependency>    <dependency>      <groupId>org.apache.xbean</groupId>      <artifactId>xbean-spring</artifactId>      <version>2.3</version>      <scope>runtime</scope>      <optional>true</optional>    </dependency>    <dependency>      <groupId>backport-util-concurrent</groupId>      <artifactId>backport-util-concurrent</artifactId>      <version>2.1</version>      <optional>false</optional>    </dependency>    <dependency>      <groupId>hsqldb</groupId>      <artifactId>hsqldb</artifactId>      <version>1.7.3.3</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>commons-collections</groupId>      <artifactId>commons-collections</artifactId>      <version>3.1</version>      <scope>compile</scope>    </dependency>    <dependency>      <groupId>commons-dbcp</groupId>      <artifactId>commons-dbcp</artifactId>      <version>1.2</version>      <scope>test</scope>      <exclusions>        <exclusion>          <groupId>xerces</groupId>          <artifactId>xercesImpl</artifactId>        </exclusion>        <exclusion>          <groupId>xml-apis</groupId>          <artifactId>xml-apis</artifactId>        </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-jms_1.1_spec</artifactId>      <version>1.0</version>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>      <version>1.0</version>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-servlet_2.4_spec</artifactId>      <version>1.0</version>      <optional>true</optional>    </dependency>    <dependency>      <groupId>org.apache.geronimo.specs</groupId>      <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>      <version>1.0</version>      <optional>true</optional>    </dependency>    <dependency>      <groupId>geronimo</groupId>      <artifactId>geronimo-transaction</artifactId>      <version>1.0</version>      <scope>compile</scope>      <exclusions>        <!--          <exclusion>          <groupId>mx4j</groupId>          <artifactId>mx4j</artifactId>          </exclusion>        -->        <exclusion>          <groupId>commons-jelly</groupId>          <artifactId>commons-jelly-tags-velocity</artifactId>        </exclusion>        <exclusion>          <groupId>velocity</groupId>          <artifactId>velocity</artifactId>        </exclusion>        <exclusion>          <groupId>howl</groupId>          <artifactId>howl-logger</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-core</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-kernel</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-system</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-j2ee</artifactId>        </exclusion>        <exclusion>          <groupId>org.apache.geronimo.specs</groupId>          <artifactId>geronimo-ejb_2.1_spec</artifactId>        </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>geronimo</groupId>      <artifactId>geronimo-connector</artifactId>      <version>1.0</version>      <exclusions>        <exclusion>          <groupId>org.apache.geronimo.specs</groupId>          <artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-deployment</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-common</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-naming</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-security</artifactId>        </exclusion>        <exclusion>          <groupId>geronimo</groupId>          <artifactId>geronimo-management</artifactId>        </exclusion>        <exclusion>          <groupId>tranql</groupId>          <artifactId>tranql</artifactId>        </exclusion>        <exclusion>          <groupId>regexp</groupId>          <artifactId>regexp</artifactId>        </exclusion>        <exclusion>          <groupId>cglib</groupId>          <artifactId>cglib-nodep</artifactId>        </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>org.springframework</groupId>      <artifactId>spring</artifactId>      <version>1.2.6</version>    </dependency>    <dependency>      <groupId>commons-pool</groupId>      <artifactId>commons-pool</artifactId>      <version>1.2</version>      <scope>test</scope>      <exclusions>        <exclusion>          <groupId>xerces</groupId>          <artifactId>xercesImpl</artifactId>        </exclusion>        <exclusion>          <groupId>xml-apis</groupId>          <artifactId>xml-apis</artifactId>        </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>log4j</groupId>      <artifactId>log4j</artifactId>      <version>1.2.9</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>org.jencks</groupId>      <artifactId>jencks</artifactId>      <version>1.2</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>jencks</groupId>      <artifactId>xapool-without-pool</artifactId>      <version>1.4</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>org.apache.derby</groupId>      <artifactId>derby</artifactId>      <version>10.1.1.0</version>      <optional>true</optional>    </dependency>    <dependency>      <groupId>incubator-activemq</groupId>      <artifactId>activeio-core</artifactId>      <version>3.0-beta3</version>      <scope>compile</scope>    </dependency>    <dependency>      <groupId>incubator-activemq</groupId>      <artifactId>activemq-core</artifactId>      <version>4.0</version>      <scope>compile</scope>    </dependency>    <dependency>      <groupId>incubator-activemq</groupId>      <artifactId>activemq-ra</artifactId>      <version>4.0</version>      <scope>test</scope>      <exclusions>        <exclusion>          <groupId>activemq</groupId>          <artifactId>jmdns</artifactId>        </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>xstream</groupId>      <artifactId>xstream</artifactId>      <version>1.1.3</version>      <scope>compile</scope>      <optional>true</optional>    </dependency>    <dependency>      <groupId>backport175</groupId>      <artifactId>backport175</artifactId>      <version>1.0</version>      <scope>compile</scope>      <optional>true</optional>    </dependency>    <dependency>      <groupId>org.acegisecurity</groupId>      <artifactId>acegi-security</artifactId>      <version>1.0.1</version>      <scope>compile</scope>      <optional>true</optional>      <exclusions>         <exclusion>           <groupId>taglibs</groupId>           <artifactId>standard</artifactId>         </exclusion>         <exclusion>           <groupId>org.apache.directory.server</groupId>           <artifactId>apacheds-core</artifactId>         </exclusion>         <exclusion>           <groupId>commons-collections</groupId>           <artifactId>commons-collections</artifactId>         </exclusion>         <exclusion>           <groupId>commons-lang</groupId>           <artifactId>commons-lang</artifactId>         </exclusion>         <exclusion>           <groupId>oro</groupId>           <artifactId>oro</artifactId>         </exclusion>         <exclusion>           <groupId>commons-logging</groupId>           <artifactId>commons-logging</artifactId>         </exclusion>         <exclusion>           <groupId>org.slf4j</groupId>           <artifactId>slf4j-log4j12</artifactId>         </exclusion>         <exclusion>            <groupId>javax.transaction</groupId>            <artifactId>jta</artifactId>         </exclusion>         <exclusion>           <groupId>org.springframework</groupId>           <artifactId>spring-remoting</artifactId>         </exclusion>         <exclusion>           <groupId>org.springframework</groupId>           <artifactId>spring-jdbc</artifactId>         </exclusion>         <exclusion>           <groupId>org.springframework</groupId>           <artifactId>spring-support</artifactId>         </exclusion>         <exclusion>           <groupId>org.springframework</groupId>           <artifactId>spring-mock</artifactId>         </exclusion>         <exclusion>           <groupId>ehcache</groupId>           <artifactId>ehcache</artifactId>         </exclusion>         <exclusion>           <groupId>cas</groupId>           <artifactId>casclient</artifactId>         </exclusion>         <exclusion>           <groupId>aspectj</groupId>           <artifactId>aspectjrt</artifactId>         </exclusion>         <exclusion>           <groupId>javax.servlet</groupId>           <artifactId>jsp-api</artifactId>         </exclusion>         <exclusion>           <groupId>hsqldb</groupId>           <artifactId>hsqldb</artifactId>         </exclusion>         <exclusion>           <groupId>org.springframework</groupId>           <artifactId>spring-support</artifactId>         </exclusion>      </exclusions>    </dependency>    <dependency>      <groupId>sysunit</groupId>      <artifactId>sysunit</artifactId>      <version>1.0-beta-13</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>mx4j</groupId>      <artifactId>mx4j</artifactId>      <version>3.0.1</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>junit</groupId>      <artifactId>junit</artifactId>      <version>3.8.1</version>      <scope>test</scope>    </dependency>    <dependency>      <groupId>org.springframework</groupId>      <artifactId>spring-mock</artifactId>      <version>1.2.6</version>      <scope>test</scope>    </dependency>  </dependencies></project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.logicblaze.lingo</groupId>
+  <artifactId>lingo</artifactId>
+  <name>Lingo</name>
+
+  <description>Lingo is a POJO based remoting and messaging framework</description>
+
+  <parent>
+    <groupId>org.logicblaze.lingo</groupId>
+    <artifactId>lingo-parent</artifactId>
+    <version>1.2</version>
+  </parent>
+
+  <repositories>
+    <!-- temporary hack to allow folks to load the root pom -->
+    <repository>
+      <id>codehaus-snapshot-repo</id>
+      <name>Codehaus snapshot repository</name>
+      <url>http://snapshots.repository.codehaus.org/</url>
+    </repository>
+  </repositories>
+
+
+  <build>
+    <plugins>
+      <!--
+        <plugin>
+        <groupId>org.apache.xbean</groupId>
+        <artifactId>maven-xbean-plugin</artifactId>
+        <executions>
+        <execution>
+        <configuration>
+        <namespace>http://lingo.codehaus.org/1.2</namespace>
+        </configuration>
+        <goals>
+        <goal>mapping</goal>
+        </goals>
+        </execution>
+        </executions>
+        </plugin>
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.4</source>
+          <target>1.4</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/JmxRemoteTest.*</exclude>
+            <exclude>**/JmsXStreamTest.*</exclude>
+            <exclude>**/WriteLockDeadLockTest.*</exclude>
+            <exclude>**/ExampleWithJCAWithXStreamTest.*</exclude>
+            <exclude>**/ExampleAsyncWithBackport175Test.*</exclude>
+            <exclude>**/JmsQueueTest.*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xbean</groupId>
+      <artifactId>xbean-spring</artifactId>
+      <version>2.3</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>backport-util-concurrent</groupId>
+      <artifactId>backport-util-concurrent</artifactId>
+      <version>2.1</version>
+      <optional>false</optional>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.7.3.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jms_1.1_spec</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-servlet_2.4_spec</artifactId>
+      <version>1.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+      <version>1.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>geronimo</groupId>
+      <artifactId>geronimo-transaction</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+      <exclusions>
+        <!--
+          <exclusion>
+          <groupId>mx4j</groupId>
+          <artifactId>mx4j</artifactId>
+          </exclusion>
+        -->
+        <exclusion>
+          <groupId>commons-jelly</groupId>
+          <artifactId>commons-jelly-tags-velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>velocity</groupId>
+          <artifactId>velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>howl</groupId>
+          <artifactId>howl-logger</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-kernel</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-system</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-j2ee</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-ejb_2.1_spec</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>geronimo</groupId>
+      <artifactId>geronimo-connector</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-j2ee-jacc_1.0_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-deployment</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-naming</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-security</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>geronimo</groupId>
+          <artifactId>geronimo-management</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>tranql</groupId>
+          <artifactId>tranql</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>regexp</groupId>
+          <artifactId>regexp</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>cglib</groupId>
+          <artifactId>cglib-nodep</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring</artifactId>
+      <version>1.2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.9</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jencks</groupId>
+      <artifactId>jencks</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jencks</groupId>
+      <artifactId>xapool-without-pool</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.1.1.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>incubator-activemq</groupId>
+      <artifactId>activeio-core</artifactId>
+      <version>3.0-beta3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>incubator-activemq</groupId>
+      <artifactId>activemq-core</artifactId>
+      <version>4.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>incubator-activemq</groupId>
+      <artifactId>activemq-ra</artifactId>
+      <version>4.0</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>activemq</groupId>
+          <artifactId>jmdns</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.1.3</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>backport175</groupId>
+      <artifactId>backport175</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.acegisecurity</groupId>
+      <artifactId>acegi-security</artifactId>
+      <version>1.0.1</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+      <exclusions>
+         <exclusion>
+           <groupId>taglibs</groupId>
+           <artifactId>standard</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.apache.directory.server</groupId>
+           <artifactId>apacheds-core</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>commons-collections</groupId>
+           <artifactId>commons-collections</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>commons-lang</groupId>
+           <artifactId>commons-lang</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>oro</groupId>
+           <artifactId>oro</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>commons-logging</groupId>
+           <artifactId>commons-logging</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.slf4j</groupId>
+           <artifactId>slf4j-log4j12</artifactId>
+         </exclusion>
+         <exclusion>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-remoting</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-jdbc</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-support</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-mock</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>ehcache</groupId>
+           <artifactId>ehcache</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>cas</groupId>
+           <artifactId>casclient</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>aspectj</groupId>
+           <artifactId>aspectjrt</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>javax.servlet</groupId>
+           <artifactId>jsp-api</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>hsqldb</groupId>
+           <artifactId>hsqldb</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-support</artifactId>
+         </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>sysunit</groupId>
+      <artifactId>sysunit</artifactId>
+      <version>1.0-beta-13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>mx4j</groupId>
+      <artifactId>mx4j</artifactId>
+      <version>3.0.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-mock</artifactId>
+      <version>1.2.6</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
