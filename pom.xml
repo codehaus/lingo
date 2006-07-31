@@ -14,6 +14,8 @@
           <address>scm@lingo.codehaus.org</address>
         </configuration>
       </notifier>
+      
+		<notifier>		<type>irc</type>		<configuration>			<host>irc.codehaus.org</host>			<port>6667</port>			<channel>#lingo</channel>		</configuration>		</notifier> 
     </notifiers>
   </ciManagement>
   
