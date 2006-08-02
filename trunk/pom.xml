@@ -23,6 +23,14 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  
+  <modules>
+    <module>lingo</module>
+    <!--
+    <module>lingo-cache</module>
+    -->
+    <module>lingo-assembly</module>
+   </modules>
 
   <ciManagement>
     <system>continuum</system>
@@ -151,13 +159,6 @@
     </plugins>
 
   </build>
-  
-  <modules>
-    <module>lingo</module>
-    <!--
-    <module>lingo-cache</module>
-    -->
-   </modules>
   
   <dependencies>
     <dependency>
