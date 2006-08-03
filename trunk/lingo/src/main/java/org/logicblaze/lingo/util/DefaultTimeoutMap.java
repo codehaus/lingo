@@ -49,7 +49,7 @@ public class DefaultTimeoutMap implements TimeoutMap, Runnable {
 
     public DefaultTimeoutMap(ScheduledExecutorService executor, long requestMapPollTimeMillis) {
         this.executor = executor;
-        this.purgePollTime = purgePollTime;
+        this.purgePollTime = requestMapPollTimeMillis;
         schedulePoll();
     }
 
