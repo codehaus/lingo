@@ -1,0 +1,9 @@
+target
+junit*.properties
+*.iml
+
+ActiveMQ
+.fbwarnings
+bin
+.settings
+activemq-data

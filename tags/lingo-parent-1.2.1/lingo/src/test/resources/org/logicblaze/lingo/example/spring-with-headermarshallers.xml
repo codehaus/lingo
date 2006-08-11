@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- START SNIPPET: spring -->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <!-- client side proxy-->
+  <bean id="client" class="org.logicblaze.lingo.jms.JmsProxyFactoryBean">
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+    <property name="marshaller" ref="marshaller"/>
+  </bean>
+
+  <!-- the server side -->
+  <bean id="server" class="org.logicblaze.lingo.jms.JmsServiceExporter">
+    <property name="service" ref="serverImpl"/>
+    <property name="serviceInterface" value="org.logicblaze.lingo.example.ExampleService"/>
+    <property name="connectionFactory" ref="jmsFactory"/>
+    <property name="destination" ref="exampleDestination"/>
+    <property name="marshaller" ref="marshaller"/>
+  </bean>
+
+  <!-- the actual implementation of the service - which is only made public for testing purposes -->
+  <bean id="serverImpl" class="org.logicblaze.lingo.example.ExampleServiceImpl" singleton="true"/>
+
+
+  <!-- JMS ConnectionFactory to use -->
+  <bean id="jmsFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="vm://localhost"/>
+  </bean>
+
+  <bean id="exampleDestination" class="org.apache.activemq.command.ActiveMQQueue">
+    <constructor-arg index="0" value="test.org.logicblaze.lingo.example"/>
+  </bean>
+
+  <bean id="marshaller" class="org.logicblaze.lingo.jms.marshall.DefaultMarshaller">
+      <property name="headerMarshaller">
+          <bean class="org.logicblaze.lingo.jms.marshall.CompositeHeaderMarshaller">
+             <property name="headerMarshallers">
+                <list>
+                   <bean class="org.logicblaze.lingo.jms.marshall.AcegiHeaderMarshaller"/>
+                   <bean class="org.logicblaze.lingo.jms.marshall.LocaleHeaderMarshaller"/>
+                </list>
+             </property>
+          </bean>
+      </property>
+  </bean>
+
+
+</beans>
+
+<!-- END SNIPPET: spring -->

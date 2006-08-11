@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="default" xmlns:j="jelly:core" xmlns:ant="jelly:ant">
+
+  <goal name="default" prereqs="clean, jar:install-snapshot" />
+
+  <postGoal name="clean">
+    <delete dir="${basedir}/ActiveMQ" />
+  </postGoal>
+
+  <preGoal name="test:compile">
+    <attainGoal name="backport:generate" />
+  </preGoal>
+
+  <goal name="dc">
+    <attain>
+      <attainGoal name="clean" />
+      <attainGoal name="jar:deploy" />
+      <j:set var="maven.test.skip" value="true" />
+      <attainGoal name="site:deploy" />
+      <attainGoal name="dist:deploy" />
+    </attain>
+  </goal>
+
+  <postGoal name="dist:prepare-src-filesystem">
+    <!-- lets zap the build.xml -->
+    <delete file="${maven.dist.src.assembly.dir}/build.xml" />
+  </postGoal>
+
+
+  <postGoal name="dist:prepare-bin-filesystem">
+    <mkdir dir="${maven.dist.bin.assembly.dir}/lib" />
+
+    <j:forEach var="lib" items="${pom.artifacts}">
+      <echo>Processing ${lib.name}</echo>
+      <j:if test="${lib.name.startsWith('concurrent') || lib.name.startsWith('active') || lib.name.startsWith('common') || lib.name.startsWith('jencks')}">
+        <copy file="${lib.path}" todir="${maven.dist.bin.assembly.dir}/lib" />
+      </j:if>
+    </j:forEach>
+  </postGoal>
+
+  <goal name="backport:generate" description="Generates the annotations." prereqs="setclasspath">
+    <taskdef name="backport" classname="org.codehaus.backport175.compiler.task.AnnotationCTask">
+      <classpath refid="test.classpath" />
+    </taskdef>
+    <backport destdir="target/test-classes" verbose="false" classpathref="test.classpath" srcdir="${basedir}/src/test"
+      copytodest="**/*.RESIDUALPROPS">
+      <fileset dir="${basedir}/src/test">
+        <include name="**/*.java" />
+      </fileset>
+    </backport>
+  </goal>
+
+  <goal name="setclasspath" prereqs="java:compile">
+    <path id="test.classpath">
+      <pathelement path="${maven.build.dest}" />
+      <pathelement path="target/classes" />
+      <pathelement path="target/test-classes" />
+      <path refid="maven.dependency.classpath" />
+    </path>
+  </goal>
+
+</project>
