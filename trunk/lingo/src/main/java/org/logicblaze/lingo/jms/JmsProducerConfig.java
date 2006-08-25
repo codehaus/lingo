@@ -28,6 +28,8 @@ import javax.jms.TemporaryQueue;
 /**
  * A simple bean of JMS producer configuration options.
  * 
+ * @org.apache.xbean.XBean element="producerConfig"
+ * 
  * @version $Revision$
  */
 public class JmsProducerConfig {

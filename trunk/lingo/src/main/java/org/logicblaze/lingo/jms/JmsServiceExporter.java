@@ -33,6 +33,8 @@ import javax.jms.Topic;
  * Note: JMS services exported with this class can be accessed by any JMS
  * client, as there isn't any special handling involved.
  * 
+ * @org.apache.xbean.XBean element="serviceExporter"
+ * 
  * @author James Strachan
  * @see JmsProxyFactoryBean
  */

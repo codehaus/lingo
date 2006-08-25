@@ -50,6 +50,8 @@ import javax.jms.Session;
  * Note: JMS services exported with this class can be accessed by any JMS
  * client, as there isn't any special handling involved.
  * 
+ * @org.apache.xbean.XBean element="serviceExporterMessageListener"
+ * 
  * @author James Strachan
  * @see JmsProxyFactoryBean
  * @version $Revision$
