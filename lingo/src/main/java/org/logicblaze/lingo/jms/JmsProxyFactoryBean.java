@@ -30,6 +30,8 @@ import javax.jms.JMSException;
  * <p>The service URL must be an JMS URL exposing a JMS service.
  * For details, see JmsClientInterceptor docs.
  *
+ * @org.apache.xbean.XBean element="clientProxyFactory"
+ * 
  * @author James Strachan
  * @see JmsClientInterceptor
  * @see JmsServiceExporter
