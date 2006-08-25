@@ -78,6 +78,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     private JmsProducerConfig producerConfig = new JmsProducerConfig();
     private MetadataStrategy metadataStrategy;
     private boolean multipleResponsesExpected;
+    private long responseTimeout = 30000L;
     private long multipleResponseTimeout = 5000L;
     private long remoteReferenceTimeout = 60000L;
 
@@ -134,7 +135,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
                 return null;
             }
             else if (!isMultipleResponse(methodInvocation, metadata)) {
-                Message response = requestor.request(destination, requestMessage);
+                Message response = requestor.request(destination, requestMessage, getResponseTimeout());
                 RemoteInvocationResult result = marshaller.extractInvocationResult(response);
                 return recreateRemoteInvocationResult(result);
             }
@@ -211,17 +212,6 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
         return messageProperties;
     }
 
-    public int getJmsExpiration() {
-        return jmsExpiration;
-    }
-
-    /**
-     * Sets the JMS expiration timeout (in milliseconds) of the request message
-     */
-    public void setJmsExpiration(int jmsExpiration) {
-        this.jmsExpiration = jmsExpiration;
-    }
-
     public int getJmsPriority() {
         return producerConfig.getPriority();
     }
@@ -238,7 +228,7 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
     }
 
     /**
-     * Sets the time to live on each message request
+     * Sets the JMS expiration timeout (in milliseconds) of the request message
      */
     public void setTimeToLive(int timeToLive) {
         producerConfig.setTimeToLive(timeToLive);
@@ -356,6 +346,20 @@ public class JmsClientInterceptor extends RemoteInvocationBasedAccessor implemen
      */
     public void setMultipleResponseTimeout(long multipleResponseTimeout) {
         this.multipleResponseTimeout = multipleResponseTimeout;
+    }
+
+    public long getResponseTimeout() {
+        return responseTimeout;
+    }
+
+    /**
+     * Sets the maximum amount of time (in milliseconds) to wait for responses 
+     * to come back before timing out the request. You should typically set this 
+     * value greater than the {@link #getTimeToLive()} property which is used to 
+     * set the expiration time on the request message.
+     */
+    public void setResponseTimeout(long responseTimeout) {
+        this.responseTimeout = responseTimeout;
     }
 
     // Implementation methods
