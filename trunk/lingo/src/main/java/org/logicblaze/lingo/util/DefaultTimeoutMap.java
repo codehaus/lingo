@@ -125,7 +125,6 @@ public class DefaultTimeoutMap implements TimeoutMap, Runnable {
                         if (log.isDebugEnabled()) {
                             log.debug("Evicting inactive request for correlationID: " + entry);
                         }
-                        System.out.println("Evicting inactive request for correlationID: " + entry);
                         map.remove(entry.getKey());
                         iter.remove();
                     }
