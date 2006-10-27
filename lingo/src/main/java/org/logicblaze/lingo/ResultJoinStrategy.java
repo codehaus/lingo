@@ -46,4 +46,12 @@ public interface ResultJoinStrategy {
      */
     public abstract RemoteInvocationResult mergeResponses(RemoteInvocationResult currentResult, RemoteInvocationResult newResult, int responseCount);
 
+    /**
+     * After we timeout in the ResultJoinHandler waiting for responses this method is called to
+     * see if we should stop processing and return the results we have (or null if none).  It
+     * passes in the current result and the approximate amount of time in milliseconds we
+     * have waited so far.  Returns true to unblock and return the result otherwise false to
+     * continue waiting.
+     */
+    public abstract boolean unblockAfterTimeout(RemoteInvocationResult currentResult, long waitSoFarMillis); 
 }

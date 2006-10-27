@@ -43,7 +43,8 @@ public class ResultJoinHandler implements ReplyHandler {
     private Object lock = new Object();
     private int responseCount;
     private RemoteInvocationResult result;
-    private long timeout = 2000;
+    private long timeout = 500;
+    private boolean notified = false;
 
     public ResultJoinHandler(Marshaller marshaller, ResultJoinStrategy joinStrategy) {
         this.marshaller = marshaller;
@@ -61,6 +62,7 @@ public class ResultJoinHandler implements ReplyHandler {
                 result = joinStrategy.mergeResponses(result, newResult, responseCount);
             }
             if (joinStrategy.unblockCallerThread(result, responseCount)) {
+            	notified = true;
                 lock.notifyAll();
             }
         }
@@ -71,9 +73,11 @@ public class ResultJoinHandler implements ReplyHandler {
      * This method will block the calling thread until the result is available.
      */
     public RemoteInvocationResult waitForResult() {
+    	long waitCount = 0;
         while (true) {
             synchronized (lock) {
-                if (result != null) {
+            	// so if we've been notified, we're done
+                if (notified) {
                     return result;
                 }
                 try {
@@ -81,6 +85,16 @@ public class ResultJoinHandler implements ReplyHandler {
                 }
                 catch (InterruptedException e) {
                     log.debug("Ignored interrupt exception: " + e, e);
+                }
+                // calculate the amount of time we've slept
+                waitCount += timeout;
+                // should we unblock even though we've timed out?
+                if (joinStrategy.unblockAfterTimeout(result, waitCount)) {
+                	// TODO: how do we remove the handler if we never get another message?
+                    // 
+                    // note that we use a TimeoutMap so they will be discarded after timing out
+                    // though we could maybe be more aggressive
+                	return result;
                 }
             }
         }

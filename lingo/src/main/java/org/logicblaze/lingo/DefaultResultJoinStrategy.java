@@ -82,7 +82,26 @@ public class DefaultResultJoinStrategy implements ResultJoinStrategy {
         }
         return currentResult;
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.logicblaze.lingo.jms.impl.ResultJoinStrategy#unblockAfterTimeout(RemoteInvocationResult currentResult, long waitSoFarMillis)
+     */
+	public boolean unblockAfterTimeout(RemoteInvocationResult currentResult,
+			long waitSoFarMillis) {
+		if (currentResult == null) {
+			// if we don't have a result then continue waiting
+			return false;
+		} else if (waitSoFarMillis > 2000) {
+			// we've exceeded the default timeout
+			return true;
+		} else {
+			// not timed out yet
+			return false;
+		}
+	}
+	
     public int getMaximumResults() {
         return maximumResults;
     }
