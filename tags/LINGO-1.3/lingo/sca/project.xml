@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../project.xml</extend>
+
+  <name>Lingo SCA</name>
+  <artifactId>lingo-sca</artifactId>
+  <package>org.logicblaze.lingo.sca</package>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>lingo</groupId>
+      <artifactId>lingo</artifactId>
+      <version>${pom.currentVersion}</version>
+      <properties>
+        <rar.bundle>true</rar.bundle>
+      </properties>
+    </dependency>
+
+
+    <!-- SCA Annotations -->
+    <dependency>
+
+      <!--  TODO when its available publically
+        <groupId>org.osoa</groupId>
+      -->
+      <groupId>lingo</groupId>
+
+      <artifactId>sca-api</artifactId>
+      <version>SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+</project>
